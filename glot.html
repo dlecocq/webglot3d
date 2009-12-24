@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>WebGLot Alpha</title>
+	<script src="ray.js"> </script>
+	<script src="primitive.js"> </script>
+
+	<script src="stopwatch.js"> </script>
+	<script src="CanvasMatrix.js"> </script>
+	<script src="screen.js"> </script>
+	<script src="surface.js"> </script>
+	<script src="grapher.js"> </script>
+
+	<script>
+		function start() {
+		var glot = new grapher();
+		glot.initialize();
+		
+		//glot.add(new scalar_field(glot.getContext(), "sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t)"));
+		glot.add(new scalar_field(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
+		//glot.add(new p_curve(glot.getContext(), "sin(s * t), cos(1.5 * s * t)"));
+		//glot.add(new curve(glot.getContext(), "sin(x)"));
+		var f = function() { glot.reshape(); glot.display() };
+		setInterval(f, 10);
+	}
+	</script>
+	
+	<style type="text/css">
+	canvas {
+		border: 1px solid black;
+		width:90%;
+		height:90%;
+	}
+	</style>
+</head>
+<body onload="start()">
+	<canvas id="glot">
+		There is supposed to be an example drawing here, but it's not important.
+	</canvas>
+	<div id="framerate">15</div>
+</body>
+</html>
