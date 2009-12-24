@@ -13,6 +13,8 @@ function grapher() {
 	this.moving     = false;
 	this.rotation   = null;
 	
+	this.alpha = 8;
+	
 	// A framerate timer
 	this.framerate	= null;
 	this.framecount = 0;
@@ -106,6 +108,16 @@ function grapher() {
 		this.moving = false;
 		this.rotation.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
 	}
+	
+	this.keyboard = function(key_event) {
+		var key = Number(key_event.keyCode);
+		this.gl.console.log(key + " key pressed.");
+		if (key == 189) {
+			this.zoom_out();
+		} else if (key == 187) {
+			this.zoom_in();
+		}
+	}
 
 	this.initialize = function() {
 	
@@ -132,6 +144,9 @@ function grapher() {
 		
 		f = function(event) { this.glot.mousemove(event.clientX, event.clientY) };
 		canvas.onmousemove = f;
+		
+		f = function(event) { this.getElementById("glot").glot.keyboard(event) };
+		document.onkeydown = f;
 		//*/
 		
 		this.rotation = new CanvasMatrix4();
@@ -317,7 +332,7 @@ function grapher() {
 		
 		this.framecount = this.framecount + 1;
 		if (this.framecount == 150) {
-			document.getElementById("framerate").innerHTML = "Framrate : " + 150 / this.framerate.time();
+			document.getElementById("framerate").innerHTML = "Framerate : " + 150 / this.framerate.time();
 			this.framecount = 0;
 			this.framerate = new stopwatch();
 			this.framerate.start();
@@ -330,15 +345,14 @@ function grapher() {
 		for (var i = 0; i < this.primitives.length; ++i) {
 			this.primitives[i].refresh(this.scr);
 		}
-		//this.axes_dl = this.axes_dl_gen();
-		//this.grid_dl = grid_dl_gen(); 
 	}
-
-	this.run = function() {
-		//var f = function() { this.reshape(); this.display() };
-		setInterval(this.display(), 10);
-		/* How does MainLoop work in WebGL? */
-		return 0;
+	
+	this.zoom_in = function() {
+		this.alpha /= 1.1;
+	}
+	
+	this.zoom_out = function() {
+		this.alpha *= 1.1;
 	}
 
 	this.reshape = function() {
@@ -360,7 +374,7 @@ function grapher() {
 		// Set the projection
 		context.projectionMatrix = new CanvasMatrix4();
 		//context.projectionMatrix.lookat(0, 0, 6, 0, 0, 0, 0, 1, 0);
-    context.projectionMatrix.perspective(8, w / h, 10, 1000);
+    context.projectionMatrix.perspective(this.alpha, w / h, 10, 1000);
 
 		//glutPostRedisplay();
 	}
