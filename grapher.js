@@ -68,11 +68,15 @@ function grapher() {
 		var i =   (2 * (x - x_margin)) / min - 1;
 		var j = - (2 * (y - y_margin)) / min + 1;
 		
-		if (x < x_margin || x > (w + x_margin)) {
+		if (x < x_margin) {
+			i = -1.0;
+		} else if ( x > (w + x_margin)) {
 			i = 1.0;
 		}
 		
-		if (y < y_margin || y > (h + y_margin)) {
+		if (y < y_margin) {
+			j = -1.0;
+		} else if (y > (h + y_margin)) {
 			j = 1.0;
 		}
 		
@@ -84,7 +88,7 @@ function grapher() {
 		}
 		
 		var k = Math.sqrt(1 - i * i - j * j);
-		
+		this.gl.console.log("(x, y, z) : (" + i + ", " + j + ", " + k + ")");
 		return new ray(i, j, k);
 	}
 
