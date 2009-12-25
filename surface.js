@@ -33,7 +33,8 @@ function surface(context, string, options) {
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 100;
+	this.count			= 200;
+	this.index_ct   = 0;
 
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
@@ -74,9 +75,42 @@ function surface(context, string, options) {
 		 * don't think the forumla is trivial, but it will require
 		 * further examination.
 		 */
-		for (i = 0; i < this.count; ++i) {
+		for (i = 0; i <= this.count; ++i) {
 			y = -2;
+			for (j = 0; j <= this.count; ++j) {
+				vertices.push(x);
+				vertices.push(y);
+				
+				y += dy;
+			}
+			x += dx;
+		}
+		
+		var c = 0;
+		indices.push(c)
+		
+		var inc = this.count + 1;
+		var dec = inc - 1;
+		
+		for (i = 0; i < this.count; ++i) {
 			for (j = 0; j < this.count; ++j) {
+				c += inc;
+				indices.push(c);
+				c -= dec;
+				indices.push(c);
+			}
+			c += inc;
+			indices.push(c);
+			indices.push(c);
+			
+			if (dec < inc) {
+				dec = inc + 1;
+			} else {
+				dec = inc - 1;
+			}
+		}
+			
+		/*		
 				vertices.push(x);
 				vertices.push(y);
 				vertices.push(x);
@@ -97,6 +131,7 @@ function surface(context, string, options) {
 			}
 			x += dx;
 		}
+		*/
 
 		/* Again, I'm not an expert in JavaScript, and I'm currently not
 		 * sure how exactly garbage collection works.  Either way, when 
@@ -128,8 +163,9 @@ function surface(context, string, options) {
 		
 		this.indexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
-		
 		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray(indices), this.gl.STATIC_DRAW);
+		
+		this.index_ct = indices.length;
 	}
 	
 	/* Every primitive is also responsible for knowing how to draw itself,
@@ -158,7 +194,7 @@ function surface(context, string, options) {
 		 * count * 2 triangles, not oriented in any kind of strip, it's that
 		 * value time three indices.
 		 */
-		this.gl.drawElements(this.gl.TRIANGLES, this.count * this.count * 6, this.gl.UNSIGNED_SHORT, 0);
+		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
 		
 		this.gl.disableVertexAttribArray(0);
 		
