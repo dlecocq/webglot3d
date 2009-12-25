@@ -1,9 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<!--
+		This is a very early version of what will become WebGLot - a WebGL-
+		based plotting library for mathematical primitives.
+	-->
 	<title>WebGLot Alpha</title>
+	
+	<!--
+		This is a matrix library I have been using for the time being, though
+		I may move to something more standard.  I originally got this code from
+		http://webkit.org/blog/603/webgl-now-available-in-webkit-nightlies/
+	-->
 	<script src="CanvasMatrix.js"> </script>
 	
+	<!--
+		These are the class files used in WebGLot. I'm not really an expert
+		in JavaScript, and would prefer an analog to the #include macro in
+		C++ for this task so that only one script must be included.  For the
+		time being, just copy-and-paste this.
+	-->
 	<script src="ray.js"> </script>
 	<script src="primitive.js"> </script>
 	<script src="stopwatch.js"> </script>
@@ -13,9 +29,27 @@
 
 	<script>
 	function start() {
+		/* Instantiate a grapher
+		 *
+		 * In the C++ version, it's a singleton, and so it's possible that
+		 * this interface will change, so use with caution.
+		 */
 		var glot = new grapher();
+		
+		/* Perform all the necessary initialization.  This includes setting
+		 * up the viewport, view matrices, context, etc.
+		 */
 		glot.initialize();
+		
+		// You can add new primitives to the display with the add function.
 		glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
+		
+		/* This is not really in keeping with the traditional OpenGL way of
+		 * performing animation, but it seems as if this is the standard way
+		 * of doing this in WebGL at this point.  Again, this may be moved
+		 * to the grapher class, as in OpenGLot.  In that case, it will be
+		 * accessed differently.
+		 */
 		var f = function() { glot.reshape(); glot.display() };
 		setInterval(f, 10);
 	}
@@ -30,6 +64,12 @@
 	</style>
 </head>
 <body onload="start()">
+	<!--
+		WebGLot currently requires there to be a canvas with id="glot" to work.
+		This will likely remain the default behavior, but there may be a new 
+		interface added so that drawing on multiple canvases can take place.
+		Though, it's a long way down on the roadmap.
+	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
 	<div id="framerate">Framerate: </div>
 </body>
