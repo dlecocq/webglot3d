@@ -1,5 +1,5 @@
 // This class will encapsulate scalar fields
-function scalar_field(context, string, options) {
+function surface(context, string, options) {
 	
 	this.gl   = context;
 	this.f    = string;
@@ -105,11 +105,11 @@ function scalar_field(context, string, options) {
 	}
 	
 	this.gen_program = function() {
-		var vertex_source = this.read("shaders/surface.vert");
+		var vertex_source = this.read("shaders/surface.vert").replace("USER_FUNCTION", this.f);
 		var frag_source		= this.read("shaders/surface.frag");
 		
 		this.compile_program(vertex_source, frag_source);		
 	}
 }
 
-scalar_field.prototype = new primitive();
+surface.prototype = new primitive();

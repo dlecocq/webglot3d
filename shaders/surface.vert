@@ -10,8 +10,12 @@ varying vec3 normal;
 uniform float t;
 
 float function(float x, float y) {
+	return USER_FUNCTION;
+	
+	// These are some fun test functions.
 	//return sin(sqrt(x * x + y * y) - t);
-	return sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t);
+	//sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t);
+	//return sin(3.0 * sqrt(x * x + y * y)) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)));
 }
 
 void main() {

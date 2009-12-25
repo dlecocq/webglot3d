@@ -1,6 +1,7 @@
 function primitive(context) {
 	
 	this.BASE		 = "file:///Users/dlecocq/TTRG/webGLot3d/src/";
+	//this.BASE			 = "http://dan.lecocq.us/wordpress/webGLot3d/"
 	this.program = null;
 	
 	this.read = function(filename) {
