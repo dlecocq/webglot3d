@@ -33,7 +33,7 @@ function surface(context, string, options) {
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 200;
+	this.count			= 150;
 	this.index_ct   = 0;
 
 	/* This will likely be depricated, but it currently is hidden from
@@ -70,10 +70,9 @@ function surface(context, string, options) {
 		var i = 0;
 		var j = 0;
 		
-		/* This could be heavily optimized.  Only count * count
-		 * vertices are needed, but yet we store twice that. I
-		 * don't think the forumla is trivial, but it will require
-		 * further examination.
+		/* This could probably still be optimized, but at least it's now
+		 * using a single triangle strip to render the mesh.  Much better
+		 * than the alternative.
 		 */
 		for (i = 0; i <= this.count; ++i) {
 			y = -2;
@@ -109,29 +108,6 @@ function surface(context, string, options) {
 				dec = inc - 1;
 			}
 		}
-			
-		/*		
-				vertices.push(x);
-				vertices.push(y);
-				vertices.push(x);
-				vertices.push(y + dy);
-				vertices.push(x + dx);
-				vertices.push(y + dy);
-				vertices.push(x + dx);
-				vertices.push(y);
-				
-				indices.push((i * this.count + j) * 4);
-				indices.push((i * this.count + j) * 4 + 1);
-				indices.push((i * this.count + j) * 4 + 2);
-				indices.push((i * this.count + j) * 4);
-				indices.push((i * this.count + j) * 4 + 2);
-				indices.push((i * this.count + j) * 4 + 3);
-	
-				y += dy;
-			}
-			x += dx;
-		}
-		*/
 
 		/* Again, I'm not an expert in JavaScript, and I'm currently not
 		 * sure how exactly garbage collection works.  Either way, when 

@@ -20,12 +20,13 @@
 		C++ for this task so that only one script must be included.  For the
 		time being, just copy-and-paste this.
 	-->
-	<script src="ray.js"> </script>
+	<script src="ray.js">       </script>
 	<script src="primitive.js"> </script>
 	<script src="stopwatch.js"> </script>
-	<script src="screen.js"> </script>
-	<script src="surface.js"> </script>
-	<script src="grapher.js"> </script>
+	<script src="screen.js">    </script>
+	<script src="surface.js">   </script>
+	<script src="p_surface.js"> </script>
+	<script src="grapher.js">   </script>
 
 	<script>
 	function start() {
@@ -43,6 +44,7 @@
 		
 		// You can add new primitives to the display with the add function.
 		glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
+		//glot.add(new p_surface(glot.getContext(), "2.0 * 6.3 * v, 3.0 + sin(6.3 * v) + cos(6.3 * u), sin(6.3 * u) + 2.0 * cos(6.3 * v)"));
 		
 		/* This is not really in keeping with the traditional OpenGL way of
 		 * performing animation, but it seems as if this is the standard way
