@@ -1,18 +1,30 @@
-// This class will encapsulate the grapher
+/* This class encapsulates the grapher.
+ *
+ * In the C++ implementation of OpenGLot, it's a singleton class,
+ * but here it's a proper object.  This is mostly because I'm not
+ * sure if JavaScript can describe the design pattern.
+ */
 function grapher() {
 
+	/* About the view environment.
+	 * Some of these are inherited from the 2d version, but do not
+	 * map well to the 3d version and will be depricated in future
+	 * releases
+	 */
 	this.scr = new screen();
 	this.axes_dl = null;
 	this.grid_dl = null;
 	this.gl			 = null;
 	this.wall		 = null;
 	
+	// Trackball interface variables
 	this.mouse_down = null;
 	this.axis       = [0, 0, 0];
 	this.angle      = 0;
 	this.moving     = false;
 	this.rotation   = null;
-	
+
+	// The view angle for the projection matric
 	this.alpha = 8;
 	
 	// A framerate timer
@@ -21,17 +33,21 @@ function grapher() {
 	
 	this.primitives = new Array();
 
+	/* As the WebGL specification is still in flux, this is a wrapper
+	 * for getting a WebGL context for drawing.  Specifically, the 
+	 * string used to query for the context of the canvas is not only
+	 * browser specific, but version specific as well.
+	 */
 	this.getContext = function() {
-		// It would seem that all this context stuff is handled in this,
-		// so no need to fuss with things like getting glutContext, etc.
-		// At least, that's my understanding at this point.
+		/* Though the canvas name is hard-coded, it will likely be moved
+		 * to a parameter if multiple view contexts are desired.
+		 */
 		var canvas = document.getElementById("glot");
 	
 		var gl = null;
 	
-		/* It seems there's not a lot of uniformly-accepted strings for
-		 * fetching the context, and so we will try severl likely ones,
-		 * and bail out when we find one.
+		/* These seem to the be the context names for most current imp-
+		 * lementations around now.
 		 */
 		var strings = ["experimental-webgl", "moz-webgl", "webkit-3d", "webgl"];
 		
@@ -48,8 +64,10 @@ function grapher() {
 		return gl;
 	}
 	
-	/* This returns the 3D point clicked, on a unit glass ball
-	 * centered at the origin.
+	/* This returns the 3D point clicked, on a unit glass ball centered
+	 * at the origin.  This still has a couple of bugs, not the least of
+	 * which is that event coordinates are not cross-browser compatible.
+	 * Unhappiness about this fact ensues.
 	 */
 	this.coordinates = function(x, y) {
 		var canvas = document.getElementById("glot");
@@ -92,6 +110,12 @@ function grapher() {
 		return new ray(i, j, k);
 	}
 
+	/* The mouse-down handler. It's provided with the context's x and y
+	 * coordinates, but these are not guaranteed to be cross-browser
+	 * compatible.  Still, it's mostly an internal function.  Access to
+	 * specifying one's own click functions may be added, though it's
+	 * probably less valuable in the 3d version than the 2d.
+	 */
 	this.mousedown = function(x, y) {
 		this.mouse_down = this.coordinates(x, y);
 		this.axis.x = this.axis.y = this.axis.z = 0;
@@ -99,6 +123,11 @@ function grapher() {
 		this.moving = true;
 	}
 	
+	/* The call-back handler for mouse movement.  Like mousedown, it's
+	 * provided with the x and y coordinates of the event, though again
+	 * they are not cross-browser apparently.  Still have test some other
+	 * browsers.
+	 */
 	this.mousemove = function(x, y) {
 		if (this.moving) {
 			this.mouse_current = this.coordinates(x, y);
@@ -108,11 +137,22 @@ function grapher() {
 		}
 	}
 	
+	/* Mouse release handler
+	 */
 	this.mouseup = function() {
 		this.moving = false;
 		this.rotation.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
 	}
 	
+	/* The keyboard event handler.  Again, the browser wars make life
+	 * difficult, as it seems (though I'm not a JavaScript expert) that
+	 * this varies between browsers.  As I understood it, keyCode was
+	 * supposed to be an ASCII character code, but it's not been my
+	 * experience so far.  I would like to abstract this way so that a
+	 * string version of the key is provided, but String.fromCharCode
+	 * doesn't seems to be working as I expect.  Future versions will
+	 * fix this.
+	 */
 	this.keyboard = function(key_event) {
 		var key = Number(key_event.keyCode);
 		this.gl.console.log(key + " key pressed.");
@@ -123,8 +163,12 @@ function grapher() {
 		}
 	}
 
+	/* This function must be called after an instance of glot has been
+	 * created and before it's used for drawing (read: primitives) added
+	 * to it.  Future work will automatically call this at instantiation
+	 * to avoid some headache.
+	 */
 	this.initialize = function() {
-	
 		/* This is some initialization that the OpenGL / GLUT version of
 		 * openGLot did programatically after creating the context. But,
 		 * in WebGL, they are passed in as parameters into the initial-
@@ -139,7 +183,11 @@ function grapher() {
 		var canvas = document.getElementById("glot");
 		canvas.glot = this;
 		
-		// This makes the mapping a little bit easier.
+		/* When callbacks are registered, they have an assortment of different
+		 * owners (notably the canvas and the document).  To simplify the call,
+		 * the registration sets it up so that in the context of the function, 
+		 * "this" refers to the grapher instance.
+		 */
 		var f = function(event) { this.glot.mousedown(event.clientX, event.clientY) };
 		canvas.onmousedown = f;
 		
@@ -151,7 +199,6 @@ function grapher() {
 		
 		f = function(event) { this.getElementById("glot").glot.keyboard(event) };
 		document.onkeydown = f;
-		//*/
 		
 		this.rotation = new CanvasMatrix4();
 	
@@ -163,16 +210,13 @@ function grapher() {
 			return null;
 		}
 
-		/* There is a slight, but unititive syntactic change between OpenGL
-		 * and WebGL.	 glEnable becomes gl.enable, uncapitalizig the first
-		 * character of the function call, and "gl." referes to the context
-		 * provided by getContext()
+		/* Enable some features I'd like to use.
 		 */
-		gl.enable(gl.LINE_SMOOTH);
 		gl.enable(gl.POINT_SMOOTH);
-		gl.enable(gl.BLEND);
 		gl.enable(gl.VERTEX_ARRAY);
+		gl.enable(gl.LINE_SMOOTH);
 		gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.BLEND);
 	
 		// Other smoothness and blending options
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -191,9 +235,10 @@ function grapher() {
 		// Default color is black
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-		// This was included in the webkit examples, but my JavaScript
-		// is weak, and I'm not quite sure what exactly this means.
-		// Add a console
+		/* This was included in the webkit examples, but my JavaScript
+		 * is weak, and I'm not quite sure what exactly this means.
+		 * Add a console
+		 */
 		var canvas = document.getElementById("glot");
 		gl.console = ("console" in window) ? window.console : { log: function() { } };
 	
@@ -202,103 +247,52 @@ function grapher() {
 		 * size, and certain conditions and post-conditions must be satis-
 		 * fied, so proceed with caution.
 		 *
-		 * WARNING! Some primitives depend on screen having the properly-
-		 * filled values in screen for determination of vertex positions.
-		 * Thus, it is CRITICAL that this be dynamically queried at run-
-		 * time so that this data can be accurate.
+		 * The reshape function is called once for every time that display
+		 * is called, and the screen's values are adjusted accordingly.
 		 */
 		this.scr.width = this.scr.height = 500;
 
-		/* Again, it would seem that all the initialization heavy lifting
-		 * is handled by the WebGL canvas initialization, so I don't think
-		 * this line is required.
+		/* This is a timer for framerate calculation
 		 */
-		// Initialize OpenGL
-		// init_open_gl();
-	
-		/* The callback registration for WebGL is either not intuitive,
-		 * undocumented, or unavailable to me.	As such, this is provision-
-		 * ally removed from the WebGL implementation.
-		 */
-		// Register callback functions with GLUT
-		/*
-		glutReshapeFunc(reshape);
-		glutDisplayFunc(display);
-		glutKeyboardFunc(keyboard);
-		glutMouseFunc(mouse);
-		glutMotionFunc(motion);
-		glutIdleFunc(idle);
-		*/
-
 		this.framerate = new stopwatch();
 		this.framerate.start();
 
+		/* This is a timer for function's attributes
+		 */
 		this.wall = new stopwatch();
 		this.wall.start();
 
 		// Determine the axes and grid
 		//this.axes_dl = this.axes_dl_gen();
 		//this.grid_dl = this.grid_dl_gen();
-	
-		// Shit.	Well, shit.
-		/* I've not heard of / happened upon an extension wrangler for
-		 * WebGL, and so I will have to figure out how to do this the 
-		 * old-school, hardcore C way.	Consult Marcus for more details,
-		 * though I think it is safe to assume for the time being that
-		 * the required supported functions are available.
+		
+		/* Normally we'd run some checks about what capabilities are enabled
+		 * (like fragment, vertex and geometry shaders), but for now it at
+		 * least seems that all WebGL implementations are more or less OpenGL
+		 * 2.0 ES, and have fragment and vertex shaders, and not geometry
+		 * shaders
 		 */
-		/*
-		glewInit();
-	
-		if (!(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader && GLEW_EXT_geometry_shader4)) {
-			printf("Not totally ready :( \n");
-			exit(1);
-		}
-		*/
 	
 		this.framecount = 0;
-	
-		// Consult JavaScript timing documentation
-		//wall.start();
-	
-		this.context = gl;
 	
 		// In the future, this ought to return some encoded value of success or failure.
 		return 0;
 	}
 	
+	/* Yet to be written.  Really necessary in the 3D version?  Probably,
+	 * I guess.
+	 */
 	this.axes_dl_gen = function() {
 		
 	}
 
-	this.grid_dl_gen = function() {
-		var gl = this.getContext();
-		var dl = gl.genLists(1);
-	
-		glNewList(dl, GL_COMPILE);
-	
-			glColor4d(0.0, 0.0, 0.0, 0.14);
-	
-			glBegin(GL_LINES);
-		
-				// How does typecasting work in JavaScript?
-				for( var i = this.scr.miny; i <= this.scr.maxy; ++i) {
-					glVertex3d(this.scr.minx, i, 1);
-					glVertex3d(this.scr.maxx, i, 1);
-				}
-	
-				for( var i = this.scr.minx; i <= this.scr.maxx; ++i) {
-					glVertex3d(i, this.scr.miny, 1);
-					glVertex3d(i, this.scr.maxy, 1);
-				}
-		
-			glEnd();
-		
-		glEndList();
-	
-		return dl;
-	}
-
+	/* This function will draw a single frame to the canvas. It should in future
+	 * versions be the extent of the request to redraw (and it looks like that
+	 * will happen with a SetInterval call).  For now, it asks that reshape
+	 * be called once for each time it's called, or at least after any reshaping
+	 * takes place.  Perhaps it should be the end programmer's responsibility
+	 * to worry about this?  Perhaps not.
+	 */
 	this.display = function() {
 		var gl = this.getContext();
 		
@@ -321,6 +315,8 @@ function grapher() {
 			
 			gl.useProgram(program);
 			
+			/* Set all the uniforms for the program
+			 */
 			mvMat_location = gl.getUniformLocation(program, "u_modelViewMatrix");
 			prMat_location = gl.getUniformLocation(program, "u_projectionMatrix");
 			time_location	 = gl.getUniformLocation(program, "t");
@@ -334,6 +330,10 @@ function grapher() {
 		
 		gl.flush();
 		
+		/* The framerate printing asks for an html element with the id
+		 * "framerate," though there ought to be a better way of handling
+		 * it programatically.  Open to suggestions.
+		 */
 		this.framecount = this.framecount + 1;
 		if (this.framecount == 150) {
 			document.getElementById("framerate").innerHTML = "Framerate : " + 150 / this.framerate.time();
@@ -345,20 +345,37 @@ function grapher() {
 		gl.finish();
 	}
 
+	/* This name is inherited from the C++ / display-list implementation
+	 * it will probably become something more VBO-appropriate in later
+	 * versions.
+	 *
+	 * Every time that VBOs need to be refreshed, this function can be 
+	 * called, and all included primitives will re-instantiate their VBOs
+	 * if necessary.  It's a primitive's responsibility to know if the
+	 * change requires it, based on the given new screen.
+	 */
 	this.refresh_dls = function() {
 		for (var i = 0; i < this.primitives.length; ++i) {
 			this.primitives[i].refresh(this.scr);
 		}
 	}
 	
+	/* It's all in the name
+	 */
 	this.zoom_in = function() {
 		this.alpha /= 1.1;
 	}
 	
+	/* It's all in the name
+	 */
 	this.zoom_out = function() {
 		this.alpha *= 1.1;
 	}
 
+	/* Call this as often as you'd like, it will check to see if there
+	 * have been any changes in the canvas' size, and if so, it performs
+	 * all the necessary operations.
+	 */
 	this.reshape = function() {
 		var canvas = document.getElementById("glot");
 		var context = this.getContext();
@@ -383,6 +400,8 @@ function grapher() {
 		//glutPostRedisplay();
 	}
 	
+	/* Add a primitive to the container.
+	 */
 	this.add = function(primitive) {
 		this.primitives.push(primitive);
 		primitive.initialize(this.scr);
