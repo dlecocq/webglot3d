@@ -134,6 +134,7 @@ function grapher() {
 			this.axis = this.mouse_down.cross(this.mouse_current);
 			this.angle = Math.acos(this.mouse_down.dot(this.mouse_current) / (this.mouse_current.length() * this.mouse_down.length()));
 			this.angle *= (180 / 3.14159265);
+			this.display();
 		}
 	}
 	
@@ -158,8 +159,10 @@ function grapher() {
 		this.gl.console.log(key + " key pressed.");
 		if (key == 189) {
 			this.zoom_out();
+			this.display();
 		} else if (key == 187) {
 			this.zoom_in();
+			this.display();
 		}
 	}
 
@@ -274,6 +277,21 @@ function grapher() {
 		 */
 	
 		this.framecount = 0;
+		
+		/* This is truly ugly as sin, but for the time being, it works.
+		 *
+		 * I can't figure out how to get grapher::display to work when called
+		 * explicitly from glot.html, and the only way I've been able to figure
+		 * out to display, is to use an interval function.  If I just want it
+		 * to display once, then that means setTimeout.  Otherwise, that calls
+		 * for animation.
+		 *
+		 * An unfortunate consequence of this is that it implies that there's a
+		 * single grapher in the context of a webpage, but the roadmap would not
+		 * like to limit grapher to this.
+		 */
+		window.glot = this;
+		window.setTimeout(function() { this.glot.display(); }, 1);
 	
 		// In the future, this ought to return some encoded value of success or failure.
 		return 0;
