@@ -106,7 +106,9 @@ function grapher() {
 		}
 		
 		var k = Math.sqrt(1 - i * i - j * j);
-		this.gl.console.log("(x, y, z) : (" + i + ", " + j + ", " + k + ")");
+		
+		//this.gl.console.log("(x, y, z) : (" + i + ", " + j + ", " + k + ")");
+		
 		return new ray(i, j, k);
 	}
 
@@ -423,6 +425,8 @@ function grapher() {
 		primitive.initialize(this.scr);
 	}
 	
+	/* This wraps all the code for animation to take place.
+	 */
 	this.run = function() {
 		window.glot = this;
 		window.setInterval(function() { this.glot.display(); }, 10);
