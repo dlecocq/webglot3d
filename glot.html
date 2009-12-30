@@ -37,11 +37,6 @@
 		 */
 		var glot = new grapher();
 		
-		/* Perform all the necessary initialization.  This includes setting
-		 * up the viewport, view matrices, context, etc.
-		 */
-		glot.initialize();
-		
 		// You can add new primitives to the display with the add function.
 		glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
 		//glot.add(new p_surface(glot.getContext(), "2.0 * 6.3 * v, 3.0 + sin(6.3 * v) + cos(6.3 * u), sin(6.3 * u) + 2.0 * cos(6.3 * v)"));
