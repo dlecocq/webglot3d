@@ -294,6 +294,8 @@ function grapher() {
 	 * to worry about this?  Perhaps not.
 	 */
 	this.display = function() {
+		this.reshape();
+		
 		var gl = this.getContext();
 		
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
