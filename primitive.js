@@ -87,12 +87,6 @@ function primitive(context) {
 				 */
 				return null;
 		}
-		
-		/* This is actually probably a VERY BAD IDEA! Remove it at earliest
-		 * convenience, as the grapher automatically switches programs for
-		 * primitives.
-		 */
-		this.gl.useProgram(this.program);
 	}
 	
 }
