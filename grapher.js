@@ -402,4 +402,6 @@ function grapher() {
 		this.primitives.push(primitive);
 		primitive.initialize(this.scr);
 	}
+	
+	this.initialize();
 }
