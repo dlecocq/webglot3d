@@ -345,16 +345,12 @@ function grapher() {
 		gl.finish();
 	}
 
-	/* This name is inherited from the C++ / display-list implementation
-	 * it will probably become something more VBO-appropriate in later
-	 * versions.
-	 *
-	 * Every time that VBOs need to be refreshed, this function can be 
+	/* Every time that VBOs need to be refreshed, this function can be 
 	 * called, and all included primitives will re-instantiate their VBOs
 	 * if necessary.  It's a primitive's responsibility to know if the
 	 * change requires it, based on the given new screen.
 	 */
-	this.refresh_dls = function() {
+	this.refresh = function() {
 		for (var i = 0; i < this.primitives.length; ++i) {
 			this.primitives[i].refresh(this.scr);
 		}
