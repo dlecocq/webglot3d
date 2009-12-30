@@ -38,24 +38,24 @@
 		var glot = new grapher();
 		
 		// You can add new primitives to the display with the add function.
-		glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
+		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
+		glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y))"));
 		//glot.add(new p_surface(glot.getContext(), "2.0 * 6.3 * v, 3.0 + sin(6.3 * v) + cos(6.3 * u), sin(6.3 * u) + 2.0 * cos(6.3 * v)"));
 		
-		/* This is not really in keeping with the traditional OpenGL way of
-		 * performing animation, but it seems as if this is the standard way
-		 * of doing this in WebGL at this point.  Again, this may be moved
-		 * to the grapher class, as in OpenGLot.  In that case, it will be
-		 * accessed differently.
+		/* If you've got a function that's time-dependent and thus you'd like
+		 * for it to animate, then call glot.run.  It makes sure it constantly
+		 * refreshes, otherwise the plot will be interactive, but static.  Well,
+		 * that is to say, it will only refresh when the perpective changes,
+		 * like with zooming in and out, or rotating it.
 		 */
-		var f = function() { glot.display() };
-		setInterval(f, 10);
+		//glot.run();
 	}
 	</script>
 	
 	<style type="text/css">
 	canvas {
 		border: 1px solid black;
-		width:90%;
+		width:100%;
 		height:90%;
 	}
 	</style>

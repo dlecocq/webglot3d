@@ -423,5 +423,10 @@ function grapher() {
 		primitive.initialize(this.scr);
 	}
 	
+	this.run = function() {
+		window.glot = this;
+		window.setInterval(function() { this.glot.display(); }, 10);
+	}
+	
 	this.initialize();
 }
