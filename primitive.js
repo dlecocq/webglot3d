@@ -7,12 +7,6 @@
  */
 function primitive(context) {
 	
-	/* There is, I'm sure, a much more robust way of determining 
-	 * the best path for use as a base.  However, I've not happened
-	 * upon it yet.  Perhaps there is already a convention in place?
-	 */
-	this.BASE		 = "file:///Users/dlecocq/TTRG/webGLot3d/src/";
-	//this.BASE			 = "http://dan.lecocq.us/wordpress/webGLot3d/"
 	this.program = null;
 	
 	/* Encapsulates reading a file, usually for shader source inc-
@@ -21,9 +15,8 @@ function primitive(context) {
 	 */
 	this.read = function(filename) {
 		var request = new XMLHttpRequest();
-		var url = this.BASE + filename;
 		
-		request.open("GET", url, false);
+		request.open("GET", filename, false);
 		request.send();
 		return request.responseText;
 	}
@@ -85,6 +78,11 @@ function primitive(context) {
 				/* It's probably a best practice to delete the compiled
 				 * shaders in this case.  You should implement that.
 				 */
+				this.gl.deleteShader(frag_shader);
+				this.gl.deleteShader(vert_shader);
+				this.gl.deleteProgram(this.program);
+				this.program = null;
+				
 				return null;
 		}
 	}
