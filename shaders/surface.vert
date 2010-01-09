@@ -6,6 +6,8 @@ attribute vec4 vPosition;
 
 varying vec2 v_texCoord;
 varying vec3 normal;
+varying vec3 light;
+varying vec3 halfVector;
 
 uniform float t;
 
@@ -38,4 +40,8 @@ void main() {
 	normal = (u_modelViewMatrix * vec4(dx, dy, 1.0, 0.0)).xyz;
 	//normal = vec3(result.z, 0.0, 0.0);
 	v_texCoord = vTexCoord.st;
+	
+	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * result);
+	
+	halfVector = normalize(vec3(5.0, 5.0, 5.0).xyz);
 }
