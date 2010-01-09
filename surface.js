@@ -14,9 +14,9 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function surface(context, string, options, source) {
+function surface(string, options, source) {
 	
-	this.gl   = context;
+	this.gl   = null;
 	this.f    = string;
 	
 	/* This is one way in which the WebGL implementation of OpenGLot
@@ -44,7 +44,8 @@ function surface(context, string, options, source) {
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
 	 */
-	this.initialize = function(scr) {
+	this.initialize = function(gl, scr) {
+		this.gl = gl;
 		this.refresh(scr);
 		this.gen_program();
 	}
@@ -69,7 +70,7 @@ function surface(context, string, options, source) {
 		var texture  = [];
 		var indices  = [];
 		
-		var texrepeat = 3;
+		var texrepeat = 2;
 		
 		var x = -2;
 		var y = -2;
@@ -191,6 +192,8 @@ function surface(context, string, options, source) {
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/surface.vert").replace("USER_FUNCTION", this.f);
 		var frag_source		= this.read("shaders/surface.frag");
+		
+		vertex_source = vertex_source.replace("/* CYLINDRICAL", "//* Cylindrical")
 		
 		this.compile_program(vertex_source, frag_source);		
 	}

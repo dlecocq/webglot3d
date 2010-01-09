@@ -422,7 +422,7 @@ function grapher() {
 	 */
 	this.add = function(primitive) {
 		this.primitives.push(primitive);
-		primitive.initialize(this.scr);
+		primitive.initialize(this.gl, this.scr);
 	}
 	
 	/* This wraps all the code for animation to take place.

@@ -40,8 +40,8 @@
 		
 		// You can add new primitives to the display with the add function.
 		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
-		//glot.add(new surface(glot.getContext(), "sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 5.0"));
-		glot.add(new surface(glot.getContext(), "max(sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0, sin(sqrt(x * x + y * y) + t))"));
+		glot.add(new surface("sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0"));
+		//glot.add(new surface(glot.getContext(), "max(sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0, sin(sqrt(x * x + y * y) + t))"));
 		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y))"));
 		//glot.add(new p_surface(glot.getContext(), "2.0 * 6.3 * v, 3.0 + sin(6.3 * v) + cos(6.3 * u), sin(6.3 * u) + 2.0 * cos(6.3 * v)"));
 		
@@ -59,7 +59,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:90%;
+		height:94%;
 	}
 	</style>
 </head>
