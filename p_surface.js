@@ -17,9 +17,9 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function p_surface(context, string, options, source) {
+function p_surface(string, options, source) {
 	
-	this.gl   = context;
+	this.gl   = null;
 	this.f    = string;
 	
 	/* This is one way in which the WebGL implementation of OpenGLot
@@ -45,7 +45,8 @@ function p_surface(context, string, options, source) {
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
 	 */
-	this.initialize = function(scr) {
+	this.initialize = function(gl, scr) {
+		this.gl = gl;
 		this.refresh(scr);
 		this.gen_program();
 	}
