@@ -6,6 +6,8 @@ attribute vec4 vPosition;
 
 varying vec2 v_texCoord;
 varying vec3 normal;
+varying vec3 light;
+varying vec3 halfVector;
 
 uniform float t;
 
@@ -22,11 +24,21 @@ void main() {
 	float x = vPosition.x;
 	float y = vPosition.y;
 
-	vec4 result = vec4(x, y, 0.0, 1.0);
+	gl_Position = function(x, y);
 	
-	result = function(x, y);
-
-	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
+	/* CYLINDRICAL
+	gl_Position = vec4(gl_Position.y * cos(gl_Position.x), gl_Position.y * sin(gl_Position.x), gl_Position.z, 1.0);
+	//*/
+	
+	/* SPHERICAL
+	gl_Position = vec4(gl_Position.x * sin(gl_Position.y) * cos(gl_Position.z), gl_Position.x * sin(gl_Position.y) * sin(gl_Position.z), gl_Position.x * cos(gl_Position.y), 1.0);
+	//*/
+	
+	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * gl_Position);
+	
+	halfVector = normalize(vec3(5.0, 5.0, 5.0).xyz);
+	
+	gl_Position = u_projectionMatrix * u_modelViewMatrix * gl_Position;
 
 	//*
 	float h = 0.001;
