@@ -75,11 +75,13 @@ function p_surface(context, string, options, source) {
 		var dx = 1.0 / this.count;
 		var dy = 1.0 / this.count;
 		
-		var texrepeat = 3;
+		var xrepeat = 5;
+		var yrepeat = 30;
 		
 		var tx = 0.0;
-		var ty = texrepeat;
-		var dt = texrepeat / this.count;
+		var ty = yrepeat;
+		var dtx = xrepeat / this.count;
+		var dty = yrepeat / this.count;
 		
 		var i = 0;
 		var j = 0;
@@ -90,7 +92,7 @@ function p_surface(context, string, options, source) {
 		 */
 		for (i = 0; i <= this.count; ++i) {
 			y = 0;
-			ty = texrepeat;
+			ty = yrepeat;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(x);
 				vertices.push(y);
@@ -99,10 +101,10 @@ function p_surface(context, string, options, source) {
 				texture.push(ty);
 				
 				y += dy;
-				ty -= dt;
+				ty -= dty;
 			}
 			x += dx;
-			tx += dt;
+			tx += dtx;
 		}
 		
 		var c = 0;
