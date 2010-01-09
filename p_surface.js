@@ -17,7 +17,7 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function p_surface(context, string, options) {
+function p_surface(context, string, options, source) {
 	
 	this.gl   = context;
 	this.f    = string;
@@ -38,6 +38,9 @@ function p_surface(context, string, options) {
 	 */
 	this.count			= 150;
 	this.index_ct   = 0;
+	
+	this.texture    = null;
+	this.source     = source || "textures/kaust.png"
 
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
@@ -55,6 +58,7 @@ function p_surface(context, string, options) {
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
+		this.texture = new texture(this.gl, this.source);
 	}
 
 	/* All primitives are responsible for knowing how to construct them-
@@ -63,12 +67,19 @@ function p_surface(context, string, options) {
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
+		var texture  = [];
 		var indices  = [];
 		
 		var x = 0;
 		var y = 0;
 		var dx = 1.0 / this.count;
 		var dy = 1.0 / this.count;
+		
+		var texrepeat = 3;
+		
+		var tx = 0.0;
+		var ty = texrepeat;
+		var dt = texrepeat / this.count;
 		
 		var i = 0;
 		var j = 0;
@@ -79,13 +90,19 @@ function p_surface(context, string, options) {
 		 */
 		for (i = 0; i <= this.count; ++i) {
 			y = 0;
+			ty = texrepeat;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(x);
 				vertices.push(y);
 				
+				texture.push(tx);
+				texture.push(ty);
+				
 				y += dy;
+				ty -= dt;
 			}
 			x += dx;
+			tx += dt;
 		}
 		
 		var c = 0;
@@ -130,15 +147,9 @@ function p_surface(context, string, options) {
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(vertices), this.gl.STATIC_DRAW);
 
-		/* One of the options (currently anticipated from this version) is
-		 * to color the surface with a normal map or a regular texture and
-		 * lighting information for the perception of depth on the object.
-		 */
-		/*
 		this.textureVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(texture), this.gl.STATIC_DRAW);
-		*/
 		
 		this.indexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
@@ -153,32 +164,24 @@ function p_surface(context, string, options) {
 	 * was before it's called.
 	 */
 	this.draw = function() {
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
+		
 		this.gl.enableVertexAttribArray(0);
-		// This is used for texture support
-		//this.gl.enableVertexAttribArray(1);
+		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
 		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
-		// More texture support
-		/*
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
 		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-		*/
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
 		
-		/* The number six here is magic, and relates to the number of index
-		 * references based on this.count.  Since we have this.count * this.
-		 * count * 2 triangles, not oriented in any kind of strip, it's that
-		 * value time three indices.
-		 */
+		this.texture.bind();
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
 		
 		this.gl.disableVertexAttribArray(0);
-		
-		// Texture stuff
-		//this.gl.disableVertexAttribArray(1);
+		this.gl.disableVertexAttribArray(1);
 	}
 	
 	/* Any class who inherits from the primitive class gets free access
@@ -188,6 +191,8 @@ function p_surface(context, string, options) {
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/p_surface.vert").replace("USER_FUNCTION", this.f);
+		
+		vertex_source = vertex_source.replace("/* CYLINDRICAL", "//* Cylindrical");
 		var frag_source		= this.read("shaders/p_surface.frag");
 		
 		this.compile_program(vertex_source, frag_source);		
