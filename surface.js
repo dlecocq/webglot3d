@@ -37,7 +37,7 @@ function surface(string, options, source) {
 	this.index_ct   = 0;
 	
 	this.texture    = null;
-	this.source     = source || "textures/kaust.png";
+	this.source     = source || "textures/siggraph.png";
 	//"textures/saudi-flag.gif"
 	//"textures/dan.jpg"
 
@@ -70,12 +70,12 @@ function surface(string, options, source) {
 		var texture  = [];
 		var indices  = [];
 		
-		var texrepeat = 2;
+		var texrepeat = 3;
 		
-		var x = -2;
-		var y = -2;
-		var dx = 4.0 / this.count;
-		var dy = 4.0 / this.count;
+		var x = scr.minx;
+		var y = scr.miny;
+		var dx = (scr.maxx - scr.minx) / this.count;
+		var dy = (scr.maxy - scr.miny) / this.count;
 		
 		var tx = 0.0;
 		var ty = texrepeat;
@@ -89,7 +89,7 @@ function surface(string, options, source) {
 		 * than the alternative.
 		 */
 		for (i = 0; i <= this.count; ++i) {
-			y = -2;
+			y = scr.miny;
 			ty = texrepeat;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(x);
