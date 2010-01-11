@@ -11,7 +11,7 @@ function grapher() {
 	 * map well to the 3d version and will be depricated in future
 	 * releases
 	 */
-	this.scr = new screen();
+	this.scr     = new screen();
 	this.axes_dl = null;
 	this.grid_dl = null;
 	this.gl			 = null;
@@ -230,6 +230,8 @@ function grapher() {
 		// Set the line width and point size
 		gl.lineWidth(1.5);
 		
+		this.setDomain(-2, 2, -2, 2);
+		
 		/* WebGL doesn't support this, it seems.  OpenGL ES 2.0 elliminated
 		 * it to obviate the need for dedicated hardware for this task,
 		 * which is a luxury in some sense.
@@ -326,6 +328,7 @@ function grapher() {
 		var time_location	 = null;
 		
 		gl.modelviewMatrix = new CanvasMatrix4();
+		gl.modelviewMatrix.translate(-(this.scr.minx + this.scr.maxx) / 2.0, -(this.scr.miny + this.scr.maxy) / 2.0, 0.0);
 		gl.modelviewMatrix.multRight(this.rotation);
 		if (this.moving) {
 			gl.modelviewMatrix.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
@@ -430,6 +433,14 @@ function grapher() {
 	this.run = function() {
 		window.glot = this;
 		window.setInterval(function() { this.glot.display(); }, 10);
+	}
+	
+	this.setDomain = function(minx, maxx, miny, maxy) {
+		this.scr.minx = minx;
+		this.scr.maxx = maxx;
+		this.scr.miny = miny;
+		this.scr.maxy = maxy;
+		this.refresh();
 	}
 	
 	this.initialize();
