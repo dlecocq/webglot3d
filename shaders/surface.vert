@@ -27,6 +27,10 @@ void main() {
 	vec4 result = vec4(x, y, 0.0, 1.0);
 	
 	result.z = function(x, y);
+	
+	//* This is not meant for general use
+	result.z = clamp(result.z, -1.0, 1.0);
+	//*/
 
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 

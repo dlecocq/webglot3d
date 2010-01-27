@@ -336,12 +336,12 @@ function grapher() {
 		gl.modelviewMatrix.translate(0, 0, -30);
 
 		for (var i in this.primitives) {
+			//*
 			program = this.primitives[i].program;
 			
 			gl.useProgram(program);
 			
-			/* Set all the uniforms for the program
-			 */
+			// Set all the uniforms for the program
 			mvMat_location = gl.getUniformLocation(program, "u_modelViewMatrix");
 			prMat_location = gl.getUniformLocation(program, "u_projectionMatrix");
 			time_location	 = gl.getUniformLocation(program, "t");
@@ -349,8 +349,9 @@ function grapher() {
 			gl.uniformMatrix4fv(mvMat_location, false, gl.modelviewMatrix.getAsWebGLFloatArray());
 			gl.uniformMatrix4fv(prMat_location, false, gl.projectionMatrix.getAsWebGLFloatArray());
 			gl.uniform1f(time_location, this.wall.time());
+			//*/
 			
-			this.primitives[i].draw();
+			this.primitives[i].draw(this.scr);
 		}
 		
 		gl.flush();

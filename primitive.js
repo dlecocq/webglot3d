@@ -87,4 +87,71 @@ function primitive(context) {
 		}
 	}
 	
+	this.checkFramebuffer = function() {
+		var gl = this.gl;
+		var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+
+		if (status == gl.FRAMEBUFFER_COMPLETE) {
+			//gl.console.log("Framebuffer complete");
+		} else if (status == gl.FRAMEBUFFER_UNSUPPORTED) {
+			gl.console.log("Framebuffer unsupported");
+		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
+			gl.console.log("Incomplete attachment");
+		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER) {
+			gl.console.log("Incomplete draw buffer");
+		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_READ_BUFFER) {
+			gl.console.log("Incomplete read buffer");
+		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_MULTISAMPLE) {
+			gl.console.log("Incomplete multisample");
+		} else if (status == gl.FRAMEBUFFER_UNDEFINED) {
+			gl.console.log("Framebuffer undefined");
+		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT) {
+			gl.console.log("Incomplete missing attachment");
+		} else {
+			gl.console.log("Uncertain failure.");
+		}
+		
+		return status;
+	}
+	
+	this.setUniforms = function(scr, program) {
+		try {
+			program = program || this.program;
+		
+			this.gl.useProgram(program);
+		
+			modelview_location  = this.gl.getUniformLocation(program, "modelviewMatrix");
+			projection_location = this.gl.getUniformLocation(program, "projectionMatrix");
+			time_location	      = this.gl.getUniformLocation(program, "t");
+			dx_location         = this.gl.getUniformLocation(program, "dx");
+			dy_location         = this.gl.getUniformLocation(program, "dy");
+			scale_location      = this.gl.getUniformLocation(program, "scale");
+			color_location      = this.gl.getUniformLocation(program, "color");
+
+			this.projectionMatrix = new CanvasMatrix4();
+			this.modelviewMatrix = new CanvasMatrix4();
+
+			// Set the projection
+			this.projectionMatrix.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);
+
+			this.gl.uniformMatrix4fv(modelview_location , false, this.modelviewMatrix.getAsWebGLFloatArray());
+			this.gl.uniformMatrix4fv(projection_location, false, this.projectionMatrix.getAsWebGLFloatArray());
+
+			if (this.color) {
+				this.gl.uniform4f(color_location, this.color[0], this.color[1], this.color[2], this.color[3]);
+			}
+			
+			/*
+			this.gl.uniform1f(time_location , scr.time);
+			this.gl.uniform1f(dx_location   , scr.dx);
+			this.gl.uniform1f(dy_location   , scr.dy);
+			this.gl.uniform1f(scale_location, scr.s);
+			*/
+		
+			for (var j in this.parameters) {
+				param_loc = this.gl.getUniformLocation(program, j);
+				this.gl.uniform1f(param_loc, this.parameters[j]);
+			}
+		} catch (e) {}
+	}
 }

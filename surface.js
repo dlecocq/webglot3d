@@ -37,7 +37,7 @@ function surface(string, options, source) {
 	this.index_ct   = 0;
 	
 	this.texture    = null;
-	this.source     = source || "textures/siggraph.png";
+	this.source     = source || "textures/deisa.jpg";
 	//"textures/saudi-flag.gif"
 	//"textures/dan.jpg"
 
