@@ -6,13 +6,14 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function sphere(x, y, z, options, source) {
+function sphere(x, y, z, radius, options, source) {
 	
 	this.gl   = null;
 	
 	this.x    = x;
 	this.y    = y;
 	this.z    = z;
+	this.r    = radius || 1; 
 	
 	/* This is one way in which the WebGL implementation of OpenGLot
 	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
@@ -83,9 +84,9 @@ function sphere(x, y, z, options, source) {
 			y = Math.cos(i / this.count * 2 * Math.PI);
 			ty = texrepeat;
 			for (j = 0; j <= this.count; ++j) {
-				vertices.push(this.x + Math.sin(j / this.count * Math.PI) * x);
-				vertices.push(this.y + Math.sin(j / this.count * Math.PI) * y);
-				vertices.push(this.z + Math.cos(j / this.count * Math.PI));
+				vertices.push(this.x + this.r * Math.sin(j / this.count * Math.PI) * x);
+				vertices.push(this.y + this.r * Math.sin(j / this.count * Math.PI) * y);
+				vertices.push(this.z + this.r * Math.cos(j / this.count * Math.PI));
 				texture.push(tx);
 				texture.push(ty);
 				ty -= dt;
@@ -179,8 +180,8 @@ function sphere(x, y, z, options, source) {
 	 * provides free access to functionality for reading files.
 	 */
 	this.gen_program = function() {
-		var vertex_source = this.read("shaders/passthru.vert");
-		var frag_source		= this.read("shaders/passthru.frag");
+		var vertex_source = this.read("shaders/sphere.vert");
+		var frag_source		= this.read("shaders/sphere.frag");
 		
 		this.compile_program(vertex_source, frag_source);		
 	}
