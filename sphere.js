@@ -6,13 +6,13 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function sphere(x, y, options, source) {
+function sphere(x, y, z, options, source) {
 	
 	this.gl   = null;
-	this.f    = string;
 	
-	this.x    = 0;
-	this.y    = 0;
+	this.x    = x;
+	this.y    = y;
+	this.z    = z;
 	
 	/* This is one way in which the WebGL implementation of OpenGLot
 	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
@@ -28,7 +28,7 @@ function sphere(x, y, options, source) {
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 150;
+	this.count			= 50;
 	this.index_ct   = 0;
 	
 	this.texture    = null;
@@ -67,11 +67,6 @@ function sphere(x, y, options, source) {
 		
 		var texrepeat = 3;
 		
-		var x = scr.minx;
-		var y = scr.miny;
-		var dx = (scr.maxx - scr.minx) / this.count;
-		var dy = (scr.maxy - scr.miny) / this.count;
-		
 		var tx = 0.0;
 		var ty = texrepeat;
 		var dt = texrepeat / this.count;
@@ -84,18 +79,17 @@ function sphere(x, y, options, source) {
 		 * than the alternative.
 		 */
 		for (i = 0; i <= this.count; ++i) {
-			y = scr.miny;
+			x = Math.sin(i / this.count * 2 * Math.PI);
+			y = Math.cos(i / this.count * 2 * Math.PI);
 			ty = texrepeat;
 			for (j = 0; j <= this.count; ++j) {
-				vertices.push(x);
-				vertices.push(y);
+				vertices.push(this.x + Math.sin(j / this.count * Math.PI) * x);
+				vertices.push(this.y + Math.sin(j / this.count * Math.PI) * y);
+				vertices.push(this.z + Math.cos(j / this.count * Math.PI));
 				texture.push(tx);
 				texture.push(ty);
-				
-				y += dy;
 				ty -= dt;
 			}
-			x += dx;
 			tx += dt;
 		}
 		
@@ -165,7 +159,7 @@ function sphere(x, y, options, source) {
 		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
 		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
@@ -185,10 +179,8 @@ function sphere(x, y, options, source) {
 	 * provides free access to functionality for reading files.
 	 */
 	this.gen_program = function() {
-		var vertex_source = this.read("shaders/surface.vert").replace("USER_FUNCTION", this.f);
-		var frag_source		= this.read("shaders/surface.frag");
-		
-		vertex_source = vertex_source.replace("/* CYLINDRICAL", "//* Cylindrical")
+		var vertex_source = this.read("shaders/passthru.vert");
+		var frag_source		= this.read("shaders/passthru.frag");
 		
 		this.compile_program(vertex_source, frag_source);		
 	}

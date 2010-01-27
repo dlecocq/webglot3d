@@ -25,6 +25,7 @@
 	<script src="ray.js">       </script>
 	<script src="primitive.js"> </script>
 	<script src="pde.js">       </script>
+	<script src="sphere.js">    </script>
 	<script src="stopwatch.js"> </script>
 	<script src="screen.js">    </script>
 	<script src="surface.js">   </script>
@@ -40,17 +41,13 @@
 		 */
 		var glot = new grapher();
 		
+		glot.add(new sphere(0, 0, 0));
+		
 		// You can add new primitives to the display with the add function.
 		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
-		glot.add(new surface("sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0"));
+		//glot.add(new surface("sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0"));
 		
 		//glot.add(new pde());
-		
-		/*
-		// This is Alyn's surface
-		glot.setDomain(0, 2, 0, 2);
-		glot.add(new surface("(5.0 * pow(10.0, -10.0) * (-4.280531708 * pow(10.0, 15.0) * x + 4.506771811 * pow(10.0, 15.0) * y - 7.630209408 * pow(10.0, 15.0) * x * y - 8.293980515 * pow(10.0, 15.0) * x * x - 1.669313514 * pow(10.0, 16.0) * y * y + 1.766712748 * pow(10.0, 15.0) * x * x * y - 1.132596998 * pow(10.0, 15.0) * pow(x, 3.0) * y + 2.847176538 * pow(10.0, 15.0) * x * x * y * y + 1.916284753 * pow(10.0, 16.0) * x * y * y - 1.869429427 * pow(10.0, 16.0) * x * pow(y, 3.0) - 1.885885652 * pow(10.0, 15.0) * pow(x, 3.0) * y * y + 1.438716381 * pow(10.0, 15.0) * x * x * pow(y, 3.0) + 3.338394741 * pow(10.0, 14.0) * pow(x, 4.0) * y + 5.012557621 * pow(10.0, 15.0) * x * pow(y, 4.0) + 1.259809481 * pow(10.0, 16.0) * pow(x, 3.0) - 6.052770127 * pow(10.0, 15.0) * pow(x, 4.0) + 1.287281253 * pow(10.0, 16.0) * pow(y, 3.0) - 4.469715143 * pow(10.0, 15.0) * pow(y, 4.0) + 1.031336735 * pow(10.0, 15.0) * pow(x, 5.0) + 1.420185441 * pow(10.0, 15.0) * pow(y, 5.0) + 6.17273985 * pow(10.0, 15.0)) * x * y) / (6.718464 * pow(10.0, 6.0) * x + 6.718464 * pow(10.0, 6.0) * y - 1.2199104 * pow(10.0, 7.0) * x * y - 1.578624 * pow(10.0, 7.0) * x * x - 1.3063680 * pow(10.0, 7.0) * y * y + 1.8392016 * pow(10.0, 7.0) * x * x * y - 1.3255240 * pow(10.0, 7.0) * pow(x, 3.0) * y - 3.9832880 * pow(10.0, 7.0) * x * x * y * y + 2.1825600 * pow(10.0, 7.0) * x * y * y + 1.6438000 * pow(10.0, 7.0) * x * pow(y, 3.0) + 3.5650000 * pow(10.0, 7.0) * pow(x, 3.0) * y * y - 1.2281750 * pow(10.0, 7.0) * pow(x, 4.0) * y * y - 9.345875 * pow(10.0, 6.0) * pow(x, 3.0) * pow(y, 3.0) + 3.406900 * pow(10.0, 6.0) * x * x * pow(y, 3.0) + 1.7555500 * pow(10.0, 7.0) * x * x * pow(y, 4.0) + 1.489000 * pow(10.0, 6.0) * pow(x, 4.0) * y + 1.440250 * pow(10.0, 6.0) * pow(x, 5.0) * y - 4.2250000 * pow(10.0, 7.0) * x * pow(y, 4.0) + 1.4912500 * pow(10.0, 7.0) * x * pow(y, 5.0) + 1.2224016 * pow(10.0, 7.0) * pow(x, 3.0) - 2.873760 * pow(10.0, 6.0) * pow(x, 4.0) - 4.536000 * pow(10.0, 6.0) * pow(y, 3.0) + 1.8360000 * pow(10.0, 7.0) * pow(y, 4.0) - 4.22600 * pow(10.0, 5.0) * pow(x, 5.0) + 1.45000 * pow(10.0, 5.0) * pow(x, 6.0) - 3.150000 * pow(10.0, 6.0) * pow(y, 5.0) - 6.3 * pow(10.0, 6.0) * pow(y, 6.0) + 2.25 * pow(10.0, 6.0) * pow(y, 7.0) + 1.5626 * pow(10.0, 4.0) * pow(x, 7.0) + 2.755625 * pow(10.0, 6.0) * pow(x, 4.0) * pow(y, 3.0) - 2.16 * pow(10.0, 6.0) * pow(x, 3.0) * pow(y, 4.0) - 4.715 * pow(10.0, 6.0) * x * x * pow(y, 5.0) + 1.094375 * pow(10.0, 6.0) * pow(x, 5.0) * y * y + 1.05 * pow(10.0, 6.0) * x * pow(y, 6.0) - 2.90625 * pow(10.0, 5.0) * y * pow(x, 6.0))"));
-		//*/
 		
 		/*
 		// Another of Alyn's surfaces
