@@ -31,6 +31,7 @@
 	<script src="surface.js">   </script>
 	<script src="p_surface.js"> </script>
 	<script src="grapher.js">   </script>
+	<script src="isosurface.js"></script>
 
 	<script>
 	function start() {
@@ -43,9 +44,13 @@
 		
 		//glot.add(new sphere(0, 0, 0, 0.4));
 		
+		glot.setDomain(-2, 2, -2, 2);
+		
 		// You can add new primitives to the display with the add function.
 		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
-		glot.add(new surface("sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0"));
+		//glot.add(new isosurface("1.0 - sin(z) + cos(sqrt(x * x + y * y + sin(t)))"));
+		glot.add(new isosurface("x * x + y * y - abs(cos(z) * cos(z))"));
+		//glot.add(new isosurface("z - sin(sqrt(x * x + y * y))"));
 		
 		//glot.add(new pde());
 		

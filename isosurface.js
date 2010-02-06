@@ -1,4 +1,4 @@
-/* This class encapsulates the surface primitive.
+/* This class encapsulates the isosurface primitive.
  * 
  * It requires the OpenGL context to be passed in, though 
  * this is an incredibly ugly interface, and hopefully I 
@@ -14,7 +14,7 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function surface(string, options, source) {
+function isosurface(string, options, source) {
 	
 	this.gl   = null;
 	this.f    = string;
@@ -33,7 +33,7 @@ function surface(string, options, source) {
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 150;
+	this.count			= 2;
 	this.index_ct   = 0;
 	
 	this.texture    = null;
@@ -66,67 +66,17 @@ function surface(string, options, source) {
 	 * the objects.
 	 */
 	this.gen_vbo = function(scr) {
-		var vertices = [];
-		var texture  = [];
-		var indices  = [];
-		
-		var texrepeat = 3;
-		
-		var x = scr.minx;
-		var y = scr.miny;
-		var dx = (scr.maxx - scr.minx) / this.count;
-		var dy = (scr.maxy - scr.miny) / this.count;
-		
-		var tx = 0.0;
-		var ty = texrepeat;
-		var dt = texrepeat / this.count;
-		
-		var i = 0;
-		var j = 0;
-		
-		/* This could probably still be optimized, but at least it's now
-		 * using a single triangle strip to render the mesh.  Much better
-		 * than the alternative.
-		 */
-		for (i = 0; i <= this.count; ++i) {
-			y = scr.miny;
-			ty = texrepeat;
-			for (j = 0; j <= this.count; ++j) {
-				vertices.push(x);
-				vertices.push(y);
-				texture.push(tx);
-				texture.push(ty);
-				
-				y += dy;
-				ty -= dt;
-			}
-			x += dx;
-			tx += dt;
-		}
-		
-		var c = 0;
-		indices.push(c)
-		
-		var inc = this.count + 1;
-		var dec = inc - 1;
-		
-		for (i = 0; i < this.count; ++i) {
-			for (j = 0; j < this.count; ++j) {
-				c += inc;
-				indices.push(c);
-				c -= dec;
-				indices.push(c);
-			}
-			c += inc;
-			indices.push(c);
-			indices.push(c);
-			
-			if (dec < inc) {
-				dec = inc + 1;
-			} else {
-				dec = inc - 1;
-			}
-		}
+		// Victory! It works!
+		var vertices = [ scr.maxx, scr.maxy,  scr.minx, //A
+										 scr.minx, scr.miny, -scr.minx, //B
+										 scr.maxx, scr.miny,  scr.minx, //C
+										 scr.maxx, scr.miny, -scr.minx, //D
+										 scr.maxx, scr.maxy, -scr.minx, //E
+										 scr.minx, scr.miny,  scr.minx, //F
+										 scr.minx, scr.maxy,  scr.minx, //G
+										 scr.minx, scr.maxy, -scr.minx]; //H
+		var texture  = vertices;
+		var indices  = [ 2, 5, 0, 6, 7, 7, 4, 0, 3, 2, 1, 5, 6, 6, 1, 7, 3, 4]; // Deep magic
 
 		/* Again, I'm not an expert in JavaScript, and I'm currently not
 		 * sure how exactly garbage collection works.  Either way, when 
@@ -170,10 +120,10 @@ function surface(string, options, source) {
 		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
-		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(1, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
 		this.texture.bind();
@@ -190,8 +140,8 @@ function surface(string, options, source) {
 	 * provides free access to functionality for reading files.
 	 */
 	this.gen_program = function() {
-		var vertex_source = this.read("shaders/surface.vert").replace("USER_FUNCTION", this.f);
-		var frag_source		= this.read("shaders/surface.frag");
+		var vertex_source = this.read("shaders/isosurface.vert").replace("USER_FUNCTION", this.f);
+		var frag_source		= this.read("shaders/isosurface.frag").replace("USER_FUNCTION", this.f);
 		
 		vertex_source = vertex_source.replace("/* CYLINDRICAL", "//* Cylindrical")
 		
@@ -199,4 +149,4 @@ function surface(string, options, source) {
 	}
 }
 
-surface.prototype = new primitive();
+isosurface.prototype = new primitive();
