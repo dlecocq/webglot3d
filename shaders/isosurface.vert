@@ -17,7 +17,8 @@ void main() {
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * vPosition;
 
 	//normal = vec3(result.z, 0.0, 0.0);
-	v_texCoord = (u_modelViewMatrix * vTexCoord).xyz;
+	//v_texCoord = (u_modelViewMatrix * vTexCoord).xyz;
+	v_texCoord = vTexCoord.xyz;
 	
 	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * vPosition);
 	

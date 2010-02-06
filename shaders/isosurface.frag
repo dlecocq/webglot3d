@@ -40,19 +40,19 @@ void main () {
 	vec3 temp1;
 	vec3 temp2;
 	
-	point = start + vec3(0.0, 0.0, 30.0 - 3.4) + direction * s;
+	point = start + direction * s;
 	v_previous = function(point.x, point.y, point.z);
 
 	for (s = 0.0; s < 6.92; s += ds) {
 		// Determine the point you're sampling, and sample it
-		point = start + vec3(0.0, 0.0, 30.0 - 3.4) + direction * s;
+		point = start + direction * s;
 		value = function(point.x, point.y, point.z);
 		
 		// If it's less than 0, then draw something
 		if ((value * v_previous) < 0.0) {
 			// Linearly interpolate where the value is 0
 			s = (s_previous * value - s * v_previous) / (value - v_previous);
-			point = start + vec3(0.0, 0.0, 30.0 - 3.4) + direction * s;
+			point = start + direction * s;
 			
 			// And at that point, estimate the gradient
 			vec3 normal = f_normal(point.x, point.y, point.z, h);
@@ -67,12 +67,14 @@ void main () {
 			s_previous = s;
 			v_previous = value;
 			
+			/*
 			// Check to see if you're still inside the box.  If not, then bail.
 			temp1 = sign(point - min);
 			temp2 = sign(max - point);
 			if (dot(temp1, temp2) < 3.0) {
 				break;
 			}
+			*/
 		}
 	}
 	
