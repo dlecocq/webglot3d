@@ -18,7 +18,7 @@ void main() {
 
 	//normal = vec3(result.z, 0.0, 0.0);
 	//v_texCoord = (u_modelViewMatrix * vTexCoord).xyz;
-	v_texCoord = vTexCoord.xyz;
+	v_texCoord = (vTexCoord).xyz;
 	
 	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * vPosition);
 	

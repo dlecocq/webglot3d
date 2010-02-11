@@ -1,3 +1,5 @@
+uniform mat4 u_modelViewMatrix;
+
 varying vec3 position;
 varying vec3 v_texCoord;
 varying vec3 light;
@@ -23,7 +25,10 @@ vec3 f_normal(float x, float y, float z, float h) {
 
 void main () {
 	vec3 start = v_texCoord;
-	vec3 direction = normalize(start - vec3(0.0, 0.0, -100.0));
+	
+	vec3 direction = position - vec3(0.0, 0.0, -100.0);
+	direction = (u_modelViewMatrix * vec4(direction.x, direction.y, direction.z, 1.0)).xyz;
+	direction = normalize(direction);
 	
 	vec3 point;
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
@@ -41,7 +46,8 @@ void main () {
 	vec3 temp2;
 	
 	point = start + direction * s;
-	v_previous = function(point.x, point.y, point.z);
+	//v_previous = function(point.x, point.y, point.z);
+	v_previous = 1.0;
 
 	for (s = 0.0; s < 6.92; s += ds) {
 		// Determine the point you're sampling, and sample it
@@ -59,7 +65,8 @@ void main () {
 			
 			// Take the dot product, and gray-scale accordingly
 			float dot = abs(dot(normal, direction));
-			gl_FragColor = vec4(dot, dot, dot, 1.0);
+			//gl_FragColor = vec4(dot, dot, dot, 1.0);
+			gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;
 		} else {
 			// If it's not less than 0, then save the current value and
@@ -67,14 +74,12 @@ void main () {
 			s_previous = s;
 			v_previous = value;
 			
-			/*
 			// Check to see if you're still inside the box.  If not, then bail.
 			temp1 = sign(point - min);
 			temp2 = sign(max - point);
 			if (dot(temp1, temp2) < 3.0) {
-				break;
+				//break;
 			}
-			*/
 		}
 	}
 	
