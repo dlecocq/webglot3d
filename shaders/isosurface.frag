@@ -1,5 +1,6 @@
 uniform mat4 u_modelViewMatrix;
 
+varying vec3 direction;
 varying vec3 position;
 varying vec3 v_texCoord;
 varying vec3 light;
@@ -26,10 +27,6 @@ vec3 f_normal(float x, float y, float z, float h) {
 void main () {
 	vec3 start = v_texCoord;
 	
-	vec3 direction = position - vec3(0.0, 0.0, -100.0);
-	direction = (u_modelViewMatrix * vec4(direction.x, direction.y, direction.z, 1.0)).xyz;
-	direction = normalize(direction);
-	
 	vec3 point;
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
@@ -46,8 +43,7 @@ void main () {
 	vec3 temp2;
 	
 	point = start + direction * s;
-	//v_previous = function(point.x, point.y, point.z);
-	v_previous = 1.0;
+	v_previous = function(point.x, point.y, point.z);
 
 	for (s = 0.0; s < 6.92; s += ds) {
 		// Determine the point you're sampling, and sample it

@@ -47,11 +47,19 @@
 		glot.setDomain(-2, 2, -2, 2);
 		
 		// You can add new primitives to the display with the add function.
-		glot.add(new isosurface("sqrt(x * x + y * y + z * z) - 1.0"));
+		
+		// The unit sphere
+		//glot.add(new isosurface("sqrt(x * x + y * y + z * z) - 1.0"));
+		
+		// The unit cylinder
+		//glot.add(new isosurface("sqrt(x * x + y * y) - 1.0"));
+		
 		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
 		//glot.add(new isosurface("1.0 - sin(z) + cos(sqrt(x * x + y * y + sin(t)))"));
 		//glot.add(new isosurface("x * x + y * y - abs(cos(z) * cos(z))"));
-		//glot.add(new isosurface("z - sin(sqrt(x * x + y * y))"));
+		
+		// This shoulc be a sinusodal lathe, I believe
+		glot.add(new isosurface("abs(sin(z)) - sqrt(x * x + y * y)"));
 		
 		//glot.add(new pde());
 		

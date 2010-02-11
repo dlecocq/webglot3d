@@ -4,6 +4,7 @@ uniform mat4 u_projectionMatrix;
 attribute vec4 vTexCoord;
 attribute vec4 vPosition;
 
+varying vec3 direction;
 varying vec3 position;
 varying vec3 v_texCoord;
 varying vec3 light;
@@ -16,9 +17,11 @@ void main() {
 
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * vPosition;
 
-	//normal = vec3(result.z, 0.0, 0.0);
-	//v_texCoord = (u_modelViewMatrix * vTexCoord).xyz;
 	v_texCoord = (vTexCoord).xyz;
+
+	direction = vPosition.xyz - vec3(0.0, 0.0, -100.0);
+	direction = (u_modelViewMatrix * vec4(direction.x, direction.y, direction.z, 1.0)).xyz;
+	direction = normalize(direction);
 	
 	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * vPosition);
 	
