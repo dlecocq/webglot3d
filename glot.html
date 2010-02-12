@@ -24,6 +24,7 @@
 	<script src="texture.js">   </script>
 	<script src="ray.js">       </script>
 	<script src="primitive.js"> </script>
+	<script src="box.js">       </script>
 	<script src="pde.js">       </script>
 	<script src="sphere.js">    </script>
 	<script src="stopwatch.js"> </script>
@@ -60,6 +61,8 @@
 		
 		// This shoulc be a sinusodal lathe, I believe
 		glot.add(new isosurface("abs(sin(z)) - sqrt(x * x + y * y)"));
+		
+		glot.add(new box());
 		
 		//glot.add(new pde());
 		
