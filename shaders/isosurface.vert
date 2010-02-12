@@ -17,7 +17,7 @@ void main() {
 
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * vPosition;
 
-	v_texCoord = (vTexCoord).xyz;
+	v_texCoord = (vPosition).xyz;
 
 	direction = vPosition.xyz - vec3(0.0, 0.0, -100.0);
 	direction = (u_modelViewMatrix * vec4(direction.x, direction.y, direction.z, 1.0)).xyz;
