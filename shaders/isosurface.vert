@@ -19,7 +19,7 @@ void main() {
 
 	v_texCoord = (vPosition).xyz;
 
-	direction = vPosition.xyz - vec3(0.0, 0.0, -100.0);
+	direction = vPosition.xyz + vec3(0.0, 0.0, 100.0);
 	direction = (u_modelViewMatrix * vec4(direction.x, direction.y, direction.z, 1.0)).xyz;
 	direction = normalize(direction);
 	
