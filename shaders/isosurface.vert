@@ -20,7 +20,7 @@ void main() {
 
 	v_texCoord = (vPosition).xyz;
 	
-	direction = normalize(position - (u_modelViewInverse * vec4(0.0, 0.0, 100.0, 1.0)).xyz);
+	direction = normalize((u_modelViewInverse * vec4(0.0, 0.0, -300.0, 1.0)).xyz);
 	
 	/*
 	direction = vec3(0.0, 0.0, 100.0);

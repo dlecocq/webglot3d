@@ -18,9 +18,9 @@ void main() {
 
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * vPosition;
 
-	v_texCoord = (vTexCoord).xyz;
+	v_texCoord = (vPosition).xyz;
 
-	direction = normalize(position - (u_modelViewInverse * vec4(0.0, 0.0, 100.0, 1.0)).xyz);
+	direction = normalize((u_modelViewInverse * vec4(0.0, 0.0, -300.0, 1.0)).xyz);
 		
 	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * vPosition);
 	

@@ -8,14 +8,14 @@ varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
 
-const float width    = 256.0;
-const float height   = 256.0;
-const float b_width  = 16.0;
-const float b_height = 16.0;
-const float depth    = 256.0;
+const float width    = 32.0;
+const float height   = 32.0;
+const float b_width  = 4.0;
+const float b_height = 3.0;
+const float depth    = 12.0;
 
-const vec3 min = vec3(0.0, 0.0, 0.0);
-const vec3 max = vec3(1.0, 1.0, 1.0);
+const vec3 min = vec3(-2.0, -2.0, -2.0);
+const vec3 max = vec3( 2.0,  2.0,  2.0);
 
 uniform sampler2D sampler;
 
@@ -24,14 +24,30 @@ uniform float t;
 float function(float x, float y, float z) {
 	// Eventually you should do linear interpolation.
 	//*
+	float xint = floor((x / 4.0 + 0.5) * width);
+	float yint = floor((y / 4.0 + 0.5) * height);
+	float zint = floor((z / 4.0 + 0.5) * depth);
+	
+	float row = floor(zint / b_width);
+	float col = floor(mod(zint, b_width));
+	
+	float xcoord = xint + col * width;
+	float ycoord = yint + row * height;
+	
+	xcoord /= (width  * b_width);
+	ycoord /= (height * b_height);
+
+	return texture2D(sampler, vec2(xcoord, ycoord)).r - 0.5;
+	//*/
+	/*
 	float x_off = floor(mod(z * depth, b_width)) / b_width;
 	float y_off = z - mod(z, 1.0 / b_height);
 	
-	float xcoord = x / b_width  + x_off;
-	float ycoord = y / b_height + y_off;
-	return texture2D(sampler, vec2(ycoord, xcoord)).r - 0.1;
+	float xcoord = x / width  + x_off;
+	float ycoord = y / height + y_off;
+	return texture2D(sampler, vec2(xcoord, ycoord)).r - 0.1;
 	//*/
-	//return sqrt(x * x + y * y + z * z) - 1.0;
+	return sqrt(x * x + y * y + z * z) - 1.0;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
@@ -62,7 +78,7 @@ void main () {
 	point = start + direction * s;
 	v_previous = function(point.x, point.y, point.z);
 
-	for (s = ds; s < 6.92; s += ds) {
+	for (s = ds; s < 3.5; s += ds) {
 		// Determine the point you're sampling, and sample it
 		point = start + direction * s;
 		value = function(point.x, point.y, point.z);
