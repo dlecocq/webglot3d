@@ -31,7 +31,7 @@ void main () {
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	float s   = 0.0;
-	float ds  = 0.1;
+	float ds  = 0.05;
 
 	float h = 0.01;
 
@@ -45,7 +45,7 @@ void main () {
 	point = start + direction * s;
 	v_previous = function(point.x, point.y, point.z);
 
-	for (s = 0.0; s < 6.92; s += ds) {
+	for (s = 0.01; s < 6.92; s += ds) {
 		// Determine the point you're sampling, and sample it
 		point = start + direction * s;
 		value = function(point.x, point.y, point.z);
@@ -60,9 +60,12 @@ void main () {
 			vec3 normal = f_normal(point.x, point.y, point.z, h);
 			
 			// Take the dot product, and gray-scale accordingly
+			gl_FragColor = vec4(normal.x, normal.y, normal.z, 1.0);
+			/*
 			float dot = abs(dot(normal, direction));
-			//gl_FragColor = vec4(dot, dot, dot, 1.0);
-			gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
+			gl_FragColor = vec4(dot, dot, dot, 1.0);
+			*/
+			//gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;
 		} else {
 			// If it's not less than 0, then save the current value and
@@ -74,7 +77,7 @@ void main () {
 			temp1 = sign(point - min);
 			temp2 = sign(max - point);
 			if (dot(temp1, temp2) < 3.0) {
-				//break;
+				break;
 			}
 		}
 	}
