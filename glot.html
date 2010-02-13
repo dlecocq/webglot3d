@@ -21,18 +21,19 @@
 		time being, just copy-and-paste this.
 	-->
 	<script src="emptytexture.js"> </script>
-	<script src="texture.js">   </script>
-	<script src="ray.js">       </script>
-	<script src="primitive.js"> </script>
-	<script src="box.js">       </script>
-	<script src="pde.js">       </script>
-	<script src="sphere.js">    </script>
-	<script src="stopwatch.js"> </script>
-	<script src="screen.js">    </script>
-	<script src="surface.js">   </script>
-	<script src="p_surface.js"> </script>
-	<script src="grapher.js">   </script>
-	<script src="isosurface.js"></script>
+	<script src="texture.js">      </script>
+	<script src="ray.js">          </script>
+	<script src="primitive.js">    </script>
+	<script src="datasurface.js">  </script>
+	<script src="box.js">          </script>
+	<script src="pde.js">          </script>
+	<script src="sphere.js">       </script>
+	<script src="stopwatch.js">    </script>
+	<script src="screen.js">       </script>
+	<script src="surface.js">      </script>
+	<script src="p_surface.js">    </script>
+	<script src="grapher.js">      </script>
+	<script src="isosurface.js">   </script>
 
 	<script>
 	function start() {
@@ -62,7 +63,9 @@
 		//glot.add(new isosurface("sin(x) * sin(y) - 0.5"));
 		
 		// This shoulc be a sinusodal lathe, I believe
-		glot.add(new isosurface("abs(sin(z)) - sqrt(x * x + y * y)"));
+		//glot.add(new isosurface("abs(sin(z)) - sqrt(x * x + y * y)"));
+		
+		glot.add(new datasurface());
 		
 		glot.add(new box());
 		

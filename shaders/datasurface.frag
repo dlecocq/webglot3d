@@ -1,3 +1,5 @@
+#version 120
+
 uniform mat4 u_modelViewMatrix;
 
 varying vec3 direction;
@@ -6,10 +8,14 @@ varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
 
-const float width = 64.0;
+const float width    = 256.0;
+const float height   = 256.0;
+const float b_width  = 16.0;
+const float b_height = 16.0;
+const float depth    = 256.0;
 
-const vec3 min = vec3(-2, -2, -2);
-const vec3 max = vec3( 2,  2,  2);
+const vec3 min = vec3(0.0, 0.0, 0.0);
+const vec3 max = vec3(1.0, 1.0, 1.0);
 
 uniform sampler2D sampler;
 
@@ -17,8 +23,15 @@ uniform float t;
 
 float function(float x, float y, float z) {
 	// Eventually you should do linear interpolation.
-	float xcoord = y + x / width;
-	return texture2D(sampler, vec2(xcoord, z)).r - 0.5;
+	//*
+	float x_off = floor(mod(z * depth, b_width)) / b_width;
+	float y_off = z - mod(z, 1.0 / b_height);
+	
+	float xcoord = x / b_width  + x_off;
+	float ycoord = y / b_height + y_off;
+	return texture2D(sampler, vec2(ycoord, xcoord)).r - 0.1;
+	//*/
+	//return sqrt(x * x + y * y + z * z) - 1.0;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
@@ -49,7 +62,7 @@ void main () {
 	point = start + direction * s;
 	v_previous = function(point.x, point.y, point.z);
 
-	for (s = 0.0; s < 6.92; s += ds) {
+	for (s = ds; s < 6.92; s += ds) {
 		// Determine the point you're sampling, and sample it
 		point = start + direction * s;
 		value = function(point.x, point.y, point.z);
@@ -61,10 +74,10 @@ void main () {
 			point = start + direction * s;
 			
 			// And at that point, estimate the gradient
-			vec3 normal = f_normal(point.x, point.y, point.z, h);
+			//vec3 normal = f_normal(point.x, point.y, point.z, h);
 			
 			// Take the dot product, and gray-scale accordingly
-			float dot = abs(dot(normal, direction));
+			//float dot = abs(dot(normal, direction));
 			//gl_FragColor = vec4(dot, dot, dot, 1.0);
 			gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;
@@ -78,7 +91,7 @@ void main () {
 			temp1 = sign(point - min);
 			temp2 = sign(max - point);
 			if (dot(temp1, temp2) < 3.0) {
-				//break;
+				break;
 			}
 		}
 	}
