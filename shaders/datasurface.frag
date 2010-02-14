@@ -14,8 +14,10 @@ const float b_width  = 4.0;
 const float b_height = 3.0;
 const float depth    = 12.0;
 
-const vec3 min = vec3(-2.0, -2.0, -2.0);
-const vec3 max = vec3( 2.0,  2.0,  2.0);
+const float hw = 2.0;
+
+const vec3 min = vec3(-hw, -hw, -hw);
+const vec3 max = vec3( hw,  hw,  hw);
 
 uniform sampler2D sampler;
 
@@ -23,9 +25,10 @@ uniform float t;
 
 float function(float x, float y, float z) {
 	// Eventually you should do linear interpolation.
-	float xint = floor((x / 4.0 + 0.5) * width);
-	float yint = floor((y / 4.0 + 0.5) * height);
+	// Do this first with the low z, then the high z
 	float zint = floor((z / 4.0 + 0.5) * depth);
+	
+	float alpha = (z / 4.0 + 0.5) * depth - zint;
 	
 	float row = floor(zint / b_width);
 	float col = floor(mod(zint, b_width));
@@ -33,7 +36,20 @@ float function(float x, float y, float z) {
 	float xcoord = ((x / 4.0 + 0.5) + col) / b_width;
 	float ycoord = ((y / 4.0 + 0.5) + row) / b_height;
 
-	return texture2D(sampler, vec2(xcoord, ycoord)).r - 0.5;
+	float lo = texture2D(sampler, vec2(xcoord, ycoord)).r;
+	
+	//return lo;
+	
+	zint += 1.0;
+	row = floor(zint / b_width);
+	col = floor(mod(zint, b_width));
+	
+	xcoord = ((x / 4.0 + 0.5) + col) / b_width;
+	ycoord = ((y / 4.0 + 0.5) + row) / b_height;
+	
+	float hi = texture2D(sampler, vec2(xcoord, ycoord)).r;
+	
+	return alpha * hi + (1.0 - alpha) * lo - 0.7;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
@@ -52,7 +68,7 @@ void main () {
 	float s   = 0.0;
 	float ds  = 0.1;
 
-	float h = 0.01;
+	float h = 0.33333;
 
 	float s_previous;
 	float v_previous;
@@ -76,12 +92,12 @@ void main () {
 			point = start + direction * s;
 			
 			// And at that point, estimate the gradient
-			//vec3 normal = f_normal(point.x, point.y, point.z, h);
+			vec3 normal = f_normal(point.x, point.y, point.z, h);
 			
 			// Take the dot product, and gray-scale accordingly
-			//float dot = abs(dot(normal, direction));
-			//gl_FragColor = vec4(dot, dot, dot, 1.0);
-			gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
+			float dot = abs(dot(normal, direction));
+			gl_FragColor = vec4(dot, dot, dot, 1.0);
+			//gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;
 		} else {
 			// If it's not less than 0, then save the current value and
