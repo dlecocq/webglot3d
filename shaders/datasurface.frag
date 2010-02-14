@@ -23,7 +23,6 @@ uniform float t;
 
 float function(float x, float y, float z) {
 	// Eventually you should do linear interpolation.
-	//*
 	float xint = floor((x / 4.0 + 0.5) * width);
 	float yint = floor((y / 4.0 + 0.5) * height);
 	float zint = floor((z / 4.0 + 0.5) * depth);
@@ -31,23 +30,10 @@ float function(float x, float y, float z) {
 	float row = floor(zint / b_width);
 	float col = floor(mod(zint, b_width));
 	
-	float xcoord = xint + col * width;
-	float ycoord = yint + row * height;
-	
-	xcoord /= (width  * b_width);
-	ycoord /= (height * b_height);
+	float xcoord = ((x / 4.0 + 0.5) + col) / b_width;
+	float ycoord = ((y / 4.0 + 0.5) + row) / b_height;
 
 	return texture2D(sampler, vec2(xcoord, ycoord)).r - 0.5;
-	//*/
-	/*
-	float x_off = floor(mod(z * depth, b_width)) / b_width;
-	float y_off = z - mod(z, 1.0 / b_height);
-	
-	float xcoord = x / width  + x_off;
-	float ycoord = y / height + y_off;
-	return texture2D(sampler, vec2(xcoord, ycoord)).r - 0.1;
-	//*/
-	return sqrt(x * x + y * y + z * z) - 1.0;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
