@@ -8,11 +8,11 @@ varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
 
-const float width    = 32.0;
-const float height   = 32.0;
-const float b_width  = 4.0;
-const float b_height = 3.0;
-const float depth    = 12.0;
+const float width    = 256.0;
+const float height   = 256.0;
+const float b_width  = 16.0;
+const float b_height = 16.0;
+const float depth    = 256.0;
 
 const float hw = 2.0;
 
@@ -49,14 +49,14 @@ float function(float x, float y, float z) {
 	
 	float hi = texture2D(sampler, vec2(xcoord, ycoord)).r;
 	
-	return alpha * hi + (1.0 - alpha) * lo - 0.7;
+	return alpha * hi + (1.0 - alpha) * lo - 0.6;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
 	float dx = (function(x + h, y, z) - function(x - h, y, z));
 	float dy = (function(x, y + h, z) - function(x, y - h, z));
 	float dz = (function(x, y, z + h) - function(x, y, z - h));
-	return (0.5 / h) * vec3(dx, dy, dz);
+	return normalize((0.5 / h) * vec3(dx, dy, dz));
 }
 
 void main () {
@@ -66,9 +66,9 @@ void main () {
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	float s   = 0.0;
-	float ds  = 0.1;
+	float ds  = 0.02;
 
-	float h = 0.33333;
+	float h = 0.015625;
 
 	float s_previous;
 	float v_previous;
@@ -95,7 +95,7 @@ void main () {
 			vec3 normal = f_normal(point.x, point.y, point.z, h);
 			
 			// Take the dot product, and gray-scale accordingly
-			float dot = abs(dot(normal, direction));
+			float dot = abs(dot(normal, direction)) * 0.8;
 			gl_FragColor = vec4(dot, dot, dot, 1.0);
 			//gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;

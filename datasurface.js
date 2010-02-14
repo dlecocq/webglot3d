@@ -36,7 +36,7 @@ function datasurface(options, source) {
 	this.index_ct   = 0;
 	
 	this.texture    = null;
-	this.source     = source || "volumes/heart.png";
+	this.source     = source || "volumes/foot.png";
 	//"textures/saudi-flag.gif"
 	//"textures/dan.jpg"
 
