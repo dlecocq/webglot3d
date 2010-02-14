@@ -8,11 +8,11 @@ varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
 
-const float width    = 256.0;
-const float height   = 256.0;
-const float b_width  = 16.0;
-const float b_height = 16.0;
-const float depth    = 256.0;
+const float width    = 192.0;
+const float height   = 192.0;
+const float b_width  = 20.0;
+const float b_height = 12.0;
+const float depth    = 240.0;
 
 const float hw = 2.0;
 
@@ -49,7 +49,7 @@ float function(float x, float y, float z) {
 	
 	float hi = texture2D(sampler, vec2(xcoord, ycoord)).r;
 	
-	return alpha * hi + (1.0 - alpha) * lo - 0.4;
+	return alpha * hi + (1.0 - alpha) * lo - 0.6;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
@@ -66,9 +66,9 @@ void main () {
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	float s   = 0.0;
-	float ds  = 0.05;
+	float ds  = 0.02;
 
-	float h = 0.015625;
+	float h = 0.01666;
 
 	float s_previous;
 	float v_previous;
