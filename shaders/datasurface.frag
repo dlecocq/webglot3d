@@ -49,7 +49,7 @@ float function(float x, float y, float z) {
 	
 	float hi = texture2D(sampler, vec2(xcoord, ycoord)).r;
 	
-	return alpha * hi + (1.0 - alpha) * lo - 0.6;
+	return alpha * hi + (1.0 - alpha) * lo - 0.4;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
@@ -66,7 +66,7 @@ void main () {
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	float s   = 0.0;
-	float ds  = 0.02;
+	float ds  = 0.05;
 
 	float h = 0.015625;
 
