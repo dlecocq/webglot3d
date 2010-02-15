@@ -450,5 +450,9 @@ function grapher() {
 		this.refresh();
 	}
 	
+	this.restart = function() {
+		this.wall.start();
+	}
+	
 	this.initialize();
 }
