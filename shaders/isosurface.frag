@@ -21,7 +21,7 @@ vec3 f_normal(float x, float y, float z, float h) {
 	float dx = (function(x + h, y, z) - function(x - h, y, z));
 	float dy = (function(x, y + h, z) - function(x, y - h, z));
 	float dz = (function(x, y, z + h) - function(x, y, z - h));
-	return (0.5 / h) * vec3(dx, dy, dz);
+	return normalize((0.5 / h) * vec3(dx, dy, dz));
 }
 
 void main () {
@@ -60,12 +60,9 @@ void main () {
 			vec3 normal = f_normal(point.x, point.y, point.z, h);
 			
 			// Take the dot product, and gray-scale accordingly
-			gl_FragColor = vec4(normal.x, normal.y, normal.z, 1.0);
-			/*
+
 			float dot = abs(dot(normal, direction));
 			gl_FragColor = vec4(dot, dot, dot, 1.0);
-			*/
-			//gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;
 		} else {
 			// If it's not less than 0, then save the current value and
@@ -81,23 +78,4 @@ void main () {
 			}
 		}
 	}
-	
-	/*
-	vec4 texture = texture2D(sampler, v_texCoord.st);
-
-	// Scaling The Input Vector To Length 1
-	vec3 norm_normal = normalize(normal);
-	vec3 norm_light = normalize(light);
-	
-	//gl_ModelViewMatrix * position;
-
-	// Calculating The Diffuse Term And Clamping It To [0;1]
-	float DiffuseTerm = clamp(dot(norm_normal, norm_light), 0.0, 1.0);
-
-	// Calculating The Final Color
-	gl_FragColor = 0.4 * texture + 0.6 * texture * DiffuseTerm;
-	gl_FragColor.a = 1.0;
-
-	//gl_FragColor = vec4(norm_normal.r, norm_normal.g, norm_normal.b, 1.0);
-	*/
 }
