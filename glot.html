@@ -36,6 +36,20 @@
 	<script src="isosurface.js">   </script>
 
 	<script>
+	var mySurface = null;
+	
+	function gen_isosurface(string) {
+		if (mySurface) {
+			glot.primitives.pop();
+			mySurface = new isosurface(document.forms["function"].elements.fn.value);
+			glot.add(mySurface);
+		} else {
+			mySurface = new isosurface(document.forms["function"].elements.fn.value);
+			glot.add(mySurface);
+		}
+		glot.restart();
+	}
+	
 	function start() {
 		/* Instantiate a grapher
 		 *
@@ -43,8 +57,6 @@
 		 * this interface will change, so use with caution.
 		 */
 		var glot = new grapher();
-		
-		//glot.add(new sphere(0, 0, 0, 0.4));
 		
 		glot.setDomain(-2, 2, -2, 2);
 		
@@ -56,30 +68,13 @@
 		// The unit cylinder
 		//glot.add(new isosurface("sqrt(x * x + y * y) - 1.0"));
 		
-		//glot.add(new surface(glot.getContext(), "sin(sqrt(x * x + y * y) + t)"));
+		// A sinusodal lathe
+		//glot.add(new isosurface("abs(sin(z - t)) - sqrt(x * x + y * y)"));
+		
 		//glot.add(new isosurface("1.0 - sin(z) + cos(sqrt(x * x + y * y + sin(t)))"));
-		//glot.add(new isosurface("x * x + y * y - abs(cos(z) * cos(z))"));
-		
-		//glot.add(new isosurface("sin(x) * sin(y) - 0.5"));
-		
-		// This shoulc be a sinusodal lathe, I believe
-		//glot.add(new isosurface("abs(sin(z)) - sqrt(x * x + y * y)"));
-		
-		glot.add(new datasurface());
 		
 		glot.add(new box());
-		
-		//glot.add(new pde());
-		
-		/*
-		// Another of Alyn's surfaces
-		glot.setDomain(0, 2, 0, 2);
-		glot.add(new surface("(pow(10.0, -9.0) * x * y * pow(10.0, 15.0) * (-4.2805 * x + 4.5067 * y - 8.2939 * x * x - 7.630209 * x * y - 16.6313 * y * y + 1.7667 * x * x * y + 1.916284 * x * y * y - 1.13259 * pow(x, 3.0) * y + 0.33383 * pow(x, 4.0) * y - 1.88588 * pow(x, 3.0) * pow(y, 2.0) + 2.847 * pow(x, 2.0) * pow(y, 2.0) + 1.4387 * pow(x, 2.0) * pow(y, 3.0) - 18.69 * x * pow(y, 3.0) + 5.01255 * x * pow(y, 4.0) + 12.598 * pow(x, 3.0) + 12.8728 * pow(y, 3.0) - 6.05277 * pow(x, 4.0) + 1.0313 * pow(x, 5.0) - 4.4697 * pow(y, 4.0) + 1.42018 * pow(y, 5.0) + 6.17273)) / (pow(10.0, 6.0) * (6.718464 * x + 6.718 * y - 15.3867 * pow(x, 2.0) - 12.1991 * x * y - 13.06368 * pow(y, 2.0) + 18.392 * pow(x, 2.0) * y + 21.8256 * x * pow(y, 2.0) - 13.2552 * pow(x, 3.0) * y + 1.489 * pow(x, 4.0) * y + 35.65 * pow(x, 3.0) * pow(y, 2.0) - 39.832880 * pow(x, 2.0) * pow(y, 2.0) + 3.4069 * pow(x, 2.0) * pow(y, 3.0) + 16.438 * x * pow(y, 3.0) - 42.25 * x * pow(y, 4.0) - 1.2281750 * pow(x, 4.0) * pow(y, 2.0) - 9.3458 * pow(x, 3.0) * pow(y, 3.0) + 17.5555 * pow(x, 2.0) * pow(y, 4.0) + 1.440250 * pow(x, 5.0) * y + 14.9125 * x * pow(y, 5.0) + 2.755625 * pow(x, 4.0) * pow(y, 3.0) - 2.16 * pow(x, 3.0) * pow(y, 4.0) - 4.715 * pow(x, 2.0) * pow(y, 5.0) + 1.094375 * pow(x, 5.0) * pow(y, 2.0) + 1.05 * x * pow(y, 6.0) - 0.290625 * y * pow(x, 6.0) + 12.224016 * pow(x, 3.0) - 4.536 * pow(y, 3.0) - 2.87386 * pow(x, 4.0) - 0.42260 * pow(x, 5.0) + 18.36 * pow(y, 4.0) - 3.15 * pow(y, 5.0) + 0.145 * pow(x, 6.0) - 6.3 * pow(y, 6.0) + 2.25 * pow(y, 7.0) + 0.015625 * pow(x, 7.0)))"));
-		//*/
-		//glot.add(new surface(glot.getContext(), "max(sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * exp(-sqrt(x * x + y * y)/5.0) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t) / 3.0, sin(sqrt(x * x + y * y) + t))"));
-		//glot.add(new surface("sin(sqrt(x * x + y * y))"));
-		//glot.add(new p_surface("2.0 * 6.3 * v, 3.0 + sin(6.3 * v) + cos(6.3 * u), sin(6.3 * u) + 2.0 * cos(6.3 * v)"));
-		
+				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
 		 * refreshes, otherwise the plot will be interactive, but static.  Well,
@@ -94,7 +89,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:94%;
+		height:80%;
 	}
 	</style>
 </head>
@@ -106,6 +101,14 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
+	
+	<div id="function_form">
+		<form name="function" onsubmit="gen_isosurface(); return false">
+			f(x, y, z, t) = <input size='100' name="fn" /> = 0
+		</form>
+		<p><em>Note:</em> If you need to enter numerical constants, make sure they are written as floating-point numbers. Eg, 2.0, not 2</p>
+	</div>
+	
 	<div id="framerate">Framerate: </div>
 </body>
 </html>
