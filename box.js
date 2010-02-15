@@ -62,7 +62,7 @@ function box(options, source) {
 										 scr.minx, scr.miny,  scr.minx,  //F 5
 										 scr.minx, scr.maxy,  scr.minx,  //G 6
 										 scr.minx, scr.maxy, -scr.minx]; //H 7
-		var indices  = [ 0, 6, 5, 2, 0, 4, 7, 2, 0, 4, 3, 6, 5, 1, 3, 1, 7]; // Deep magic
+		var indices  = [ 0, 2, 0, 4, 0, 6, 6, 7, 6, 5, 5, 1, 5, 2, 2, 3, 3, 4, 3, 1, 1, 7, 7, 4];
 
 		/* Again, I'm not an expert in JavaScript, and I'm currently not
 		 * sure how exactly garbage collection works.  Either way, when 
@@ -105,7 +105,7 @@ function box(options, source) {
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
 		
-		this.gl.drawElements(this.gl.LINE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
+		this.gl.drawElements(this.gl.LINES, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
 		
 		this.gl.disableVertexAttribArray(0);
 	}
