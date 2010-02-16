@@ -80,7 +80,7 @@ void main () {
 	point = start + direction * s;
 	v_previous = function(point.x, point.y, point.z);
 
-	for (s = ds; s < 3.5; s += ds) {
+	for (s = ds; s < 6.93; s += ds) {
 		// Determine the point you're sampling, and sample it
 		point = start + direction * s;
 		value = function(point.x, point.y, point.z);
