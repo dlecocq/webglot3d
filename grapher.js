@@ -32,6 +32,7 @@ function grapher() {
 	this.framecount = 0;
 	
 	this.primitives = new Array();
+	this.parameters = new Array();
 
 	/* As the WebGL specification is still in flux, this is a wrapper
 	 * for getting a WebGL context for drawing.  Specifically, the 
@@ -432,7 +433,15 @@ function grapher() {
 	 */
 	this.add = function(primitive) {
 		this.primitives.push(primitive);
-		primitive.initialize(this.gl, this.scr);
+		primitive.initialize(this.gl, this.scr, this.parameters);
+	}
+	
+	this.set = function(parameter, value) {
+		this.parameters[parameter] = value;
+	}
+	
+	this.get = function(parameter) {
+		return this.parameters[parameter];
 	}
 	
 	/* This wraps all the code for animation to take place.

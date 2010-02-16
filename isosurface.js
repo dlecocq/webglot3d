@@ -29,6 +29,8 @@ function isosurface(string, options, source) {
 	this.textureVBO = null;
 	this.indexVBO		= null;
 	
+	this.parameters = null;
+	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
@@ -44,8 +46,9 @@ function isosurface(string, options, source) {
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
 	 */
-	this.initialize = function(gl, scr) {
+	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
+		this.parameters = parameters;
 		this.refresh(scr);
 		this.gen_program();
 	}
@@ -113,6 +116,7 @@ function isosurface(string, options, source) {
 	 * was before it's called.
 	 */
 	this.draw = function() {
+		this.setUniforms();
 		//scr.set_uniforms(this.gl, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
 		

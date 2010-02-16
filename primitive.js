@@ -28,6 +28,19 @@ function primitive(context) {
 	 * the console, which can prove extremely helpful.
 	 */
 	this.compile_program = function(vertex_source, frag_source) {
+		// Add user parameters
+		if (this.parameters) {
+			console.log("Adding parameters to shader source");
+			var params = "// User parameters\n";
+			for (i in this.parameters) {
+				params += "uniform float " + i + ";\n";
+			}
+			
+			vertex_source = vertex_source.replace("// USER_PARAMETERS", params);
+			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
+			console.log(frag_source);
+		}
+		
 		var vertex_shader = this.gl.createShader(this.gl.VERTEX_SHADER);
 		var frag_shader		= this.gl.createShader(this.gl.FRAGMENT_SHADER);
 		

@@ -9,12 +9,14 @@ varying vec3 halfVector;
 const vec3 min = vec3(-2, -2, -2);
 const vec3 max = vec3( 2,  2,  2);
 
+// USER_PARAMETERS
+
 uniform sampler2D sampler;
 
 uniform float t;
 
 float function(float x, float y, float z) {
-	return USER_FUNCTION;
+	return USER_FUNCTION - alpha;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {

@@ -58,12 +58,14 @@
 		 */
 		var glot = new grapher();
 		
+		glot.set("alpha", 1.5);
+		
 		glot.setDomain(-2, 2, -2, 2);
 		
 		// You can add new primitives to the display with the add function.
 		
 		// The unit sphere
-		//glot.add(new isosurface("sqrt(x * x + y * y + z * z) - 1.0"));
+		glot.add(new isosurface("sqrt(x * x + y * y + z * z)"));
 		
 		// The unit cylinder
 		//glot.add(new isosurface("sqrt(x * x + y * y) - 1.0"));
