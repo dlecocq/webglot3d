@@ -33,6 +33,9 @@ function grapher() {
 	
 	this.primitives = new Array();
 	this.parameters = new Array();
+	
+	this.userClickFunction    = null;
+	this.userKeyboardFunction = null;
 
 	/* As the WebGL specification is still in flux, this is a wrapper
 	 * for getting a WebGL context for drawing.  Specifically, the 
@@ -167,6 +170,21 @@ function grapher() {
 			this.zoom_in();
 			this.display();
 		}
+		if (this.userKeyboardFunction) {
+			try {
+				this.userKeyboardFunction(key_event);
+			} catch(e) {
+				console.log("User keyboard function failed: " + e);
+			}
+		}
+	}
+	
+	this.setClickFunction = function(myfunction) {
+		this.userClickFunction = myfunction;
+	}
+	
+	this.setKeyboardFunction = function(myfunction) {
+		this.userKeyboardFunction = myfunction;
 	}
 
 	/* This function must be called after an instance of glot has been

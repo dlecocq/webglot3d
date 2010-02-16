@@ -36,6 +36,17 @@
 	<script src="isosurface.js">   </script>
 
 	<script>
+	function keyboard(key_event) {
+		var key = Number(key_event.keyCode);
+		if (key == 65) {
+			glot.set("alpha", glot.get("alpha") + 0.01);
+			glot.display();
+		} else if (key == 90) {
+			glot.set("alpha", glot.get("alpha") - 0.01);
+			glot.display();
+		}	
+	}
+	
 	var mySurface = null;
 	
 	function gen_isosurface(string) {
@@ -57,6 +68,8 @@
 		 * this interface will change, so use with caution.
 		 */
 		var glot = new grapher();
+		
+		glot.setKeyboardFunction(keyboard);
 		
 		glot.set("alpha", 1.5);
 		
