@@ -38,6 +38,7 @@ function primitive(context) {
 			
 			vertex_source = vertex_source.replace("// USER_PARAMETERS", params);
 			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
+			console.log(frag_source);
 		}
 		
 		var vertex_shader = this.gl.createShader(this.gl.VERTEX_SHADER);

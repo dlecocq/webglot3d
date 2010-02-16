@@ -39,10 +39,12 @@
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
 		if (key == 65) {
-			glot.set("alpha", glot.get("alpha") + 0.01);
+			console.log("Setting isovalue to " + (glot.get("isovalue") + 0.01));
+			glot.set("isovalue", glot.get("isovalue") + 0.01);
 			glot.display();
 		} else if (key == 90) {
-			glot.set("alpha", glot.get("alpha") - 0.01);
+			console.log("Setting isovalue to " + (glot.get("isovalue") + 0.01));
+			glot.set("isovalue", glot.get("isovalue") - 0.01);
 			glot.display();
 		}	
 	}
@@ -71,14 +73,21 @@
 		
 		glot.setKeyboardFunction(keyboard);
 		
-		glot.set("alpha", 1.5);
+		glot.set("isovalue", 0.2);
+		
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  8);
+		glot.set("b_height", 8);
 		
 		glot.setDomain(-2, 2, -2, 2);
+		
+		glot.add(new datasurface("volumes/orange.png", 256, 256, 8, 8));
 		
 		// You can add new primitives to the display with the add function.
 		
 		// The unit sphere
-		glot.add(new isosurface("sqrt(x * x + y * y + z * z)"));
+		//glot.add(new isosurface("sqrt(x * x + y * y + z * z)"));
 		
 		// The unit cylinder
 		//glot.add(new isosurface("sqrt(x * x + y * y) - 1.0"));

@@ -8,11 +8,9 @@ varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
 
-const float width    = 256.0;
-const float height   = 256.0;
-const float b_width  = 8.0;
-const float b_height = 8.0;
-const float depth    = 64.0;
+// USER_PARAMETERS
+
+float depth    = b_width * b_height;
 
 const float hw = 2.0;
 
@@ -49,7 +47,7 @@ float function(float x, float y, float z) {
 	
 	float hi = texture2D(sampler, vec2(xcoord, ycoord)).r;
 	
-	return alpha * hi + (1.0 - alpha) * lo - 0.2;
+	return alpha * hi + (1.0 - alpha) * lo - isovalue;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {

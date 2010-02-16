@@ -14,7 +14,7 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function datasurface(options, source) {
+function datasurface(source, width, height, b_width, b_height) {
 	
 	this.gl   = null;
 	
@@ -37,14 +37,20 @@ function datasurface(options, source) {
 	
 	this.texture    = null;
 	this.source     = source || "volumes/orange.png";
-	//"textures/saudi-flag.gif"
-	//"textures/dan.jpg"
+	
+	this.width      = width;
+	this.height     = height;
+	this.b_width    = b_width;
+	this.b_height   = b_height;
+	
+	this.parameters = null;
 
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
 	 */
-	this.initialize = function(gl, scr) {
+	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
+		this.parameters = parameters;
 		this.refresh(scr);
 		this.gen_program();
 		this.texture = new texture(this.gl, this.source);
@@ -119,6 +125,7 @@ function datasurface(options, source) {
 	 * was before it's called.
 	 */
 	this.draw = function() {
+		this.setUniforms();
 		//scr.set_uniforms(this.gl, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
 		
