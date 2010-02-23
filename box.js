@@ -1,29 +1,13 @@
-/* This class encapsulates the isosurface primitive.
- * 
- * It requires the OpenGL context to be passed in, though 
- * this is an incredibly ugly interface, and hopefully I 
- * will find a clean way to work around it at some point.
- *
- * It also accepts a string version of the function to be
- * plotted.  It must be GLSL 1.0-compliant string version
- * of the function.  Parameters available are x, y, and t
- * representing the x and y coordinates, as well as a time
- * parameter.
- *
- * Currently options is not used, but eventually it will
- * include support for what coordinate space this function
- * is defined in, and so forth.
+/* This class encapsulates the box primitive.  It is mostly
+ * meant for use with isosurface rendering to give the user
+ * an impression of the orientation of an object
  */
 function box(options, source) {
 	
-	this.gl   = null;
+	// The WebGL context
+	this.gl         = null;
 	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	// The VBOs used for drawing it
 	this.vertexVBO	= null;
 	this.indexVBO		= null;
 	
@@ -39,10 +23,8 @@ function box(options, source) {
 	}
 	
 	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	 * changes to the viewing environment.  This just updates the VBO
+	 * to draw a box around the whole screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -64,23 +46,17 @@ function box(options, source) {
 										 scr.minx, scr.maxy, -scr.minx]; //H 7
 		var indices  = [ 0, 2, 0, 4, 0, 6, 6, 7, 6, 5, 5, 1, 5, 2, 2, 3, 3, 4, 3, 1, 1, 7, 7, 4];
 
-		/* Again, I'm not an expert in JavaScript, and I'm currently not
-		 * sure how exactly garbage collection works.  Either way, when 
-		 * generating the VBO, it's a good idea to delete the previously-
-		 * declared VBO so that it frees up some space on the GPU.  This
-		 * will be added soon, when I can find a tool that helps me track
-		 * and make sure that this memory is getting cleaned up.
-		 */
-		/*
 		if (this.vertexVBO) {
-			this.gl.console.log("deleting");
 			this.gl.deleteBuffer(this.vertexVBO);
 		}
-		*/
 		
 		this.vertexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(vertices), this.gl.STATIC_DRAW);
+		
+		if (this.indexVBO) {
+			this.gl.deleteBuffer(this.indexVBO);
+		}
 		
 		this.indexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
@@ -95,9 +71,6 @@ function box(options, source) {
 	 * was before it's called.
 	 */
 	this.draw = function() {
-		//scr.set_uniforms(this.gl, this.program);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
-		
 		this.gl.enableVertexAttribArray(0);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
