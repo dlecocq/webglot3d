@@ -72,17 +72,134 @@
 		var glot = new grapher();
 		
 		glot.setKeyboardFunction(keyboard);
+				
+		glot.setDomain(-2, 2, -2, 2);
 		
+		/*
 		glot.set("isovalue", 0.2);
-		
 		glot.set("width",    256);
 		glot.set("height",   256);
 		glot.set("b_width",  8);
 		glot.set("b_height", 8);
-		
-		glot.setDomain(-2, 2, -2, 2);
-		
 		glot.add(new datasurface("volumes/orange.png", 256, 256, 8, 8));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  16);
+		glot.set("b_height", 16);
+		glot.add(new datasurface("volumes/foot.png", 256, 256, 16, 16));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  13);
+		glot.set("b_height", 12);
+		glot.add(new datasurface("volumes/bruce.png", 256, 256, 13, 12));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  11);
+		glot.set("b_height", 10);
+		glot.add(new datasurface("volumes/cadaver-small.png", 256, 256, 11, 10));
+		//*/
+
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    32);
+		glot.set("height",   32);
+		glot.set("b_width",  6);
+		glot.set("b_height", 6);
+		glot.add(new datasurface("volumes/bucky.png", 32, 32, 6, 6));		
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    192);
+		glot.set("height",   180);
+		glot.set("b_width",  14);
+		glot.set("b_height", 12);
+		glot.add(new datasurface("volumes/daisy.png", 192, 180, 14, 12));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  9);
+		glot.set("b_height", 5);
+		glot.add(new datasurface("volumes/frog.png", 256, 256, 9, 5));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    301);
+		glot.set("height",   324);
+		glot.set("b_width",  8);
+		glot.set("b_height", 7);
+		glot.add(new datasurface("volumes/lobster.png", 301, 324, 8, 7));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    64);
+		glot.set("height",   64);
+		glot.set("b_width",  8);
+		glot.set("b_height", 8);
+		glot.add(new datasurface("volumes/neghip.png", 64, 64, 8, 8));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  14);
+		glot.set("b_height", 10);
+		glot.add(new datasurface("volumes/pig-small.png", 256, 256, 14, 10));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    176);
+		glot.set("height",   176);
+		glot.set("b_width",  16);
+		glot.set("b_height", 16);
+		glot.add(new datasurface("volumes/sheep-small.png", 176, 176, 16, 16));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    512);
+		glot.set("height",   512);
+		glot.set("b_width",  8);
+		glot.set("b_height", 8);
+		glot.add(new datasurface("volumes/teddy.png", 512, 512, 8, 8));
+		//*/
+		
+		/*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  8);
+		glot.set("b_height", 8);
+		glot.add(new datasurface("volumes/tomato.png", 256, 256, 8, 8));
+		//*/
+		
+		//*
+		glot.set("isovalue", 0.2);
+		glot.set("width",    256);
+		glot.set("height",   256);
+		glot.set("b_width",  16);
+		glot.set("b_height", 16);
+		glot.add(new datasurface("volumes/engine.png", 256, 256, 16, 16));
+		//*/
 		
 		// You can add new primitives to the display with the add function.
 		
@@ -113,7 +230,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:80%;
+		height:94%;
 	}
 	</style>
 </head>
@@ -125,7 +242,7 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
-	
+	<!--
 	<div id="function_form">
 		<form name="function" onsubmit="gen_isosurface(); return false">
 			f(x, y, z, t) = <input size='100' name="fn" /> = 0
@@ -134,5 +251,6 @@
 	</div>
 	
 	<div id="framerate">Framerate: </div>
+	-->
 </body>
 </html>
