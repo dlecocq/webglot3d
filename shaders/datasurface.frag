@@ -64,9 +64,9 @@ void main () {
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
 	float s   = 0.0;
-	float ds  = 0.1;
+	float ds  = 0.02;
 
-	float h = 0.05;
+	float h = 4.0 / min(depth, min(height, width));
 
 	float s_previous;
 	float v_previous;
@@ -89,11 +89,11 @@ void main () {
 			s = (s_previous * value - s * v_previous) / (value - v_previous);
 			point = start + direction * s;
 			
-			// And at that point, estimate the gradient
 			vec3 normal = f_normal(point.x, point.y, point.z, h);
 			
 			// Take the dot product, and gray-scale accordingly
-			float dot = abs(dot(normal, direction)) * 0.8;
+
+			float dot = abs(dot(normal, direction));
 			gl_FragColor = vec4(dot, dot, dot, 1.0);
 			//gl_FragColor = vec4(point.x, point.y, point.z, 1.0);
 			break;
