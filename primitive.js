@@ -1,3 +1,7 @@
+CARTESIAN   = 0;
+CYLINDRICAL = 1;
+SPHERICAL   = 2;
+
 /* This is a parent class for all primitives.  Inheriting from
  * it is not strictly necessary (as this is JavaScript), but it
  * provides access to some very valuable functions.
@@ -38,7 +42,6 @@ function primitive(context) {
 			
 			vertex_source = vertex_source.replace("// USER_PARAMETERS", params);
 			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
-			console.log(frag_source);
 		}
 		
 		var vertex_shader = this.gl.createShader(this.gl.VERTEX_SHADER);
@@ -58,6 +61,7 @@ function primitive(context) {
 		if (!compiled) {
 				// Something went wrong during compilation; get the error
 				var error = this.gl.getShaderInfoLog(vertex_shader);
+				this.gl.console.log(vertex_source);
 				this.gl.console.log("Error in compiling vertex shader: " + error);
 				return null;
 		}
@@ -66,6 +70,7 @@ function primitive(context) {
 		if (!compiled) {
 				// Something went wrong during compilation; get the error
 				var error = this.gl.getShaderInfoLog(frag_shader);
+				this.gl.console.log(frag_source);
 				this.gl.console.log("Error in compiling fragment shader: " + error);
 				return null;
 		}
