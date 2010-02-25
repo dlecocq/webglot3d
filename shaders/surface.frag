@@ -21,5 +21,7 @@ void main () {
 	gl_FragColor = 0.4 * texture + 0.6 * texture * DiffuseTerm;
 	gl_FragColor.a = 1.0;
 
-	//gl_FragColor = vec4(norm_normal.r, norm_normal.g, norm_normal.b, 1.0);
+	/* A normal map
+	gl_FragColor = vec4(norm_normal.r, norm_normal.g, norm_normal.b, 1.0);
+	//*/
 }

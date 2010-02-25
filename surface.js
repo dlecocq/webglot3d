@@ -44,8 +44,9 @@ function surface(string, options, source) {
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
 	 */
-	this.initialize = function(gl, scr) {
+	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
+		this.parameters = parameters;
 		this.refresh(scr);
 		this.gen_program();
 	}
@@ -163,7 +164,7 @@ function surface(string, options, source) {
 	 * was before it's called.
 	 */
 	this.draw = function() {
-		//scr.set_uniforms(this.gl, this.program);
+		this.setUniforms();
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
 		
 		this.gl.enableVertexAttribArray(0);
