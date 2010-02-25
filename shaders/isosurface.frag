@@ -6,6 +6,7 @@ varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
 
+// The bounding box
 const vec3 min = vec3(-2, -2, -2);
 const vec3 max = vec3( 2,  2,  2);
 
@@ -16,6 +17,26 @@ uniform sampler2D sampler;
 uniform float t;
 
 float function(float x, float y, float z) {
+	
+	/* Here are some transformations for coordinate systems.  To make
+	 * this more transparent when it's used.  This way, any time you
+	 * call ``function'' in this shader, you can be certain it has had
+	 * the coordinate transformation performed on it.
+	 */
+	
+	/* CYLINDRICAL
+	float r = sqrt(x * x + y * y);
+	y = atan(y, x);
+	x = r;
+	//*/
+	
+	/* SPHERICAL
+	float rho = sqrt(x * x + y * y + z * z);
+	z = acos(z / rho);
+	y = atan(y, x);
+	x = rho;
+	//*/
+	
 	return USER_FUNCTION - alpha;
 }
 

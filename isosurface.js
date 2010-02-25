@@ -16,11 +16,12 @@
  */
 function isosurface(string, options, source) {
 	
-	this.gl   = null;
-	this.f    = string;
+	this.gl      = null;
+	this.f       = string;
+	this.options = options;
 	
 	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
+	 * differs greatly from the C++ implementation.  WebGL (OpenGL 
 	 * ES 2.0) does not support display lists, and instead I've moved
 	 * the implementation to use vertex-buffer objects.  These are
 	 * those.
@@ -147,7 +148,13 @@ function isosurface(string, options, source) {
 		var vertex_source = this.read("shaders/isosurface.vert").replace("USER_FUNCTION", this.f);
 		var frag_source		= this.read("shaders/isosurface.frag").replace("USER_FUNCTION", this.f);
 		
-		vertex_source = vertex_source.replace("/* CYLINDRICAL", "//* Cylindrical")
+		if (this.options & CYLINDRICAL) {
+			vertex_source = vertex_source.replace("/* CYLINDRICAL", "//* Cylindrical");
+			frag_source   = frag_source.replace("/* CYLINDRICAL", "//* Cylindrical");
+		} else if (this.options & SPHERICAL) {
+			vertex_source = vertex_source.replace("/* SPHERICAL", "//* Spherical");
+			frag_source   = frag_source.replace("/* SPHERICAL", "//* Spherical");
+		}
 		
 		this.compile_program(vertex_source, frag_source);		
 	}
