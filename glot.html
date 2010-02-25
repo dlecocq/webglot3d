@@ -192,7 +192,7 @@
 		glot.add(new datasurface("volumes/tomato.png", 256, 256, 8, 8));
 		//*/
 		
-		//*
+		/*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
@@ -213,6 +213,26 @@
 		//glot.add(new isosurface("abs(sin(z - t)) - sqrt(x * x + y * y)"));
 		
 		//glot.add(new isosurface("1.0 - sin(z) + cos(sqrt(x * x + y * y + sin(t)))"));
+		
+		/* Test surface - cylinder
+		glot.add(new p_surface("6.3 * u, 1.0, 3.0 * v - 1.5", CYLINDRICAL));
+		//*/
+		
+		/* Test surface - sphere
+		glot.add(new p_surface("1.0, 3.14159265 * u, 6.3 * v", SPHERICAL));
+		//*/
+		
+		/* Test surface - Grapher's example conchoid
+		glot.set("k", 1.2);
+		glot.set("k2", 1.2);
+		glot.set("a", 1.5);
+		glot.add(new p_surface("pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*cos(18.85 * u), pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*sin(18.85 * u), pow(k, 18.85 * u) * sin(6.3 * v) - a * pow(k2, 18.85 * u)"));
+		//*/
+		
+		//* Test surface - a funky "sphere" - a sphere with changing radius.
+		// You can have a lot of fun with it.
+		glot.add(new p_surface("abs(cos(20.0 * v * u) * sin(20.0 * v * u)), 3.14159265 * u, 6.3 * v", SPHERICAL));
+		//*/
 		
 		glot.add(new box());
 				
