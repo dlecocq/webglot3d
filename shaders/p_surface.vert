@@ -9,15 +9,28 @@ varying vec3 normal;
 varying vec3 light;
 varying vec3 halfVector;
 
+// USER_PARAMETERS
+
 uniform float t;
 
 vec4 function(float u, float v) {
-	return vec4(USER_FUNCTION, 1.0);
+	vec4 result = vec4(USER_FUNCTION, 1.0);
 	
-	// These are some fun test functions.
-	//return sin(sqrt(x * x + y * y) - t);
-	//sin(3.0 * sqrt(x * x + y * y) - 2.0 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - t);
-	//return sin(3.0 * sqrt(x * x + y * y)) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)));
+	/* Here are some transformations for coordinate systems.  To make
+	 * this more transparent when it's used.  This way, any time you
+	 * call ``function'' in this shader, you can be certain it has had
+	 * the coordinate transformation performed on it.
+	 */
+	
+	/* CYLINDRICAL
+	result = vec4(result.y * cos(result.x), result.y * sin(result.x), result.z, 1.0);
+	//*/
+	
+	/* SPHERICAL
+	result = vec4(result.x * sin(result.y) * cos(result.z), result.x * sin(result.y) * sin(result.z), result.x * cos(result.y), 1.0);
+	//*/
+	
+	return result;
 }
 
 void main() {
@@ -26,28 +39,22 @@ void main() {
 
 	gl_Position = function(x, y);
 	
-	/* CYLINDRICAL
-	gl_Position = vec4(gl_Position.y * cos(gl_Position.x), gl_Position.y * sin(gl_Position.x), gl_Position.z, 1.0);
-	//*/
-	
-	/* SPHERICAL
-	gl_Position = vec4(gl_Position.x * sin(gl_Position.y) * cos(gl_Position.z), gl_Position.x * sin(gl_Position.y) * sin(gl_Position.z), gl_Position.x * cos(gl_Position.y), 1.0);
-	//*/
-	
 	light = vec3(10.0, 10.0, 10.0) - vec3(u_modelViewMatrix * gl_Position);
 	
 	halfVector = normalize(vec3(5.0, 5.0, 5.0).xyz);
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * gl_Position;
 
-	//*
 	float h = 0.001;
-	vec4 xp = (function(x + h, y    ) - function(x - h, y    )) / (2.0 * h);
-	vec4 yp = (function(x    , y + h) - function(x    , y - h)) / (2.0 * h);
+	/* There's actually no need to divide by 2h, because we're only looking
+	 * for a direction, and it's going to be normalized anyway.
+	 */
+	vec4 xp = function(x + h, y    ) - function(x - h, y    );
+	vec4 yp = function(x    , y + h) - function(x    , y - h);
 
-	normal = cross(xp.xyz, yp.xyz);
+	normal = normalize(cross(xp.xyz, yp.xyz));
 	
-	normal = (u_modelViewMatrix * vec4(normal.x, normal.y, normal.z, 0.0)).xyz;
-	//normal = vec3(result.z, 0.0, 0.0);
+	normal = normalize((u_modelViewMatrix * vec4(normal.x, normal.y, normal.z, 0.0)).xyz);
+
 	v_texCoord = vTexCoord.st;
 }
