@@ -43,7 +43,7 @@ function screen() {
 		}
 		this.modelview.translate(0, 0, -30);
 		
-		this.inversemv = new CanvasMatrix4(glot.gl.modelviewMatrix);
+		this.inversemv = new CanvasMatrix4(this.modelview);
 		this.inversemv.invert();
 	}
 }
