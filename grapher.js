@@ -22,7 +22,7 @@ function grapher() {
 	this.axis       = [0, 0, 0];
 	this.angle      = 0;
 	this.moving     = false;
-	this.rotation   = null;
+	//this.rotation   = null;
 
 	// The view angle for the projection matric
 	this.alpha = 8;
@@ -148,7 +148,7 @@ function grapher() {
 	 */
 	this.mouseup = function() {
 		this.moving = false;
-		this.rotation.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
+		this.scr.rotate(this.angle, this.axis);
 	}
 	
 	/* The keyboard event handler.  Again, the browser wars make life
@@ -199,11 +199,6 @@ function grapher() {
 		 * ization phase, but I'm not yet sure as to the syntax.	Add this
 		 * in for later versions.	 Provisionally disabled.
 		 */
-		/*
-		// Set the color mode (double with alpha)
-		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-		*/
-		//*
 		var canvas = document.getElementById("glot");
 		canvas.glot = this;
 		
@@ -223,8 +218,6 @@ function grapher() {
 		
 		f = function(event) { this.getElementById("glot").glot.keyboard(event) };
 		document.onkeydown = f;
-		
-		this.rotation = new CanvasMatrix4();
 	
 		this.gl = this.getContext();
 		var gl = this.gl;
@@ -337,7 +330,7 @@ function grapher() {
 	this.display = function() {
 		this.reshape();
 		
-		var gl = this.getContext();
+		var gl = this.gl;
 		
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
@@ -347,6 +340,7 @@ function grapher() {
 		var mvinv_location = null;
 		var time_location	 = null;
 		
+		/*
 		gl.modelviewMatrix = new CanvasMatrix4();
 		gl.modelviewMatrix.translate(-(this.scr.minx + this.scr.maxx) / 2.0, -(this.scr.miny + this.scr.maxy) / 2.0, 0.0);
 		gl.modelviewMatrix.multRight(this.rotation);
@@ -357,6 +351,9 @@ function grapher() {
 		
 		var inverseMV = new CanvasMatrix4(glot.gl.modelviewMatrix);
 		inverseMV.invert();
+		//*/
+		
+		this.scr.perspective(this.moving, this.angle, this.axis);
 
 		for (var i in this.primitives) {
 			//*
@@ -370,9 +367,9 @@ function grapher() {
 			mvinv_location = gl.getUniformLocation(program, "u_modelViewInverse");
 			time_location	 = gl.getUniformLocation(program, "t");
 		
-			gl.uniformMatrix4fv(mvMat_location, false, gl.modelviewMatrix.getAsWebGLFloatArray());
-			gl.uniformMatrix4fv(prMat_location, false, gl.projectionMatrix.getAsWebGLFloatArray());
-			gl.uniformMatrix4fv(mvinv_location, false, inverseMV.getAsWebGLFloatArray());
+			gl.uniformMatrix4fv(mvMat_location, false, this.scr.modelview.getAsWebGLFloatArray());
+			gl.uniformMatrix4fv(prMat_location, false, this.scr.projection.getAsWebGLFloatArray());
+			gl.uniformMatrix4fv(mvinv_location, false, this.scr.inversemv.getAsWebGLFloatArray());
 			gl.uniform1f(time_location, this.wall.time());
 			//*/
 			
@@ -438,13 +435,9 @@ function grapher() {
 		}
 	
 		context.viewport(0, 0, w, h);
-
-		// Set the projection
-		context.projectionMatrix = new CanvasMatrix4();
-		//context.projectionMatrix.lookat(0, 0, 6, 0, 0, 0, 0, 1, 0);
-    context.projectionMatrix.perspective(this.alpha, w / h, 10, 1000);
-
-		//glutPostRedisplay();
+		
+		this.scr.aspect = w / h;
+		this.scr.alpha  = this.alpha;
 	}
 	
 	/* Add a primitive to the container.
