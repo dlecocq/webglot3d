@@ -1,20 +1,23 @@
 function screen() {
 	this.height	= this.width 	= 10;
-	this.minx		= this.miny		= -5;
-	this.maxx		= this.maxy		=  5;
+	this.minx		= this.miny		= 0;
+	this.maxx		= this.maxy		= 1;
 	
 	this.aspect = 1.0;
 	this.alpha  = 8.0;
 	
+	this.dx     = 0.0;
+	this.dy     = 0.0;
+	
 	// Perhaps this won't be needed int the JavaScript
 	// implementation.  Look into how time sampling is
 	// done / available in JavaScript 
-	this.time									=  0;
+	this.wall   =  new stopwatch();
 	
 	this.rotation   = new CanvasMatrix4();
-	this.projection = null;
-	this.modelview  = null;
-	this.inversemv  = null;
+	this.projection = new CanvasMatrix4();
+	this.modelview  = new CanvasMatrix4();
+	this.inversemv  = new CanvasMatrix4();
 	
 	this.rotate = function(angle, axis) {
 		this.rotation.rotate(angle, axis.x, axis.y, axis.z);
@@ -24,10 +27,10 @@ function screen() {
 		this.projection = new CanvasMatrix4();
 		this.modelview  = new CanvasMatrix4();
 		
-		this.modelview.translate(-this.dx, -this.dy, 0.0);
+		//this.modelview.translate(-this.dx, -this.dy, 0.0);
 		
 		// Set the projection
-		this.projectionMatrix.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);
+		this.projection.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);
 	}
 	
 	this.perspective = function(moving, angle, axis) {
@@ -46,4 +49,6 @@ function screen() {
 		this.inversemv = new CanvasMatrix4(this.modelview);
 		this.inversemv.invert();
 	}
+	
+	this.wall.start();
 }
