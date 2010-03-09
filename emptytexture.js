@@ -6,8 +6,14 @@ function emptytexture(context, width, height) {
 	this.image	 = null;
 	
 	this.gl			 = context;
+	
+	this.width  = 0;
+	this.height = 0;
 
-	this.initialize = function(width, height) {		
+	this.initialize = function(width, height) {
+		this.width  = width;
+		this.height = height;
+		
 		this.texture = this.gl.createTexture();
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
 
@@ -29,5 +35,5 @@ function emptytexture(context, width, height) {
 	
 	this.initialize(width, height);
 	
-	return this.texture;
+	//return this.texture;
 }
