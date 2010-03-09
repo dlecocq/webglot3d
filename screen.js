@@ -3,6 +3,10 @@ function screen() {
 	this.minx		= this.miny		= 0;
 	this.maxx		= this.maxy		= 1;
 	
+	this.moving = false;
+	this.angle  = 0;
+	this.axis   = [0, 0, 0];
+	
 	this.aspect = 1.0;
 	this.alpha  = 8.0;
 	
@@ -19,8 +23,8 @@ function screen() {
 	this.modelview  = new CanvasMatrix4();
 	this.inversemv  = new CanvasMatrix4();
 	
-	this.rotate = function(angle, axis) {
-		this.rotation.rotate(angle, axis.x, axis.y, axis.z);
+	this.rotate = function() {
+		this.rotation.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
 	}
 	
 	this.sfq = function() {
@@ -33,7 +37,7 @@ function screen() {
 		this.projection.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);
 	}
 	
-	this.perspective = function(moving, angle, axis) {
+	this.perspective = function() {
 		// Set the projection
 		this.projection = new CanvasMatrix4();
     this.projection.perspective(this.alpha, this.aspect, 10, 1000);
@@ -41,8 +45,8 @@ function screen() {
 		this.modelview = new CanvasMatrix4();
 		this.modelview.translate(-(this.minx + this.maxx) * 0.5, -(this.miny + this.maxy) * 0.5, 0.0);
 		this.modelview.multRight(this.rotation);
-		if (moving) {
-			this.modelview.rotate(angle, axis.x, axis.y, axis.z);
+		if (this.moving) {
+			this.modelview.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
 		}
 		this.modelview.translate(0, 0, -30);
 		

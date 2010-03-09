@@ -124,9 +124,12 @@ function grapher() {
 	 */
 	this.mousedown = function(x, y) {
 		this.mouse_down = this.coordinates(x, y);
-		this.axis.x = this.axis.y = this.axis.z = 0;
-		this.angle = 0;
-		this.moving = true;
+		//this.axis.x = this.axis.y = this.axis.z = 0;
+		this.scr.axis.x = this.scr.axis.y = this.scr.axis.z = 0;
+		//this.angle = 0;
+		this.scr.angle = 0;
+		//this.moving = true;
+		this.scr.moving = true;
 	}
 	
 	/* The call-back handler for mouse movement.  Like mousedown, it's
@@ -135,11 +138,11 @@ function grapher() {
 	 * browsers.
 	 */
 	this.mousemove = function(x, y) {
-		if (this.moving) {
+		if (this.scr.moving) {
 			this.mouse_current = this.coordinates(x, y);
-			this.axis = this.mouse_down.cross(this.mouse_current);
-			this.angle = Math.acos(this.mouse_down.dot(this.mouse_current) / (this.mouse_current.length() * this.mouse_down.length()));
-			this.angle *= (180 / 3.14159265);
+			this.scr.axis = this.mouse_down.cross(this.mouse_current);
+			this.scr.angle = Math.acos(this.mouse_down.dot(this.mouse_current) / (this.mouse_current.length() * this.mouse_down.length()));
+			this.scr.angle *= (180 / 3.14159265);
 			this.display();
 		}
 	}
@@ -147,8 +150,8 @@ function grapher() {
 	/* Mouse release handler
 	 */
 	this.mouseup = function() {
-		this.moving = false;
-		this.scr.rotate(this.angle, this.axis);
+		this.scr.moving = false;
+		this.scr.rotate();
 	}
 	
 	/* The keyboard event handler.  Again, the browser wars make life
@@ -334,26 +337,7 @@ function grapher() {
 		
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-		var program				 = null;
-		var mvMat_location = null;
-		var prMat_location = null;
-		var mvinv_location = null;
-		var time_location	 = null;
-		
-		/*
-		gl.modelviewMatrix = new CanvasMatrix4();
-		gl.modelviewMatrix.translate(-(this.scr.minx + this.scr.maxx) / 2.0, -(this.scr.miny + this.scr.maxy) / 2.0, 0.0);
-		gl.modelviewMatrix.multRight(this.rotation);
-		if (this.moving) {
-			gl.modelviewMatrix.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
-		}
-		gl.modelviewMatrix.translate(0, 0, -30);
-		
-		var inverseMV = new CanvasMatrix4(glot.gl.modelviewMatrix);
-		inverseMV.invert();
-		//*/
-		
-		this.scr.perspective(this.moving, this.angle, this.axis);
+		this.scr.perspective();
 		//this.scr.sfq();
 
 		for (var i in this.primitives) {
