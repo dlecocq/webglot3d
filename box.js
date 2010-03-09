@@ -70,7 +70,8 @@ function box(options, source) {
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
-	this.draw = function() {
+	this.draw = function(scr) {
+		this.setUniforms(scr);
 		this.gl.enableVertexAttribArray(0);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
