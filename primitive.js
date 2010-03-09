@@ -138,8 +138,8 @@ function primitive(context) {
 		
 			this.gl.useProgram(program);
 		
-			modelview_location  = this.gl.getUniformLocation(program, "modelviewMatrix");
-			projection_location = this.gl.getUniformLocation(program, "projectionMatrix");
+			modelview_location  = this.gl.getUniformLocation(program, "u_modelViewMatrix");
+			projection_location = this.gl.getUniformLocation(program, "u_projectionMatrix");
 			time_location	      = this.gl.getUniformLocation(program, "t");
 			dx_location         = this.gl.getUniformLocation(program, "dx");
 			dy_location         = this.gl.getUniformLocation(program, "dy");
@@ -152,8 +152,9 @@ function primitive(context) {
 			// Set the projection
 			this.projectionMatrix.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);
 
-			this.gl.uniformMatrix4fv(modelview_location , false, this.modelviewMatrix.getAsWebGLFloatArray());
-			this.gl.uniformMatrix4fv(projection_location, false, this.projectionMatrix.getAsWebGLFloatArray());
+			this.gl.uniformMatrix4fv(modelview_location , false, scr.modelview.getAsWebGLFloatArray());
+			this.gl.uniformMatrix4fv(projection_location, false, scr.projection.getAsWebGLFloatArray());
+			this.gl.uniform1f(time_location, scr.wall.time());
 
 			if (this.color) {
 				this.gl.uniform4f(color_location, this.color[0], this.color[1], this.color[2], this.color[3]);
