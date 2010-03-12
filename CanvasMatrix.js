@@ -475,11 +475,11 @@ CanvasMatrix4.prototype.multLeft = function(mat)
 CanvasMatrix4.prototype.ortho = function(left, right, bottom, top, near, far)
 {
     var tx = (left + right) / (left - right);
-    var ty = (top + bottom) / (top - bottom);
-    var tz = (far + near) / (far - near);
+    var ty = (top + bottom) / (bottom - top);
+    var tz = (near) / (near - far);
     
     var matrix = new CanvasMatrix4();
-    matrix.m11 = 2 / (left - right);
+    matrix.m11 = 2 / (right - left);
     matrix.m12 = 0;
     matrix.m13 = 0;
     matrix.m14 = 0;
@@ -489,7 +489,7 @@ CanvasMatrix4.prototype.ortho = function(left, right, bottom, top, near, far)
     matrix.m24 = 0;
     matrix.m31 = 0;
     matrix.m32 = 0;
-    matrix.m33 = -2 / (far - near);
+    matrix.m33 = 1 / (far - near);
     matrix.m34 = 0;
     matrix.m41 = tx;
     matrix.m42 = ty;
