@@ -33,14 +33,10 @@ function pde(string, options) {
 	this.width  = 0;
 	this.height = 0;
 	this.level  = 0;
-	this.factor = Math.pow(0.5, this.level);
 	
 	this.calc_program = null;
 	
 	this.texture = null;
-	
-	this.modelviewMatrix  = null;
-	this.projectionMatrix = null;
 
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
@@ -71,8 +67,8 @@ function pde(string, options) {
 			// Delete texture
 		}
 
-		this.ping = new emptytexture(this.gl, this.width * this.factor, this.height * this.factor);
-		this.pong = new emptytexture(this.gl, this.width * this.factor, this.height * this.factor);
+		this.ping = new emptytexture(this.gl, this.width, this.height);
+		this.pong = new emptytexture(this.gl, this.width, this.height);
 		
 		this.fbo = this.gl.createFramebuffer();
 	}
@@ -103,11 +99,11 @@ function pde(string, options) {
 	
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-		this.gl.viewport(0, 0, this.width * this.factor, this.height * this.factor);
+		this.gl.viewport(0, 0, this.ping.width, this.ping.height);
 		
     this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width * this.factor);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), this.height * this.factor);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.pong.width );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), this.pong.height);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -121,15 +117,11 @@ function pde(string, options) {
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
 		
-		this.tmp = this.ping;
-		this.ping = this.pong;
-		this.pong = this.tmp;
-		
 		// First, set up Framebuffer we'll render into
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
-		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
+		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping.texture, 0);
 		this.gl.enable(this.gl.TEXTURE_2D);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong.texture);
 		this.checkFramebuffer();
 
 		// Then drawing the triangle strip using the calc program
@@ -137,6 +129,10 @@ function pde(string, options) {
 				
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);
+		
+		this.tmp = this.ping;
+		this.ping = this.pong;
+		this.pong = this.tmp;
 	}
 	
 	/* Every primitive is also responsible for knowing how to draw itself,
@@ -145,11 +141,16 @@ function pde(string, options) {
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
-		this.calculate(scr);
-		this.calculate(scr);
-		this.calculate(scr);
-		this.calculate(scr);
+		scr.sfq();
 		
+		this.calculate(scr);
+		/*
+		this.calculate(scr);
+		this.calculate(scr);
+		this.calculate(scr);
+		*/
+		
+		scr.perspective();
 		this.setUniforms(scr);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "uSampler"), 0);
 		this.gl.viewport(0, 0, scr.width, scr.height);
@@ -171,7 +172,7 @@ function pde(string, options) {
 		
 		// the recently-drawn texture
 		this.gl.enable(this.gl.TEXTURE_2D);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping.texture);
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
 		
 		this.gl.disableVertexAttribArray(0);
@@ -195,17 +196,6 @@ function pde(string, options) {
 		var frag_source	= this.read("shaders/pde.frag");
 		
 		this.program = this.compile_program(vertex_source, frag_source);
-	}
-	
-	this.setLevel = function(level, scr) {
-		this.level = level;
-		this.factor = Math.pow(0.5, this.level);
-		// Resize this.pong and this.ping
-		this.pong = new emptytexture(this.gl, this.width * this.factor, this.height * this.factor);
-		// Calculate
-		this.calculate(scr);
-		this.pong = new emptytexture(this.gl, this.width * this.factor, this.height * this.factor);
-		this.calculate(scr);
 	}
 }
 

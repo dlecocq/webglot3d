@@ -44,6 +44,9 @@ function primitive(context) {
 			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
 		}
 		
+		this.gl.console.log("Vertex shader:\n" + vertex_source);
+		this.gl.console.log("Fragment shader:\n" + frag_source);
+		
 		var vertex_shader = this.gl.createShader(this.gl.VERTEX_SHADER);
 		var frag_shader		= this.gl.createShader(this.gl.FRAGMENT_SHADER);
 		
@@ -110,7 +113,7 @@ function primitive(context) {
 		var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
 		if (status == gl.FRAMEBUFFER_COMPLETE) {
-			//gl.console.log("Framebuffer complete");
+			gl.console.log("Framebuffer complete");
 		} else if (status == gl.FRAMEBUFFER_UNSUPPORTED) {
 			gl.console.log("Framebuffer unsupported");
 		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {

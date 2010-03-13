@@ -1,10 +1,12 @@
 varying vec2 vTextureCoord;
 
-uniform sampler2D uSampler;
+uniform sampler2D sampler;
 
 void main() {
 	//float value = texture2D(uSampler, vTextureCoord.st).r / 20.0 + 0.5;
-	vec4 tex = texture2D(uSampler, vTextureCoord.st);
+		gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+	/*
+	vec4 tex = texture2D(sampler, vTextureCoord.st);
 	
 	float value = 0.25 * (tex.r + tex.g + tex.b + tex.a) / 2.0 + 0.5;
 	
@@ -32,9 +34,10 @@ void main() {
 		green = (value) * 2.5;
 	}
 	
-	gl_FragColor = vec4(red, green, blue, 1.0);
+	//gl_FragColor = vec4(red, green, blue, 1.0);
 	//gl_FragColor = vec4(value, value, value, 1.0);
 	//gl_FragColor = texture2D(uSampler, vTextureCoord.st);
+	*/
 
 	//gl_FragColor.r = (gl_FragColor.r + 1.0) / 2.0;
 	//gl_FragColor.a = 1.0;

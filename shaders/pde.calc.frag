@@ -1,6 +1,6 @@
 varying vec2 vTextureCoord;
 
-uniform sampler2D uSampler;
+uniform sampler2D sampler;
 
 uniform float t;
 
@@ -15,19 +15,19 @@ float dx = 2.0 / (width  - 1.0);
 
 const float alpha = 1.0;
 
-//const float omega = 120.0;
+const float omega = 120.0;
 
 // USER_PARAMETERS
 
 float uxx(float x, float y, float t) {
-	return -2.0 * (1.0 + y) * (1.0 - y);
-	//return -omega * omega * sin(omega * x);
+	//return -2.0 * (1.0 + y) * (1.0 - y);
+	return -omega * omega * sin(omega * x);
 	//return 1.0 + y + 2.0 * x * y + y * y + 7.0 * x;
 }
 
 float uyy(float x, float y, float t) {
-	return -2.0 * (1.0 + x) * (1.0 - x);
-	//return -omega * omega * cos(omega * y);
+	//return -2.0 * (1.0 + x) * (1.0 - x);
+	return -omega * omega * cos(omega * y);
 	//return x + x * x + x * 2.0 * y + 1.0 + 7.0 * y;
 }
 
@@ -64,11 +64,11 @@ void main () {
 		x = u_f(x, y, t);
 		gl_FragColor = vec4(x, x, x, x);
 	} else {
-		vec4 left  = texture2D(uSampler, vec2(texx - texdx, texy        ));
-		vec4 right = texture2D(uSampler, vec2(texx + texdx, texy        ));
-		vec4 down  = texture2D(uSampler, vec2(texx        , texy - texdy));
-		vec4 up    = texture2D(uSampler, vec2(texx        , texy + texdy));
-		vec4 self  = texture2D(uSampler, vec2(texx        , texy        ));
+		vec4 left  = texture2D(sampler, vec2(texx - texdx, texy        ));
+		vec4 right = texture2D(sampler, vec2(texx + texdx, texy        ));
+		vec4 down  = texture2D(sampler, vec2(texx        , texy - texdy));
+		vec4 up    = texture2D(sampler, vec2(texx        , texy + texdy));
+		vec4 self  = texture2D(sampler, vec2(texx        , texy        ));
 		
 		//* Blur kernel
 		//gl_FragColor = 0.2 * (left + right + down + up + self);
@@ -93,6 +93,8 @@ void main () {
 		float a = (dy2 * (left.a - 16.0 * self.b - 16.0 * right.b + right.a) + dx2 * (up.a - 16.0 * self.g - 16.0 * down.g + down.a) + 12.0 * dx2 * dy2 * f(x + 0.5 * dx, y - 0.5 * dy, t)) / (-30.0 * (dx2 + dy2));
 		//*/
 		
-		gl_FragColor = vec4(r, g, b, a);
+		//gl_FragColor = vec4(r, g, b, a);
+		gl_FragColor = vec4(x, x, x, x);
 	}
+	gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
 }

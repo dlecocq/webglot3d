@@ -337,7 +337,7 @@ function grapher() {
 		
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-		this.scr.perspective();
+		//this.scr.perspective();
 		//this.scr.sfq();
 
 		for (var i in this.primitives) {
