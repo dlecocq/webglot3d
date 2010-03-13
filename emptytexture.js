@@ -35,5 +35,5 @@ function emptytexture(context, width, height) {
 	
 	this.initialize(width, height);
 	
-	//return this.texture;
+	return this.texture;
 }

@@ -15,19 +15,19 @@ float dx = 2.0 / (width  - 1.0);
 
 const float alpha = 1.0;
 
-//const float omega = 120.0;
+const float omega = 120.0;
 
 // USER_PARAMETERS
 
 float uxx(float x, float y, float t) {
-	return -2.0 * (1.0 + y) * (1.0 - y);
-	//return -omega * omega * sin(omega * x);
+	//return -2.0 * (1.0 + y) * (1.0 - y);
+	return -omega * omega * sin(omega * x);
 	//return 1.0 + y + 2.0 * x * y + y * y + 7.0 * x;
 }
 
 float uyy(float x, float y, float t) {
-	return -2.0 * (1.0 + x) * (1.0 - x);
-	//return -omega * omega * cos(omega * y);
+	//return -2.0 * (1.0 + x) * (1.0 - x);
+	return -omega * omega * cos(omega * y);
 	//return x + x * x + x * 2.0 * y + 1.0 + 7.0 * y;
 }
 

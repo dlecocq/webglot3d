@@ -71,8 +71,8 @@ function pde(string, options) {
 			// Delete texture
 		}
 
-		this.ping = new emptytexture(this.gl, this.width * this.factor, this.height * this.factor);
-		this.pong = new emptytexture(this.gl, this.width * this.factor, this.height * this.factor);
+		this.ping = new emptytexture(this.gl, this.width, this.height);
+		this.pong = new emptytexture(this.gl, this.width, this.height);
 		
 		this.fbo = this.gl.createFramebuffer();
 	}
@@ -106,8 +106,8 @@ function pde(string, options) {
 		this.gl.viewport(0, 0, this.width * this.factor, this.height * this.factor);
 		
     this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width * this.factor);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), this.height * this.factor);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), this.height);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -128,8 +128,11 @@ function pde(string, options) {
 		// First, set up Framebuffer we'll render into
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
+		//*
 		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
+		//*/
+		//this.pong.bind();
 		this.checkFramebuffer();
 
 		// Then drawing the triangle strip using the calc program
@@ -145,12 +148,14 @@ function pde(string, options) {
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
+		scr.sfq();
 		this.calculate(scr);
 		this.calculate(scr);
 		this.calculate(scr);
 		this.calculate(scr);
 		
-		this.setUniforms(scr);
+		//scr.perspective();
+		this.setUniforms(scr, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "uSampler"), 0);
 		this.gl.viewport(0, 0, scr.width, scr.height);
 		
@@ -171,8 +176,11 @@ function pde(string, options) {
 		
 		// the recently-drawn texture
 		this.gl.enable(this.gl.TEXTURE_2D);
+		//*
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping);
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
+		//*/
+		//this.ping.bind();
 		
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);

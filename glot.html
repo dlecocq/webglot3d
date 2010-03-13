@@ -250,12 +250,15 @@
 		glot.add(new isosurface("x / d", SPHERICAL));
 		//*/
 		
-		//* Test surface - using cylindrical coordinates with surface class
+		/* Test surface - using cylindrical coordinates with surface class
 		glot.set("speed", 3.0);
 		glot.add(new surface("sin(4.0 * x - speed * t) / 5.0", CYLINDRICAL));
 		//*/
 		
 		glot.add(new box());
+		glot.add(new pde());
+	
+
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly

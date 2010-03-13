@@ -23,9 +23,6 @@ function grapher() {
 	this.angle      = 0;
 	this.moving     = false;
 	//this.rotation   = null;
-
-	// The view angle for the projection matric
-	this.alpha = 8;
 	
 	// A framerate timer
 	this.framerate	= null;
@@ -272,7 +269,8 @@ function grapher() {
 		 * The reshape function is called once for every time that display
 		 * is called, and the screen's values are adjusted accordingly.
 		 */
-		this.scr.width = this.scr.height = 500;
+		this.scr.width  = canvas.clientWidth;
+		this.scr.height = canvas.clientHeight;
 
 		/* This is a timer for framerate calculation
 		 */
@@ -375,13 +373,13 @@ function grapher() {
 	/* It's all in the name
 	 */
 	this.zoom_in = function() {
-		this.alpha /= 1.1;
+		this.scr.alpha /= 1.1;
 	}
 	
 	/* It's all in the name
 	 */
 	this.zoom_out = function() {
-		this.alpha *= 1.1;
+		this.scr.alpha *= 1.1;
 	}
 
 	/* Call this as often as you'd like, it will check to see if there
