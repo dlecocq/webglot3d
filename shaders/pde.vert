@@ -4,13 +4,22 @@ uniform mat4 u_projectionMatrix;
 attribute vec4 position;
 attribute vec2 aTextureCoord;
 
+uniform sampler2D uSampler;
+
 uniform float t;
 
 varying vec2 vTextureCoord;
 
 void main() {
 	
-	gl_Position = u_projectionMatrix * u_modelViewMatrix * position;
+	vec4 tex = texture2D(uSampler, aTextureCoord.st);
+	
+	vec4 result = position;
+	result.z = (tex.r + tex.g + tex.b + tex.a) * 0.25;
+	result.x = result.x * 4.0 - 2.0;
+	result.y = result.y * 4.0 - 2.0;
+	
+	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	
 	vTextureCoord = aTextureCoord;
 }

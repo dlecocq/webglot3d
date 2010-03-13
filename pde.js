@@ -19,7 +19,7 @@ function pde(string, options) {
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 15;
+	this.count			= 150;
 	this.index_ct   = 0;
 	
 	this.tmp    = null;
@@ -77,12 +77,88 @@ function pde(string, options) {
 	 * the objects.
 	 */
 	this.gen_vbo = function(scr) {
+		/*
 		var vertices = [scr.minx, scr.miny, 0,
 		                scr.minx, scr.maxy, 0,
 		                scr.maxx, scr.miny, 0,
 		                scr.maxx, scr.maxy, 0];
 		var texture = [0, 0, 0, 1, 1, 0, 1, 1];
 		var indices = [0, 1, 2, 3];
+		*/
+		
+		var vertices = [];
+		var texture  = [];
+		var indices  = [];
+		
+		var x = scr.minx;
+		var y = scr.miny;
+		var dx = (scr.maxx - scr.minx) / this.count;
+		var dy = (scr.maxy - scr.miny) / this.count;
+		
+		var tx = 0.0;
+		var ty = 1.0;
+		var dt = 1.0 / this.count;
+		
+		var i = 0;
+		var j = 0;
+		
+		/* This could probably still be optimized, but at least it's now
+		 * using a single triangle strip to render the mesh.  Much better
+		 * than the alternative.
+		 */
+		for (i = 0; i <= this.count; ++i) {
+			y = scr.miny;
+			ty = 1.0;
+			for (j = 0; j <= this.count; ++j) {
+				vertices.push(x);
+				vertices.push(y);
+				texture.push(tx);
+				texture.push(ty);
+				
+				y += dy;
+				ty -= dt;
+			}
+			x += dx;
+			tx += dt;
+		}
+		
+		var c = 0;
+		indices.push(c)
+		
+		var inc = this.count + 1;
+		var dec = inc - 1;
+		
+		for (i = 0; i < this.count; ++i) {
+			for (j = 0; j < this.count; ++j) {
+				c += inc;
+				indices.push(c);
+				c -= dec;
+				indices.push(c);
+			}
+			c += inc;
+			indices.push(c);
+			indices.push(c);
+			
+			if (dec < inc) {
+				dec = inc + 1;
+			} else {
+				dec = inc - 1;
+			}
+		}
+
+		/* Again, I'm not an expert in JavaScript, and I'm currently not
+		 * sure how exactly garbage collection works.  Either way, when 
+		 * generating the VBO, it's a good idea to delete the previously-
+		 * declared VBO so that it frees up some space on the GPU.  This
+		 * will be added soon, when I can find a tool that helps me track
+		 * and make sure that this memory is getting cleaned up.
+		 */
+		/*
+		if (this.vertexVBO) {
+			this.gl.console.log("deleting");
+			this.gl.deleteBuffer(this.vertexVBO);
+		}
+		*/
 		
 		this.vertexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
@@ -111,7 +187,7 @@ function pde(string, options) {
 		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
@@ -161,7 +237,7 @@ function pde(string, options) {
 		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
@@ -192,13 +268,14 @@ function pde(string, options) {
 	 */
 	this.gen_program = function() {
 		//*
-		var vertex_source = this.read("shaders/pde.vert");//.replace("USER_FUNCTION", this.f);
+		var vertex_source = this.read("shaders/pde.calc.vert");//.replace("USER_FUNCTION", this.f);
 		var frag_source   = this.read("shaders/pde.calc.frag");//.replace("USER_FUNCTION", this.f);
 		//*/
 		
 		this.calc_program = this.compile_program(vertex_source, frag_source);
-		
-		var frag_source	= this.read("shaders/pde.frag");
+
+		var vertex_source = this.read("shaders/pde.vert");
+		var frag_source	  = this.read("shaders/pde.frag");
 		
 		this.program = this.compile_program(vertex_source, frag_source);
 	}

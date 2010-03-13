@@ -15,7 +15,7 @@ float dx = 2.0 / (width  - 1.0);
 
 const float alpha = 1.0;
 
-const float omega = 120.0;
+const float omega = 80.0;
 
 // USER_PARAMETERS
 
