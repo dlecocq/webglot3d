@@ -36,11 +36,6 @@ function pde(string, options) {
 	this.factor = Math.pow(0.5, this.level);
 	
 	this.calc_program = null;
-	
-	this.texture = null;
-	
-	this.modelviewMatrix  = null;
-	this.projectionMatrix = null;
 
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
@@ -82,9 +77,12 @@ function pde(string, options) {
 	 * the objects.
 	 */
 	this.gen_vbo = function(scr) {
-		var vertices = [scr.minx, scr.miny, scr.minx, scr.maxy, scr.maxx, scr.miny, scr.maxx, scr.maxy];
+		var vertices = [scr.minx, scr.miny, 0,
+		                scr.minx, scr.maxy, 0,
+		                scr.maxx, scr.miny, 0,
+		                scr.maxx, scr.maxy, 0];
 		var texture = [0, 0, 0, 1, 1, 0, 1, 1];
-		var indices  = [0, 1, 2, 3];
+		var indices = [0, 1, 2, 3];
 		
 		this.vertexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
@@ -113,7 +111,7 @@ function pde(string, options) {
 		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
@@ -154,7 +152,7 @@ function pde(string, options) {
 		this.calculate(scr);
 		this.calculate(scr);
 		
-		//scr.perspective();
+		scr.perspective();
 		this.setUniforms(scr, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "uSampler"), 0);
 		this.gl.viewport(0, 0, scr.width, scr.height);
@@ -163,7 +161,7 @@ function pde(string, options) {
 		this.gl.enableVertexAttribArray(1);
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);

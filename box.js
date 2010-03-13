@@ -71,7 +71,7 @@ function box(options, source) {
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
-		//scr.perspective();
+		scr.perspective();
 		this.setUniforms(scr);
 		this.gl.enableVertexAttribArray(0);
 		
