@@ -1,6 +1,6 @@
 /* This class encapsulates the flow primitive.
  */
-function pde(string, options) {
+function pde3d(string, options) {
 	
 	this.gl   = null;
 	this.f    = string;
@@ -176,7 +176,7 @@ function pde(string, options) {
 	
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-		this.gl.viewport(0, 0, this.ping.width, this.ping.height);
+		//this.gl.viewport(0, 0, this.ping.width, this.ping.height);
 		
     this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width );
@@ -263,17 +263,17 @@ function pde(string, options) {
 	 */
 	this.gen_program = function() {
 		//*
-		var vertex_source = this.read("shaders/pde.calc.vert");//.replace("USER_FUNCTION", this.f);
-		var frag_source   = this.read("shaders/pde.calc.frag");//.replace("USER_FUNCTION", this.f);
+		var vertex_source = this.read("shaders/pde3d.calc.vert");//.replace("USER_FUNCTION", this.f);
+		var frag_source   = this.read("shaders/pde3d.calc.frag");//.replace("USER_FUNCTION", this.f);
 		//*/
 		
 		this.calc_program = this.compile_program(vertex_source, frag_source);
 
-		var vertex_source = this.read("shaders/pde.vert");
-		var frag_source	  = this.read("shaders/pde.frag");
+		var vertex_source = this.read("shaders/pde3d.vert");
+		var frag_source	  = this.read("shaders/pde3d.frag");
 		
 		this.program = this.compile_program(vertex_source, frag_source);
 	}
 }
 
-pde.prototype = new primitive();
+pde3d.prototype = new primitive();
