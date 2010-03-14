@@ -176,7 +176,7 @@ function pde(string, options) {
 	
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-		this.gl.viewport(0, 0, this.ping.width, this.ping.height);
+		//this.gl.viewport(0, 0, this.ping.width, this.ping.height);
 		
     this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width );
@@ -220,11 +220,9 @@ function pde(string, options) {
 	this.draw = function(scr) {
 		scr.sfq();
 		this.calculate(scr);
-		/*
 		this.calculate(scr);
 		this.calculate(scr);
 		this.calculate(scr);
-		*/
 		
 		scr.perspective();
 		this.setUniforms(scr, this.program);
