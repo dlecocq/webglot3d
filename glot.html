@@ -27,6 +27,8 @@
 	<script src="datasurface.js">  </script>
 	<script src="box.js">          </script>
 	<script src="pde.js">          </script>
+	<script src="noisetexture.js"> </script>
+	<script src="flow.js">         </script>
 	<script src="sphere.js">       </script>
 	<script src="stopwatch.js">    </script>
 	<script src="screen.js">       </script>
@@ -256,7 +258,8 @@
 		//*/
 		
 		glot.add(new box());
-		glot.add(new pde());
+		//glot.add(new pde());
+		glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0) * 0.25"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
