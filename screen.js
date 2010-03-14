@@ -31,7 +31,7 @@ function screen() {
 		this.projection = new CanvasMatrix4();
 		this.modelview  = new CanvasMatrix4();
 		
-		//this.modelview.translate(-this.dx, -this.dy, 0.0);
+		this.modelview.translate(-this.dx, -this.dy, 0.0);
 		
 		// Set the projection
 		this.projection.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);

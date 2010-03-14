@@ -1,6 +1,6 @@
 /* This class encapsulates the flow primitive.
  */
-function pde(string, options) {
+function flow(string, options) {
 	
 	this.gl   = null;
 	this.f    = string;
@@ -22,17 +22,12 @@ function pde(string, options) {
 	this.count			= 150;
 	this.index_ct   = 0;
 	
-	this.tmp    = null;
+	this.source = null;
 	this.ping   = null;
 	this.pong   = null;
 	this.fbo    = null;
-	this.rb     = null;
 	
-	this.parameters = null;
-	
-	this.width  = 0;
-	this.height = 0;
-	this.level  = 0;
+	this.texture = null;
 	
 	this.calc_program = null;
 
@@ -42,8 +37,8 @@ function pde(string, options) {
 	this.initialize = function(gl, scr, parameters) {
 		this.width  = scr.width ;
 		this.height = scr.height;
-		this.parameters = parameters;
 		this.gl = gl;
+		this.parameters = parameters;
 		this.refresh(scr);
 		this.gen_program();
 	}
@@ -64,11 +59,23 @@ function pde(string, options) {
 		if (this.pong) {
 			// Delete texture
 		}
-
-		this.ping = new emptytexture(this.gl, this.width, this.height);
-		this.pong = new emptytexture(this.gl, this.width, this.height);
 		
-		this.fbo = this.gl.createFramebuffer();
+		if ((!this.source) || scr.width > (this.source.width * 2 + 100) || scr.height > (this.source.height * 2 + 100)) {
+			console.log("Creating texture of size " + scr.width + " x " + scr.height);
+			
+			this.ping = new emptytexture(this.gl, scr.width, scr.height);
+			//this.ping = new texture(this.gl, "textures/kaust.png").texture;
+			this.pong = new emptytexture(this.gl, scr.width, scr.height);
+			//this.pong = new texture(this.gl, "textures/kaust.png").texture;
+			this.source = new noisetexture(this.gl, scr.width / 2, scr.height / 2);
+			//this.source = new texture(this.gl, "textures/kaust.png").texture;
+			
+			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+		}
+		
+		if (!this.fbo) {
+			this.fbo = this.gl.createFramebuffer();
+		}
 	}
 
 	/* All primitives are responsible for knowing how to construct them-
@@ -76,26 +83,17 @@ function pde(string, options) {
 	 * the objects.
 	 */
 	this.gen_vbo = function(scr) {
-		/*
-		var vertices = [scr.minx, scr.miny, 0,
-		                scr.minx, scr.maxy, 0,
-		                scr.maxx, scr.miny, 0,
-		                scr.maxx, scr.maxy, 0];
-		var texture = [0, 0, 0, 1, 1, 0, 1, 1];
-		var indices = [0, 1, 2, 3];
-		*/
-		
 		var vertices = [];
 		var texture  = [];
 		var indices  = [];
 		
 		var x = scr.minx;
 		var y = scr.miny;
+		var tx = 0.0;
+		var ty = 0.0;
+		
 		var dx = (scr.maxx - scr.minx) / this.count;
 		var dy = (scr.maxy - scr.miny) / this.count;
-		
-		var tx = 0.0;
-		var ty = 1.0;
 		var dt = 1.0 / this.count;
 		
 		var i = 0;
@@ -107,7 +105,7 @@ function pde(string, options) {
 		 */
 		for (i = 0; i <= this.count; ++i) {
 			y = scr.miny;
-			ty = 1.0;
+			ty = 0.0;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(x);
 				vertices.push(y);
@@ -115,7 +113,7 @@ function pde(string, options) {
 				texture.push(ty);
 				
 				y += dy;
-				ty -= dt;
+				ty += dt;
 			}
 			x += dx;
 			tx += dt;
@@ -163,6 +161,10 @@ function pde(string, options) {
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(vertices), this.gl.STATIC_DRAW);
 
+		/* One of the options (currently anticipated from this version) is
+		 * to color the surface with a normal map or a regular texture and
+		 * lighting information for the perception of depth on the object.
+		 */
 		this.textureVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(texture), this.gl.STATIC_DRAW);
@@ -176,11 +178,8 @@ function pde(string, options) {
 	
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-		this.gl.viewport(0, 0, this.ping.width, this.ping.height);
-		
-    this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width );
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), this.height);
+    this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "source"), 1);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -194,19 +193,30 @@ function pde(string, options) {
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
 		
-		this.tmp = this.ping;
+		var tmp = this.ping;
 		this.ping = this.pong;
-		this.pong = this.tmp;
+		this.pong = tmp;
 		
 		// First, set up Framebuffer we'll render into
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
+		
 		this.gl.enable(this.gl.TEXTURE_2D);
+		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
+		this.gl.activeTexture(this.gl.TEXTURE1);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source.texture);
 		this.checkFramebuffer();
-
+		
 		// Then drawing the triangle strip using the calc program
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
+		
+		/*
+		scr.set_uniforms(this.gl, this.program);
+		// Then, on top of that, draw the current line set
+		this.gl.useProgram(this.program);
+		this.gl.drawElements(this.gl.LINE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
+		//*/
 				
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);
@@ -220,16 +230,11 @@ function pde(string, options) {
 	this.draw = function(scr) {
 		scr.sfq();
 		this.calculate(scr);
-		/*
-		this.calculate(scr);
-		this.calculate(scr);
-		this.calculate(scr);
-		*/
-		
+		this.calculate(scr);		
+
 		scr.perspective();
 		this.setUniforms(scr, this.program);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "uSampler"), 0);
-		this.gl.viewport(0, 0, scr.width, scr.height);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -248,8 +253,10 @@ function pde(string, options) {
 		
 		// the recently-drawn texture
 		this.gl.enable(this.gl.TEXTURE_2D);
+		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping);
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
+		//*/
 		
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);
@@ -262,18 +269,16 @@ function pde(string, options) {
 	 * provides free access to functionality for reading files.
 	 */
 	this.gen_program = function() {
-		//*
-		var vertex_source = this.read("shaders/pde.calc.vert");//.replace("USER_FUNCTION", this.f);
-		var frag_source   = this.read("shaders/pde.calc.frag");//.replace("USER_FUNCTION", this.f);
-		//*/
-		
-		this.calc_program = this.compile_program(vertex_source, frag_source);
+		var vertex_source = this.read("shaders/flow.calc.vert").replace("USER_FUNCTION", this.f);
+		var frag_source   = this.read("shaders/flow.calc.frag").replace("USER_FUNCTION", this.f);
 
-		var vertex_source = this.read("shaders/pde.vert");
-		var frag_source	  = this.read("shaders/pde.frag");
+		this.calc_program = this.compile_program(vertex_source, frag_source);		
 		
-		this.program = this.compile_program(vertex_source, frag_source);
+		var vertex_source = this.read("shaders/flow.vert").replace("USER_FUNCTION", this.f);
+		var frag_source   = this.read("shaders/flow.frag").replace("USER_FUNCTION", this.f);
+
+		this.program      = this.compile_program(vertex_source, frag_source);
 	}
 }
 
-pde.prototype = new primitive();
+flow.prototype = new primitive();

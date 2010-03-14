@@ -106,6 +106,7 @@ function primitive(context) {
 				
 				return null;
 		}
+		return this.program;
 	}
 	
 	this.checkFramebuffer = function() {
@@ -149,12 +150,6 @@ function primitive(context) {
 			scale_location      = this.gl.getUniformLocation(program, "scale");
 			color_location      = this.gl.getUniformLocation(program, "color");
 
-			this.projectionMatrix = new CanvasMatrix4();
-			this.modelviewMatrix = new CanvasMatrix4();
-
-			// Set the projection
-			this.projectionMatrix.ortho(this.minx, this.maxx, this.miny, this.maxy, 0, 10);
-
 			this.gl.uniformMatrix4fv(modelview_location , false, scr.modelview.getAsWebGLFloatArray());
 			this.gl.uniformMatrix4fv(projection_location, false, scr.projection.getAsWebGLFloatArray());
 			this.gl.uniform1f(time_location, scr.wall.time());
@@ -174,6 +169,8 @@ function primitive(context) {
 				param_loc = this.gl.getUniformLocation(program, j);
 				this.gl.uniform1f(param_loc, this.parameters[j]);
 			}
-		} catch (e) {}
+		} catch (e) {
+			this.gl.console.log("setUniforms is breaking!");
+		}
 	}
 }
