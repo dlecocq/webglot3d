@@ -44,8 +44,10 @@ function primitive(context) {
 			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
 		}
 		
+		/*
 		this.gl.console.log("Vertex shader:\n" + vertex_source);
 		this.gl.console.log("Fragment shader:\n" + frag_source);
+		*/
 		
 		var vertex_shader = this.gl.createShader(this.gl.VERTEX_SHADER);
 		var frag_shader		= this.gl.createShader(this.gl.FRAGMENT_SHADER);
@@ -170,7 +172,7 @@ function primitive(context) {
 				this.gl.uniform1f(param_loc, this.parameters[j]);
 			}
 		} catch (e) {
-			this.gl.console.log("setUniforms is breaking!");
+			this.gl.console.log("setUniforms is breaking : " + e);
 		}
 	}
 }
