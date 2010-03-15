@@ -124,8 +124,8 @@ function datasurface(source, width, height, b_width, b_height) {
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
-	this.draw = function() {
-		this.setUniforms();
+	this.draw = function(scr) {
+		this.setUniforms(scr);
 		//scr.set_uniforms(this.gl, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
 		
