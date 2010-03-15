@@ -15,9 +15,7 @@ void main() {
 	vec4 tex = texture2D(uSampler, aTextureCoord.st);
 	
 	vec4 result = position;
-	result.z = (tex.r + tex.g + tex.b + tex.a) * 0.25;
-	result.x = result.x * 4.0 - 2.0;
-	result.y = result.y * 4.0 - 2.0;
+	//result.z = (tex.r + tex.g + tex.b + tex.a) * 0.25;
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	

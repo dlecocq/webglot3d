@@ -87,6 +87,10 @@ function primitive(context) {
 		this.gl.attachShader(this.program, vertex_shader);
 		this.gl.attachShader(this.program, frag_shader);
 
+		// Bind attribute locations - this could be very dangerous.
+		this.gl.bindAttribLocation(this.program, 0, "position");
+		this.gl.bindAttribLocation(this.program, 1, "aTextureCoord");
+
 		// Link the program
 		this.gl.linkProgram(this.program);
 
@@ -116,7 +120,7 @@ function primitive(context) {
 		var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
 		if (status == gl.FRAMEBUFFER_COMPLETE) {
-			gl.console.log("Framebuffer complete");
+			//gl.console.log("Framebuffer complete");
 		} else if (status == gl.FRAMEBUFFER_UNSUPPORTED) {
 			gl.console.log("Framebuffer unsupported");
 		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
