@@ -90,12 +90,33 @@ function pde3d(string, options) {
 	 * the objects.
 	 */
 	this.gen_vbo = function(scr) {
+		// Victory! It works!
+		var vertices = [ scr.maxx, scr.maxy,  scr.minx, //A
+										 scr.minx, scr.miny, -scr.minx, //B
+										 scr.maxx, scr.miny,  scr.minx, //C
+										 scr.maxx, scr.miny, -scr.minx, //D
+										 scr.maxx, scr.maxy, -scr.minx, //E
+										 scr.minx, scr.miny,  scr.minx, //F
+										 scr.minx, scr.maxy,  scr.minx, //G
+										 scr.minx, scr.maxy, -scr.minx]; //H
+		var texture  = [ 1, 1, 1,  //A
+										 0, 0, 0,  //B
+										 1, 0, 1,  //C
+										 1, 0, 0,  //D
+										 1, 1, 0,  //E
+										 0, 0, 1,  //F
+										 0, 1, 1,  //G
+										 0, 1, 0]; //H
+		var indices  = [ 2, 5, 0, 6, 7, 7, 4, 0, 3, 2, 1, 5, 6, 6, 1, 7, 3, 4]; // Deep magic
+		
+		/*
 		var vertices = [scr.minx, scr.miny,
 		                scr.minx, scr.maxy,
 		                scr.maxx, scr.miny,
 		                scr.maxx, scr.maxy];
 		var texture = [0, 0, 0, 1, 1, 0, 1, 1];
 		var indices = [0, 1, 2, 3];
+		*/
 		//*/
 		/*
 		var vertices   = [];
@@ -238,11 +259,11 @@ function pde3d(string, options) {
 		*/
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
-		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(1, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		/*
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.inttexVBO);
@@ -284,8 +305,8 @@ function pde3d(string, options) {
 	this.draw = function(scr) {
 		scr.sfq();
 		this.calculate(scr);
-		/*
 		this.calculate(scr);
+		/*
 		this.calculate(scr);
 		this.calculate(scr);
 		*/
@@ -294,6 +315,10 @@ function pde3d(string, options) {
 		//scr.sfq();
 		this.setUniforms(scr, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "uSampler"), 0);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.program, "width")   , this.width   );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.program, "height")  , this.height  );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.program, "b_width") , this.b_width );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.program, "b_height"), this.b_height);
 		this.gl.viewport(0, 0, scr.width, scr.height);
 		
 		this.gl.enableVertexAttribArray(0);
@@ -301,7 +326,7 @@ function pde3d(string, options) {
 		
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
 		//this.gl.bindAttribLocation(this.program, 0, "position");
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(0, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
@@ -312,7 +337,7 @@ function pde3d(string, options) {
 		//this.gl.bindAttribLocation(this.program, 1, "aTextureCoord");
 		//void glBindAttribLocation(	GLuint program,	GLuint index,	const GLchar *name);
 		
-		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		this.gl.vertexAttribPointer(1, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
 		

@@ -25,7 +25,7 @@ float dz = 2.0 / (float(depth ) - 1.0);
 
 const float alpha = 1.0;
 
-const float omega = 20.0;
+const float omega = 12.0;
 
 int mod(int a, int b) {
 	return a - (a / b) * b;

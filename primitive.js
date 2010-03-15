@@ -88,8 +88,15 @@ function primitive(context) {
 		this.gl.attachShader(this.program, frag_shader);
 
 		// Bind attribute locations - this could be very dangerous.
+		//*
 		this.gl.bindAttribLocation(this.program, 0, "position");
 		this.gl.bindAttribLocation(this.program, 1, "aTextureCoord");
+		//*/
+		/*
+		this.gl.bindAttribLocation(this.program, 0, "vPosition");
+		this.gl.bindAttribLocation(this.program, 1, "vTexCoord");
+		*/
+		
 
 		// Link the program
 		this.gl.linkProgram(this.program);
