@@ -1,8 +1,8 @@
 uniform mat4 u_modelViewMatrix;
 uniform mat4 u_projectionMatrix;
 
-attribute vec4 vTexCoord;
-attribute vec4 vPosition;
+attribute vec4 aTextureCoord;
+attribute vec4 position;
 
 varying vec2 v_texCoord;
 varying vec3 normal;
@@ -34,8 +34,8 @@ vec4 function(float u, float v) {
 }
 
 void main() {
-	float x = vPosition.x;
-	float y = vPosition.y;
+	float x = position.x;
+	float y = position.y;
 
 	gl_Position = function(x, y);
 	
@@ -56,5 +56,5 @@ void main() {
 	
 	normal = normalize((u_modelViewMatrix * vec4(normal.x, normal.y, normal.z, 0.0)).xyz);
 
-	v_texCoord = vTexCoord.st;
+	v_texCoord = aTextureCoord.st;
 }

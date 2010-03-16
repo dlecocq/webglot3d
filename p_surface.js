@@ -168,8 +168,8 @@ function p_surface(string, options, source) {
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
-	this.draw = function() {
-		this.setUniforms();
+	this.draw = function(scr) {
+		this.setUniforms(scr);
 		
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
 		
