@@ -1,7 +1,7 @@
 uniform mat4 u_modelViewMatrix;
 
 varying vec3 direction;
-varying vec3 position;
+varying vec3 vposition;
 varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
