@@ -37,18 +37,21 @@ float mod(float a, float b) {
 
 float uxx(float x, float y, float z, float t) {
 	//return -2.0 * (1.0 + y) * (1.0 - y);
-	return -omega * omega * sin(omega * x);
+	//return -omega * omega * sin(omega * x);
+	return -omega * omega * sin(omega * (abs(x + y * y * y) * sin(x)));
 	//return 1.0 + y + 2.0 * x * y + y * y + 7.0 * x;
 }
 
 float uyy(float x, float y, float z, float t) {
 	//return -2.0 * (1.0 + x) * (1.0 - x);
-	return -omega * omega * cos(omega * y);
+	//return -omega * omega * cos(omega * y);
+	return -omega * omega * cos(omega * (abs(y + x * x * x) * cos(x)));
 	//return x + x * x + x * 2.0 * y + 1.0 + 7.0 * y;
 }
 
 float uzz(float x, float y, float z, float t) {
-	return -omega * omega * cos(omega * z);
+	//return -omega * omega * cos(omega * z);
+	return -omega * omega * cos(omega * (abs(2.0 * z * y + x * x * x / (z + 1.0)) * cos(x)));
 }
 
 float f(float x, float y, float z, float t) {

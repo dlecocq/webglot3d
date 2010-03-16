@@ -350,7 +350,8 @@ function grapher() {
 		 */
 		this.framecount = this.framecount + 1;
 		if (this.framecount == 150) {
-			document.getElementById("framerate").innerHTML = "Framerate : " + 150 / this.framerate.time();
+			//document.getElementById("framerate").innerHTML = "Framerate : " + 150 / this.framerate.time();
+			this.gl.console.log("Framerate : " + 150 / this.framerate.time());
 			this.framecount = 0;
 			this.framerate = new stopwatch();
 			this.framerate.start();
