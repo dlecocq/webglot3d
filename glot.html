@@ -231,9 +231,9 @@
 		glot.add(new p_surface("pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*cos(18.85 * u), pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*sin(18.85 * u), pow(k, 18.85 * u) * sin(6.3 * v) - a * pow(k2, 18.85 * u)"));
 		//*/
 		
-		/* Test surface - a funky "sphere" - a sphere with changing radius.
+		//* Test surface - a funky "sphere" - a sphere with changing radius.
 		// You can have a lot of fun with it.
-		glot.add(new p_surface("abs(cos(20.0 * v * u) * sin(20.0 * v * u)), 3.14159265 * u, 6.3 * v", SPHERICAL));
+		glot.add(new p_surface("abs(cos(20.0 * v * u + t) * sin(20.0 * v * u)), 3.14159265 * u, 6.3 * v", SPHERICAL));
 		//*/
 		
 		/* Test surface - a cylinder with isosurfacing
@@ -259,9 +259,9 @@
 		
 		//glot.add(new pde());
 		
-		glot.add(new box());
+		//glot.add(new box());
 		//glot.add(new pde());
-		glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0) * 0.25"));
+		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0) * 0.25"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
