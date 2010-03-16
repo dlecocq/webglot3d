@@ -263,8 +263,8 @@
 		
 		glot.add(new box());
 		//glot.add(new pde());
-		glot.set("isovalue", 0.2);
-		glot.add(new pde3d());
+		glot.set("alpha", 0.2);
+		//glot.add(new pde3d());
 		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.25"));
 		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
 				
@@ -282,7 +282,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:94%;
+		height:80%;
 	}
 	</style>
 </head>
@@ -294,7 +294,6 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
-	<!--
 	<div id="function_form">
 		<form name="function" onsubmit="gen_isosurface(); return false">
 			f(x, y, z, t) = <input size='100' name="fn" /> = 0
@@ -303,6 +302,5 @@
 	</div>
 	
 	<div id="framerate">Framerate: </div>
-	-->
 </body>
 </html>
