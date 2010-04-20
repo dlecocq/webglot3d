@@ -335,7 +335,7 @@ function grapher() {
 		
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-		//this.scr.perspective();
+		this.scr.perspective();
 		//this.scr.sfq();
 
 		for (var i in this.primitives) {
@@ -401,10 +401,11 @@ function grapher() {
 			return;
 		}
 	
-		context.viewport(0, 0, w, h);
+		//context.viewport(0, 0, w, h);
 		
-		this.scr.aspect = w / h;
-		this.scr.alpha  = this.alpha;
+		this.scr.width = w;
+		this.scr.height = h;
+		//this.scr.alpha  = this.alpha;
 	}
 	
 	/* Add a primitive to the container.

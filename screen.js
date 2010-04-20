@@ -13,9 +13,6 @@ function screen() {
 	this.dx     = 0.0;
 	this.dy     = 0.0;
 	
-	// Perhaps this won't be needed int the JavaScript
-	// implementation.  Look into how time sampling is
-	// done / available in JavaScript 
 	this.wall   =  new stopwatch();
 	
 	this.rotation   = new CanvasMatrix4();
@@ -40,14 +37,18 @@ function screen() {
 	this.perspective = function() {
 		// Set the projection
 		this.projection = new CanvasMatrix4();
-    this.projection.perspective(this.alpha, this.aspect, 10, 1000);
+		this.projection.perspective(this.alpha, this.width / this.height, 10, 1000);
 		
 		this.modelview = new CanvasMatrix4();
+		// This gets everything centered, supposedly
 		this.modelview.translate(-(this.minx + this.maxx) * 0.5, -(this.miny + this.maxy) * 0.5, 0.0);
+		// Apply rotations that have occurred up to this point
 		this.modelview.multRight(this.rotation);
 		if (this.moving) {
-			this.modelview.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
+		  // It the object is still moving, then rotate it by the current rotation
+		  this.modelview.rotate(this.angle, this.axis.x, this.axis.y, this.axis.z);
 		}
+		// Move the model away so that it can be viewed
 		this.modelview.translate(0, 0, -30);
 		
 		this.inversemv = new CanvasMatrix4(this.modelview);
