@@ -115,7 +115,6 @@ float function(float x, float y, float z) {
 	return (hi.r + hi.g + hi.b + hi.a) * 0.25 - isovalue;
 	//return (x + b_width) / 2.0;
 	//return alpha * hi + (1.0 - alpha) * lo - isovalue;
-	//*/
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
