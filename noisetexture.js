@@ -17,10 +17,18 @@ function noisetexture(context, width, height) {
 		var pixels = new WebGLFloatArray(this.width * this.height * 4);
 		var count = this.width * this.height * 4;
 		//*
-		for (var i = 0; i < count; i += 4) {
+		for (var i = 0; i < count; i += 1) {
 			pixels[i] = Math.random() * 3.0;
+			//pixels[i] = 4.0 * i / count;
+			//pixels[i] = 0.0;
 		}
 		//*/
+		
+		/*
+		for (var i = count / 4; i < count / 2; i += 1) {
+			pixels[i] = 1.0;
+		}	
+		*/	
 		this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.width, this.height, 0, this.gl.RGBA, this.gl.FLOAT, pixels);
 		
 		this.gl.enable(this.gl.TEXTURE_2D);
