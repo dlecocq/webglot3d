@@ -106,7 +106,7 @@
 		glot.add(new datasurface("volumes/bruce.png", 256, 256, 13, 12));
 		//*/
 		
-		/*
+		//*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
@@ -261,11 +261,67 @@
 		
 		//glot.add(new pde());
 		
+		/* Some implicit surfaces from http://virtualmathmuseum.org/
+		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
+		81.0*(pow(x,3.0) + pow(y,3.0) + pow(z,3.0)) - 189.0*(x*x*y + x*x*z + y*y*x + y*y*z + z*z*x + z*z*y) + 54.0*(x*y*z) + 126.0*(x*y + x*z + y*z) - 9.0*(x * x + y * y + z * z) - 9.0*(x + y + z) + 1.0
+		
+		// http://virtualmathmuseum.org/Surface/orthocircles/orthocircles.html
+		(pow(x*x + y*y - 1.0,2.0) + z * z)*(pow(y * y + z * z - 1.0,2.0) + x * x)*(pow(z * z + x * x - 1.0, 2.0) + y * y) - pow(0.075, 2.0)*(1.0 + 3.0*(x * x + y * y + z * z))
+		
+		// This description does not appear to be correct
+		// http://virtualmathmuseum.org/Surface/bretzel5/bretzel5.html
+		(x * x + y * y * 0.25 - 1.0) * ( x * x * 0.25 + y * y - 1.0) - 0.075
+		
+		// Incomplete description?
+		// http://virtualmathmuseum.org/Surface/pilz/pilz.html
+		pow(pow(x*x + y*y - 1.0, 2.0) + pow(z - 0.5, 2.0),2.0) * (pow(y * y * 0.64 + pow(z + 0.03, 2.0) - 1.0,2.0) + x * x) - 0.28 * (1.0 + 3.0*(pow(z - 0.5, 2.0)))
+		
+		// http://virtualmathmuseum.org/Surface/barth_sextic/barth_sextic.html
+		glot.set("phi", 1.61803);
+		glot.set("w", 1.0);
+		4.0*(phi*phi*x*x - y*y) * (phi*phi*y*y - z*z) * (phi*phi*z*z - x*z) - (1.0 + 2.0*phi) * pow(x*x + y*y + z*z - w*w, 2.0) * w*w == 0
+		*/
+		
+		/*
+		Parametric surfaces
+		*/
+		
+		/*
+		var aa = 0.9;
+		var w = Math.sqrt(1 - aa * aa);
+		glot.set("aa", aa);
+		glot.set("w", w);
+		glot.add(new surface("4.0 * atan( (aa / w) * (sin(w * y))) / (cosh(aa * x))"));
+		*/
+		
+		/*
+		var aa = 0.7;
+		var wsqr = 1 - aa * aa;
+		var w = Math.sqrt(wsqr);
+		glot.set("aa", aa);
+		glot.set("wsqr", wsqr);
+		glot.set("w", w);
+		
+		var x = "-u + (2.0 * wsqr * cosh(aa * u) * sinh(aa * u) / (aa * (pow(w * cosh(aa * u), 2.0) + pow(aa * sin(w * v), 2.0))))";
+		var y = "2.0 * w * cosh(aa * u) * (-(w * cos(v) * cos(w * v)) - sin(v) * sin(w * v)) / (aa * (pow(w * cosh(aa * u), 2.0) + pow(aa * sin(w * v), 2.0)))";
+		var z = "2.0 * w * cosh(aa * u) * (-(w * sin(v) * cos(w * v)) - cos(v) * sin(w * v)) / (aa * (pow(w * cosh(aa * u), 2.0) + pow(aa * sin(w * v), 2.0)))";
+		
+		glot.add(new p_surface(x + "," + y + "," + z, 0, 5, 0, 5))
+		//*/
+		
+		/*
+		glot.add(new p_surface("u - u * u * u / 3.0 + u * v * v, v - v * v * v / 3.0 + v * u * u, u * u - v * v", 0, 3, 0, 3));
+		//x = u - u * u * u / 3 + u * v * v
+		//y = v - v * v * v / 3 + v * u * u
+		//z = u * u - v * v
+		//*/
+		
 		glot.add(new box());
 		//glot.add(new pde());
-		glot.set("alpha", 0.2);
+		//glot.set("alpha", 0.2);
+		glot.set("isovalue", 0.2);
 		//glot.add(new pde3d());
-		glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
+		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
 		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
