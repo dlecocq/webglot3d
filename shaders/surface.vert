@@ -1,3 +1,5 @@
+#version 120
+
 uniform mat4 u_modelViewMatrix;
 uniform mat4 u_projectionMatrix;
 
@@ -12,6 +14,12 @@ varying vec3 halfVector;
 // USER_PARAMETERS
 
 uniform float t;
+
+float cosh(float val) {
+    float tmp = exp(val);
+    float cosH = (tmp + 1.0 / tmp) / 2.0;
+    return cosH;
+}
 
 float function(float x, float y) {
 	/* CYLINDRICAL
