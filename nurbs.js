@@ -80,7 +80,7 @@ function nurbs(string, options) {
 		*/
 		
 		if (!this.source) {
-			this.source = new nurbstexture(this.gl, 10);
+			this.source = new nurbstexture(this.gl, 100);
 			//this.source = new texture(this.gl, "textures/kaust.png").texture;
 		}
 	}

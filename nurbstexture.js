@@ -31,20 +31,16 @@ function nurbstexture(context, height) {
 			mid += 1;
 		}
 		
-		this.gl.console.log(mid)
-		
-		//*
 		for (var i = 0; i < height; ++i) {
 			
-			this.gl.console.log(i / height);
-			
+			// Set alphas = 1
 			for (var j = 0; j < width; ++j) {
 				pixels[(width * i + j) * 4 + 3] = 1;
 			}
+			
 			// Set the first column as the parameter value
 			var u = i / height;
 			pixels[width * 4 * i] = u;
-			
 			pixels[width * 4 * i + 3] = 1;
 			
 			// Figure out which knots to use
@@ -53,14 +49,11 @@ function nurbstexture(context, height) {
 			}
 			
 			// Assign the rest of the columns
-			//*
 			for (var j = 0; j < numknots; ++j) {
-				this.gl.console.log(mid - numknots / 2 + j)
 				pixels[(width * i + j + 1) * 4] = this.knots[mid - numknots / 2 + j];
 			}
-			//*/
 		}
-		//*/
+
 		this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.FLOAT, pixels);
 		
 		this.gl.enable(this.gl.TEXTURE_2D);
@@ -76,7 +69,7 @@ function nurbstexture(context, height) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
 	}
 	
-	this.initialize(10, 10);
+	this.initialize(this.width, height);
 	
 	return this.texture;
 }
