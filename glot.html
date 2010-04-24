@@ -28,6 +28,8 @@
 	<script src="box.js">          </script>
 	<script src="pde3d.js">        </script>
 	<script src="pde.js">          </script>
+	<script src="nurbstexture.js"> </script>
+	<script src="nurbs.js">        </script>
 	<script src="noisetexture.js"> </script>
 	<script src="flow.js">         </script>
 	<script src="sphere.js">       </script>
@@ -42,12 +44,12 @@
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
 		if (key == 65) {
-			console.log("Setting isovalue to " + (glot.get("isovalue") + 0.01));
-			glot.set("isovalue", glot.get("isovalue") + 0.01);
+			console.log("Setting offset to " + (glot.get("offset") + 0.5));
+			glot.set("offset", glot.get("offset") + 0.5);
 			glot.display();
 		} else if (key == 90) {
-			console.log("Setting isovalue to " + (glot.get("isovalue") + 0.01));
-			glot.set("isovalue", glot.get("isovalue") - 0.01);
+			console.log("Setting offset to " + (glot.get("offset") - 0.5));
+			glot.set("offset", glot.get("offset") - 0.5);
 			glot.display();
 		}	
 	}
@@ -106,7 +108,7 @@
 		glot.add(new datasurface("volumes/bruce.png", 256, 256, 13, 12));
 		//*/
 		
-		//*
+		/*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
@@ -319,10 +321,13 @@
 		glot.add(new box());
 		//glot.add(new pde());
 		//glot.set("alpha", 0.2);
-		glot.set("isovalue", 0.2);
+		glot.set("isovalue", 0.1);
+		glot.set("offset", 0.0);
 		//glot.add(new pde3d());
 		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
 		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
+		
+		glot.add(new nurbs("sin(x)"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
