@@ -12,9 +12,9 @@ uniform float height;
 uniform float knots;
 uniform float p;
 
-float texdy    = 1.0 / (height     );
-float texdx    = 1.0 / (width      );
-float knots_dx = 1.0 / (knots + 1.0);
+float texdy    = 1.0 / (height);
+float texdx    = 1.0 / (width );
+float knots_dx = 1.0 / (width );
 
 float tx = vTextureCoord.x;
 float ty = vTextureCoord.y;
@@ -39,7 +39,7 @@ void main () {
 	float value = ((u - u_i) / (uof(i + p) - u_i)) * n_i + ((u_i_p_1 - u) / (u_i_p_1 - uof(i + 1.0))) * n_i_1;
 	
 	//gl_FragColor = vec4(value, 0, 0, 1.0);
-	gl_FragColor = vec4(i / width, 0.0, 0.0, 1.0);
+	gl_FragColor = vec4(n_i, 0.0, 0.0, 1.0);
 	//gl_FragColor = texture2D(knots_vector, vTextureCoord);
 	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }
