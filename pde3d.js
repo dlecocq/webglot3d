@@ -15,7 +15,7 @@ function pde3d(string, options) {
 	this.textureVBO    = null;
 	this.inttexVBO     = null;
 	this.real_coordVBO = null;
-	this.indexVBO		   = null;
+	this.indexVBO	   = null;
 	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
