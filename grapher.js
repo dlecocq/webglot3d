@@ -400,8 +400,9 @@ function grapher() {
 		if (w == this.scr.width && h == this.scr.height) {
 			return;
 		}
-	
-		//context.viewport(0, 0, w, h);
+		
+		this.gl.console.log("Setting viewport to be (" + w + " x " + h + ")");
+		context.viewport(0, 0, w, h);
 		
 		this.scr.width = w;
 		this.scr.height = h;
