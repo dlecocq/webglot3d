@@ -127,7 +127,7 @@ function primitive(context) {
 		var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
 		if (status == gl.FRAMEBUFFER_COMPLETE) {
-			//gl.console.log("Framebuffer complete");
+			gl.console.log("Framebuffer complete");
 		} else if (status == gl.FRAMEBUFFER_UNSUPPORTED) {
 			gl.console.log("Framebuffer unsupported");
 		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
@@ -158,7 +158,7 @@ function primitive(context) {
 			modelview_location  = this.gl.getUniformLocation(program, "u_modelViewMatrix");
 			projection_location = this.gl.getUniformLocation(program, "u_projectionMatrix");
 			inversemv_location  = this.gl.getUniformLocation(program, "u_modelViewInverse");
-			time_location	      = this.gl.getUniformLocation(program, "t");
+			time_location	    = this.gl.getUniformLocation(program, "t");
 			dx_location         = this.gl.getUniformLocation(program, "dx");
 			dy_location         = this.gl.getUniformLocation(program, "dy");
 			scale_location      = this.gl.getUniformLocation(program, "scale");
