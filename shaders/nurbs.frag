@@ -7,7 +7,6 @@ uniform sampler2D accumulation;
 
 void main() {
 	vec4 texture = texture2D(accumulation, vTextureCoord.st);
-	//vec4 texture = vec4(1.0, 0.0, 0.0, 1.0);
 
 	// Scaling The Input Vector To Length 1
 	vec3 norm_normal = normalize(normal);
@@ -21,6 +20,8 @@ void main() {
 	// Calculating The Final Color
 	gl_FragColor = 0.4 * texture + 0.6 * texture * DiffuseTerm;
 	gl_FragColor.a = 1.0;
+	
+	gl_FragColor = texture;
 
 	/* A normal map
 	gl_FragColor = vec4(norm_normal.r, norm_normal.g, norm_normal.b, 1.0);

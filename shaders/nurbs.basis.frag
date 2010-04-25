@@ -9,37 +9,68 @@ uniform float t;
 
 uniform float width;
 uniform float height;
+// knots = 8
 uniform float knots;
 uniform float p;
 
-float texdy    = 1.0 / (height);
-float texdx    = 1.0 / (width );
-float knots_dx = 1.0 / (width );
-
+// Abbreviations
 float tx = vTextureCoord.x;
 float ty = vTextureCoord.y;
 
-float u     = ty;
+// Stuff related to the basis functions
+// This is the basis column we're in
+float i   = floor(tx * width);
+// This is the texture representation of that
+float itx = i / (width - 1.0);
+// Basis dx - gets one left or right
+float bdx = 1.0 / (width - 1.0);
+
+// Stuff related to the knots
+// Knots dx - gets one left or right
+float kdx = 1.0 / (knots);
+float ktx = (i + 1.01) / (knots + 1.0);
+
+// General stuff
+float u     = (1.0 - ty);
 float n_i   = texture2D(basis, vTextureCoord).r;
-float n_i_1 = texture2D(basis, vec2(knots_dx + tx, ty)).r;
-
-float i = floor(tx * width);
-
-float uof(float i) {
-	// In a sane world, this would be it
-	i = i / knots;
-	return texture2D(knots_vector, vec2(tx, i * (1.0 - knots_dx) + knots_dx)).r;
-}
+float n_i_1 = texture2D(basis, vec2(itx + bdx, u)).r;
 
 // USER_PARAMETERS
 
+vec4 color(float value) {
+	float red = 1.0;
+	float green = 1.0;
+	float blue = 0.0;
+
+	if (value > 0.75) {
+		red = 0.0;
+		green = (1.0 - value) * 4.0;
+		blue = 1.0;
+	} else if (value > 0.5) {
+		red = (0.75 - value) * 4.0;
+		green = 1.0;
+		blue = (value - 0.5) * 4.0;
+	} else if (value > 0.25) {
+		red = 1.0;
+		green = 0.5 + (value - 0.25) * 2.0;
+	} else {
+		red = 1.0;
+		green = (value) * 2.0;
+	}
+
+	return vec4(red, green, blue, 1.0);
+}
+
 void main () {
-	float u_i     = uof(i);
-	float u_i_p_1 = uof(i + p + 1.0);
-	float value = ((u - u_i) / (uof(i + p) - u_i)) * n_i + ((u_i_p_1 - u) / (u_i_p_1 - uof(i + 1.0))) * n_i_1;
+	float u_i   = texture2D(knots_vector, vec2(ktx                  , u)).r;
+	float u_i1  = texture2D(knots_vector, vec2(ktx + kdx            , u)).r;
+	float u_ip  = texture2D(knots_vector, vec2(ktx + p * kdx        , u)).r;
+	float u_ip1 = texture2D(knots_vector, vec2(ktx + (p + 1.0) * kdx, u)).r;
+	float value = ((u - u_i) / (u_ip - u_i));// * n_i;// + ((u_ip1 - u) / (u_ip1 - u_i1)) * n_i_1;
 	
-	//gl_FragColor = vec4(value, 0, 0, 1.0);
-	gl_FragColor = vec4(n_i, 0.0, 0.0, 1.0);
+	//gl_FragColor = vec4(value, 0.0, 0.0, 1.0);
+	gl_FragColor = color((value + 2.0) / 4.0);
+	//gl_FragColor = vec4(u_ip1, 0.0, 0.0, 1.0);
 	//gl_FragColor = texture2D(knots_vector, vTextureCoord);
 	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }

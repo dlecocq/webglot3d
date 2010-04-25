@@ -20,25 +20,26 @@
 		C++ for this task so that only one script must be included.  For the
 		time being, just copy-and-paste this.
 	-->
-	<script src="emptytexture.js"> </script>
-	<script src="texture.js">      </script>
-	<script src="ray.js">          </script>
-	<script src="primitive.js">    </script>
-	<script src="datasurface.js">  </script>
-	<script src="box.js">          </script>
-	<script src="pde3d.js">        </script>
-	<script src="pde.js">          </script>
-	<script src="nurbstexture.js"> </script>
-	<script src="nurbs.js">        </script>
-	<script src="noisetexture.js"> </script>
-	<script src="flow.js">         </script>
-	<script src="sphere.js">       </script>
-	<script src="stopwatch.js">    </script>
-	<script src="screen.js">       </script>
-	<script src="surface.js">      </script>
-	<script src="p_surface.js">    </script>
-	<script src="grapher.js">      </script>
-	<script src="isosurface.js">   </script>
+	<script src="emptytexture.js">     </script>
+	<script src="texture.js">          </script>
+	<script src="ray.js">              </script>
+	<script src="primitive.js">        </script>
+	<script src="datasurface.js">      </script>
+	<script src="box.js">              </script>
+	<script src="pde3d.js">            </script>
+	<script src="pde.js">              </script>
+	<script src="zerobasistexture.js"> </script>
+	<script src="nurbstexture.js">     </script>
+	<script src="nurbs.js">            </script>
+	<script src="noisetexture.js">     </script>
+	<script src="flow.js">             </script>
+	<script src="sphere.js">           </script>
+	<script src="stopwatch.js">        </script>
+	<script src="screen.js">           </script>
+	<script src="surface.js">          </script>
+	<script src="p_surface.js">        </script>
+	<script src="grapher.js">          </script>
+	<script src="isosurface.js">       </script>
 
 	<script>
 	function keyboard(key_event) {
@@ -198,7 +199,7 @@
 		glot.add(new datasurface("volumes/tomato.png", 256, 256, 8, 8));
 		//*/
 		
-		/*
+		//*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
@@ -327,7 +328,7 @@
 		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
 		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
 		
-		glot.add(new nurbs("sin(x)"));
+		//glot.add(new nurbs("0.0"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly

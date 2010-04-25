@@ -93,7 +93,7 @@ function nurbs(string, options) {
 			this.calculate(scr);
 			this.gl.viewport(0, 0, scr.width, scr.height);
 
-			//this.source = this.ping;
+			this.source = this.ping;
 		}
 	}
 
@@ -198,7 +198,6 @@ function nurbs(string, options) {
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
 		
-		//this.gl.viewport(0, 0, 5, 100);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 100);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 8);
@@ -227,21 +226,14 @@ function nurbs(string, options) {
 		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
 		
 		this.gl.enable(this.gl.TEXTURE_2D);
-		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.gl.activeTexture(this.gl.TEXTURE1);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
+		this.gl.activeTexture(this.gl.TEXTURE0);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.checkFramebuffer();
 		
 		// Then drawing the triangle strip using the calc program
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
-		
-		/*
-		scr.set_uniforms(this.gl, this.program);
-		// Then, on top of that, draw the current line set
-		this.gl.useProgram(this.program);
-		this.gl.drawElements(this.gl.LINE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
-		//*/
 				
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);
@@ -254,11 +246,13 @@ function nurbs(string, options) {
 	 */
 	this.draw = function(scr) {
 		scr.perspective();
-		//this.gl.viewport(0, 0, scr.width / 4, scr.height / 4);
-		//this.setUniforms(scr, this.program);
-		//this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
-		
 		//*
+		//this.gl.viewport(0, 0, scr.width / 4, scr.height / 4);
+		this.setUniforms(scr, this.program);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
+		//*/
+		
+		/*
 		this.setUniforms(scr, this.calc_program);
 		
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
@@ -286,10 +280,12 @@ function nurbs(string, options) {
 		
 		// the recently-drawn texture
 		this.gl.enable(this.gl.TEXTURE_2D);
+		/*
 		this.gl.activeTexture(this.gl.TEXTURE1);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
+		*/
 		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
 		this.checkFramebuffer();
 		
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
