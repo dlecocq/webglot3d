@@ -178,7 +178,7 @@ function pde(string, options) {
 		this.setUniforms(scr, this.calc_program);
 		//this.gl.viewport(0, 0, this.ping.width, this.ping.height);
 		
-    this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
+    	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , this.width );
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), this.height);
 		
