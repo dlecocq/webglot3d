@@ -76,24 +76,23 @@ function nurbs(string, options) {
 		}
 		*/
 		
-		if (!this.fbo) {
-			this.fbo = this.gl.createFramebuffer();
-		}
-		
 		if (!this.source) {
 			// Used for ping-pong rendering
-			this.ping = new zerobasistexture(this.gl, 5, 100);
-			this.pong = new zerobasistexture(this.gl, 5, 100);
+			this.ping = new zerobasistexture(this.gl, scr.width, scr.height);
+			this.pong = new zerobasistexture(this.gl, scr.width, scr.height);
 			this.source = new nurbstexture(this.gl, 100);
-			
-			scr.sfq();
-			this.gl.viewport(0, 0, 5, 100);
+
 			this.calculate(scr);
 			this.calculate(scr);
 			this.calculate(scr);
 			this.gl.viewport(0, 0, scr.width, scr.height);
 
-			this.source = this.ping;
+			//this.source = this.ping;
+			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+		}
+		
+		if (!this.fbo) {
+			this.fbo = this.gl.createFramebuffer();
 		}
 	}
 
@@ -196,6 +195,8 @@ function nurbs(string, options) {
 	}
 	
 	this.calculate = function(scr) {
+		scr.sfq();
+		//this.gl.viewport(0, 0, 5, 100);
 		this.setUniforms(scr, this.calc_program);
 		
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
@@ -226,10 +227,10 @@ function nurbs(string, options) {
 		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
 		
 		this.gl.enable(this.gl.TEXTURE_2D);
-		this.gl.activeTexture(this.gl.TEXTURE1);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
 		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
+		this.gl.activeTexture(this.gl.TEXTURE1);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
 		this.checkFramebuffer();
 		
 		// Then drawing the triangle strip using the calc program
@@ -283,9 +284,9 @@ function nurbs(string, options) {
 		/*
 		this.gl.activeTexture(this.gl.TEXTURE1);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
-		*/
+		//*/
 		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping);
 		this.checkFramebuffer();
 		
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);

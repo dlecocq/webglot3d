@@ -69,8 +69,8 @@ void main () {
 	float value = ((u - u_i) / (u_ip - u_i));// * n_i;// + ((u_ip1 - u) / (u_ip1 - u_i1)) * n_i_1;
 	
 	//gl_FragColor = vec4(value, 0.0, 0.0, 1.0);
-	gl_FragColor = color((value + 2.0) / 4.0);
+	//gl_FragColor = color((value + 2.0) / 4.0);
 	//gl_FragColor = vec4(u_ip1, 0.0, 0.0, 1.0);
 	//gl_FragColor = texture2D(knots_vector, vTextureCoord);
-	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+	gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }
