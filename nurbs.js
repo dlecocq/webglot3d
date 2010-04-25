@@ -26,6 +26,7 @@ function nurbs(string, options) {
 	this.ping   = null;
 	this.pong   = null;
 	this.fbo    = null;
+	this.p		= 1;
 	
 	this.texture = null;
 	
@@ -73,15 +74,26 @@ function nurbs(string, options) {
 			
 			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 		}
+		*/
 		
 		if (!this.fbo) {
 			this.fbo = this.gl.createFramebuffer();
 		}
-		*/
 		
 		if (!this.source) {
+			// Used for ping-pong rendering
+			this.ping = new zerobasistexture(this.gl, 5, 100);
+			this.pong = new zerobasistexture(this.gl, 5, 100);
 			this.source = new nurbstexture(this.gl, 100);
-			//this.source = new texture(this.gl, "textures/kaust.png").texture;
+			
+			scr.sfq();
+			this.gl.viewport(0, 0, 5, 100);
+			this.calculate(scr);
+			this.calculate(scr);
+			this.calculate(scr);
+			this.gl.viewport(0, 0, scr.width, scr.height);
+
+			this.source = this.ping;
 		}
 	}
 
@@ -185,8 +197,14 @@ function nurbs(string, options) {
 	
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-    	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "source"), 1);
+		
+		//this.gl.viewport(0, 0, 5, 100);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 100);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 8);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "basis"), 0);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "p"), this.p);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -212,7 +230,7 @@ function nurbs(string, options) {
 		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.gl.activeTexture(this.gl.TEXTURE1);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source.texture);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
 		this.checkFramebuffer();
 		
 		// Then drawing the triangle strip using the calc program
@@ -235,14 +253,9 @@ function nurbs(string, options) {
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
-		/*
-		scr.sfq();
-		this.calculate(scr);
-		this.calculate(scr);
-		*/
-
 		scr.perspective();
-		this.setUniforms(scr, this.program);
+		//this.gl.viewport(0, 0, scr.width / 4, scr.height / 4);
+		this.setUniforms(scr, this.calc_program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
 		
 		this.gl.enableVertexAttribArray(0);
@@ -269,7 +282,6 @@ function nurbs(string, options) {
 		
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);
-		
 	}
 	
 	/* Any class who inherits from the primitive class gets free access
@@ -278,8 +290,8 @@ function nurbs(string, options) {
 	 * provides free access to functionality for reading files.
 	 */
 	this.gen_program = function() {
-		var vertex_source = this.read("shaders/flow.calc.vert").replace("USER_FUNCTION", this.f);
-		var frag_source   = this.read("shaders/flow.calc.frag").replace("USER_FUNCTION", this.f);
+		var vertex_source = this.read("shaders/nurbs.basis.vert").replace("USER_FUNCTION", this.f);
+		var frag_source   = this.read("shaders/nurbs.basis.frag").replace("USER_FUNCTION", this.f);
 
 		this.calc_program = this.compile_program(vertex_source, frag_source);		
 		
