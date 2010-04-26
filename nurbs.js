@@ -40,8 +40,8 @@ function nurbs(string, options) {
 		this.height = scr.height;
 		this.gl = gl;
 		this.parameters = parameters;
-		this.refresh(scr);
 		this.gen_program();
+		this.refresh(scr);
 	}
 	
 	/* Refresh is a way for the grapher instance to notify surface of
@@ -61,20 +61,9 @@ function nurbs(string, options) {
 			// Delete texture
 		}
 		
-		/*
-		if ((!this.source) || scr.width > (this.source.width * 2 + 100) || scr.height > (this.source.height * 2 + 100)) {
-			console.log("Creating texture of size " + scr.width + " x " + scr.height);
-			
-			this.ping = new emptytexture(this.gl, scr.width, scr.height);
-			//this.ping = new texture(this.gl, "textures/kaust.png").texture;
-			this.pong = new emptytexture(this.gl, scr.width, scr.height);
-			//this.pong = new texture(this.gl, "textures/kaust.png").texture;
-			this.source = new noisetexture(this.gl, scr.width / 2, scr.height / 2);
-			//this.source = new texture(this.gl, "textures/kaust.png").texture;
-			
-			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+		if (!this.fbo) {
+			this.fbo = this.gl.createFramebuffer();
 		}
-		*/
 		
 		if (!this.source) {
 			// Used for ping-pong rendering
@@ -85,14 +74,9 @@ function nurbs(string, options) {
 			this.calculate(scr);
 			this.calculate(scr);
 			this.calculate(scr);
-			this.gl.viewport(0, 0, scr.width, scr.height);
-
-			//this.source = this.ping;
+			this.calculate(scr);
+			
 			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-		}
-		
-		if (!this.fbo) {
-			this.fbo = this.gl.createFramebuffer();
 		}
 	}
 
@@ -196,7 +180,7 @@ function nurbs(string, options) {
 	
 	this.calculate = function(scr) {
 		scr.sfq();
-		this.gl.viewport(0, 0, 5, 100);
+ 		this.gl.viewport(0, 0, 5, 100);
 		this.setUniforms(scr, this.calc_program);
 		
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
@@ -246,7 +230,7 @@ function nurbs(string, options) {
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
-		this.calculate(scr);
+		//this.calculate(scr);
 		
 		scr.perspective();
 		this.gl.viewport(0, 0, scr.width, scr.height);
@@ -286,7 +270,7 @@ function nurbs(string, options) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
 		//*/
 		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.checkFramebuffer();
 		
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
