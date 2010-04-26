@@ -281,10 +281,6 @@ function grapher() {
 		 */
 		this.wall = new stopwatch();
 		this.wall.start();
-
-		// Determine the axes and grid
-		//this.axes_dl = this.axes_dl_gen();
-		//this.grid_dl = this.grid_dl_gen();
 		
 		/* Normally we'd run some checks about what capabilities are enabled
 		 * (like fragment, vertex and geometry shaders), but for now it at
@@ -294,21 +290,6 @@ function grapher() {
 		 */
 	
 		this.framecount = 0;
-		
-		/* This is truly ugly as sin, but for the time being, it works.
-		 *
-		 * I can't figure out how to get grapher::display to work when called
-		 * explicitly from glot.html, and the only way I've been able to figure
-		 * out to display, is to use an interval function.  If I just want it
-		 * to display once, then that means setTimeout.  Otherwise, that calls
-		 * for animation.
-		 *
-		 * An unfortunate consequence of this is that it implies that there's a
-		 * single grapher in the context of a webpage, but the roadmap would not
-		 * like to limit grapher to this.
-		 */
-		window.glot = this;
-		window.setTimeout(function() { this.glot.display(); }, 1);
 	
 		// In the future, this ought to return some encoded value of success or failure.
 		return 0;
