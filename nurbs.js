@@ -78,8 +78,8 @@ function nurbs(string, options) {
 		
 		if (!this.source) {
 			// Used for ping-pong rendering
-			this.ping = new zerobasistexture(this.gl, scr.width, scr.height);
-			this.pong = new zerobasistexture(this.gl, scr.width, scr.height);
+			this.ping = new zerobasistexture(this.gl, 5, 100);
+			this.pong = new zerobasistexture(this.gl, 5, 100);
 			this.source = new nurbstexture(this.gl, 100);
 
 			this.calculate(scr);
@@ -196,7 +196,7 @@ function nurbs(string, options) {
 	
 	this.calculate = function(scr) {
 		scr.sfq();
-		//this.gl.viewport(0, 0, 5, 100);
+		this.gl.viewport(0, 0, 5, 100);
 		this.setUniforms(scr, this.calc_program);
 		
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
@@ -246,12 +246,12 @@ function nurbs(string, options) {
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
+		this.calculate(scr);
+		
 		scr.perspective();
-		//*
-		//this.gl.viewport(0, 0, scr.width / 4, scr.height / 4);
+		this.gl.viewport(0, 0, scr.width, scr.height);
 		this.setUniforms(scr, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
-		//*/
 		
 		/*
 		this.setUniforms(scr, this.calc_program);
