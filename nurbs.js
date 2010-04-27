@@ -22,11 +22,12 @@ function nurbs(string, options) {
 	this.count			= 150;
 	this.index_ct   = 0;
 	
-	this.source = null;
-	this.ping   = null;
-	this.pong   = null;
-	this.fbo    = null;
-	this.p		= 1;
+	this.source   = null;
+	this.ping     = null;
+	this.pong     = null;
+	this.fbo      = null;
+	this.p		  = 1;
+	this.controls = null;
 	
 	this.basis  = null;
 	
@@ -72,13 +73,13 @@ function nurbs(string, options) {
 			this.ping = new zerobasistexture(this.gl, 5, 100);
 			this.pong = new zerobasistexture(this.gl, 5, 100);
 			this.source = new nurbstexture(this.gl, 100);
+			this.controls = new cptexture(this.gl, 100);
 
 			this.calculate(scr);
 			this.p += 1;
 			//*
 			this.calculate(scr);
 			this.p += 1;
-			//*
 			this.calculate(scr);
 			this.p += 1;
 			//*/
@@ -195,8 +196,9 @@ function nurbs(string, options) {
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 100);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 8);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "basis"), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "control_points"), 2);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "p"), this.p);
 		
 		this.gl.enableVertexAttribArray(0);
@@ -224,6 +226,8 @@ function nurbs(string, options) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.gl.activeTexture(this.gl.TEXTURE1);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
+		this.gl.activeTexture(this.gl.TEXTURE2);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.controls);
 		this.checkFramebuffer();
 		
 		// Then drawing the triangle strip using the calc program

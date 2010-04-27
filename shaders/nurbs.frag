@@ -55,8 +55,8 @@ void main() {
 	gl_FragColor.a = 1.0;
 	*/
 	
-	gl_FragColor = color(texture.r);
-	//gl_FragColor = texture;
+	//gl_FragColor = color(texture.r);
+	gl_FragColor = texture;
 
 	/* A normal map
 	gl_FragColor = vec4(norm_normal.r, norm_normal.g, norm_normal.b, 1.0);
