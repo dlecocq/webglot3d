@@ -78,6 +78,7 @@ function nurbs(string, options) {
 			//*
 			this.calculate(scr);
 			this.p += 1;
+			//*
 			this.calculate(scr);
 			this.p += 1;
 			//*/

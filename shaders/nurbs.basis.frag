@@ -31,7 +31,7 @@ float kdx = 1.0 / (knots);
 float ktx = (i + 1.01) / (knots + 1.0);
 
 // General stuff
-float u     = (1.0 - ty);
+float u     = ty;
 float n_i   = texture2D(basis, vTextureCoord).r;
 float n_i_1 = texture2D(basis, vec2(itx + bdx, u)).r;
 
