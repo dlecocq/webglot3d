@@ -28,6 +28,8 @@ function nurbs(string, options) {
 	this.fbo    = null;
 	this.p		= 1;
 	
+	this.basis  = null;
+	
 	this.texture = null;
 	
 	this.calc_program = null;
@@ -72,9 +74,15 @@ function nurbs(string, options) {
 			this.source = new nurbstexture(this.gl, 100);
 
 			this.calculate(scr);
+			this.p += 1;
+			//*
 			this.calculate(scr);
+			this.p += 1;
 			this.calculate(scr);
-			this.calculate(scr);
+			this.p += 1;
+			//*/
+			
+			this.basis = this.ping;
 			
 			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 		}
@@ -222,6 +230,8 @@ function nurbs(string, options) {
 				
 		this.gl.disableVertexAttribArray(0);
 		this.gl.disableVertexAttribArray(1);
+		
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 	}
 	
 	/* Every primitive is also responsible for knowing how to draw itself,
@@ -270,7 +280,7 @@ function nurbs(string, options) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
 		//*/
 		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.basis);
 		this.checkFramebuffer();
 		
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
