@@ -26,7 +26,7 @@ function zerobasistexture(context, width, height) {
 			}
 		}
 		
-		for (var i = 0; i < 100; ++i) {
+		for (var i = 0; i < height; ++i) {
 			pixels[(width * (i + 1) - 2) * 4    ] = 1;
 		}
 

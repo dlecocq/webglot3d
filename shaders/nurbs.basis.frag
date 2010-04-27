@@ -4,7 +4,6 @@ varying vec2 vTextureCoord;
 
 uniform sampler2D basis;
 uniform sampler2D knots_vector;
-uniform sampler2D control_points;
 
 uniform float t;
 
@@ -81,10 +80,10 @@ void main () {
 		value += ((u_ip1 - u) / (u_ip1 - u_i1)) * n_i_1;
 	}
 
-	//gl_FragColor = vec4(value, 0.0, 0.0, 1.0);
+	gl_FragColor = vec4(value, 0.0, 0.0, 1.0);
 	//gl_FragColor = vec4(u, 0.0, 0.0, 1.0);
 	//gl_FragColor = color((1.0 - value));
 	//gl_FragColor = color(1.0 - n_i_1);//vec4(u_i, 0.0, 0.0, 1.0);
-	gl_FragColor = texture2D(control_points, vTextureCoord);
+	//gl_FragColor = texture2D(control_points, vTextureCoord) * value;
 	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }

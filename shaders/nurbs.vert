@@ -21,15 +21,15 @@ float function(float x, float y) {
 	x = r;
 	//*/
 	
-	return USER_FUNCTION;
+	return texture2D(accumulation, vec2(0.0, y)).r;
 }
 
 void main() {
 	
 	vec4 result = position;
 	
-	float x = result.x;
-	float y = result.y;
+	float x = aTextureCoord.x;
+	float y = aTextureCoord.y;
 	result.z = function(x, y);
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;

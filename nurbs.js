@@ -70,10 +70,10 @@ function nurbs(string, options) {
 		
 		if (!this.source) {
 			// Used for ping-pong rendering
-			this.ping = new zerobasistexture(this.gl, 5, 100);
-			this.pong = new zerobasistexture(this.gl, 5, 100);
-			this.source = new nurbstexture(this.gl, 100);
-			this.controls = new cptexture(this.gl, 100);
+			this.ping = new zerobasistexture(this.gl, 5, 300);
+			this.pong = new zerobasistexture(this.gl, 5, 300);
+			this.source = new nurbstexture(this.gl, 300);
+			this.controls = new cptexture(this.gl, 300);
 
 			this.calculate(scr);
 			this.p += 1;
@@ -83,6 +83,10 @@ function nurbs(string, options) {
 			this.calculate(scr);
 			this.p += 1;
 			//*/
+			
+			this.basis = this.ping;
+			
+			this.reduce(scr);
 			
 			this.basis = this.ping;
 			
@@ -190,15 +194,14 @@ function nurbs(string, options) {
 	
 	this.calculate = function(scr) {
 		scr.sfq();
- 		this.gl.viewport(0, 0, 5, 100);
+ 		this.gl.viewport(0, 0, 5, 300);
 		this.setUniforms(scr, this.calc_program);
 		
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 100);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 300);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 8);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "basis"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "control_points"), 2);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "p"), this.p);
 		
 		this.gl.enableVertexAttribArray(0);
@@ -226,7 +229,48 @@ function nurbs(string, options) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.gl.activeTexture(this.gl.TEXTURE1);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
-		this.gl.activeTexture(this.gl.TEXTURE2);
+		this.checkFramebuffer();
+		
+		// Then drawing the triangle strip using the calc program
+		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
+				
+		this.gl.disableVertexAttribArray(0);
+		this.gl.disableVertexAttribArray(1);
+		
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+	}
+	
+	this.reduce = function(scr) {
+		scr.sfq();
+ 		this.gl.viewport(0, 0, 5, 300);
+		this.setUniforms(scr, this.reduce_program);
+		
+		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "width") , 5  );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "height"), 300);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "knots"), 8);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.reduce_program, "basis"), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.reduce_program, "control_points"), 1);
+		
+		this.gl.enableVertexAttribArray(0);
+		this.gl.enableVertexAttribArray(1);
+		
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
+		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		
+		// More texture support
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
+		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
+		
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
+		
+		// First, set up Framebuffer we'll render into
+		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
+		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
+		
+		this.gl.enable(this.gl.TEXTURE_2D);
+		this.gl.activeTexture(this.gl.TEXTURE0);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.basis);
+		this.gl.activeTexture(this.gl.TEXTURE1);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.controls);
 		this.checkFramebuffer();
 		
@@ -252,17 +296,6 @@ function nurbs(string, options) {
 		this.setUniforms(scr, this.program);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
 		
-		/*
-		this.setUniforms(scr, this.calc_program);
-		
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 100);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 8);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "basis"), 0);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "p"), this.p);
-		//*/
-		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
 		
@@ -280,10 +313,6 @@ function nurbs(string, options) {
 		
 		// the recently-drawn texture
 		this.gl.enable(this.gl.TEXTURE_2D);
-		/*
-		this.gl.activeTexture(this.gl.TEXTURE1);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
-		//*/
 		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.basis);
 		this.checkFramebuffer();
@@ -304,7 +333,12 @@ function nurbs(string, options) {
 		var vertex_source = this.read("shaders/nurbs.basis.vert").replace("USER_FUNCTION", this.f);
 		var frag_source   = this.read("shaders/nurbs.basis.frag").replace("USER_FUNCTION", this.f);
 
-		this.calc_program = this.compile_program(vertex_source, frag_source);		
+		this.calc_program = this.compile_program(vertex_source, frag_source);
+		
+		var vertex_source = this.read("shaders/nurbs.reduce.vert").replace("USER_FUNCTION", this.f);
+		var frag_source   = this.read("shaders/nurbs.reduce.frag").replace("USER_FUNCTION", this.f);
+
+		this.reduce_program = this.compile_program(vertex_source, frag_source);
 		
 		var vertex_source = this.read("shaders/nurbs.vert").replace("USER_FUNCTION", this.f);
 		var frag_source   = this.read("shaders/nurbs.frag").replace("USER_FUNCTION", this.f);
