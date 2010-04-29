@@ -30,6 +30,7 @@
 	<script src="pde.js">              </script>
 	<script src="zerobasistexture.js"> </script>
 	<script src="nurbstexture.js">     </script>
+	<script src="cptexture.js">        </script>
 	<script src="nurbs.js">            </script>
 	<script src="noisetexture.js">     </script>
 	<script src="flow.js">             </script>
@@ -199,7 +200,7 @@
 		glot.add(new datasurface("volumes/tomato.png", 256, 256, 8, 8));
 		//*/
 		
-		//*
+		/*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
@@ -319,16 +320,26 @@
 		//z = u * u - v * v
 		//*/
 		
-		glot.add(new box());
+		glot.set("isovalue", 0.1);
+	
 		//glot.add(new pde());
 		//glot.set("alpha", 0.2);
-		glot.set("isovalue", 0.1);
-		glot.set("offset", 0.0);
 		//glot.add(new pde3d());
 		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
 		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
 		
-		//glot.add(new nurbs("0.0"));
+		// glot.set("d1", 0.00225);
+		// glot.set("d2", 0.0045);
+		// glot.set("t1", 0.02);
+		// glot.set("t2", 0.2);
+		// glot.set("a", 0.899);
+		// glot.set("b", -0.91);
+		// glot.set("g", -0.899);
+		//glot.add(new surface("a * x * (1.0 - t1 * y * y) + y * ( 1.0 - t2 * x)"));
+		//glot.add(new surface("b * y * (1.0 - a * t1 * x * y / b) + x * ( g + t2 * y)"));
+		
+		glot.add(new box());
+		glot.add(new nurbs("0.0"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
@@ -344,7 +355,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:80%;
+		height:94%;
 	}
 	</style>
 </head>
@@ -356,12 +367,14 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
+	<!--
 	<div id="function_form">
 		<form name="function" onsubmit="gen_isosurface(); return false">
 			f(x, y, z, t) = <input size='100' name="fn" /> = 0
 		</form>
 		<p><em>Note:</em> If you need to enter numerical constants, make sure they are written as floating-point numbers. Eg, 2.0, not 2</p>
 	</div>
+	-->
 	
 	<div id="framerate">Framerate: </div>
 </body>
