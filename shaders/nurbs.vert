@@ -21,7 +21,7 @@ float function(float x, float y) {
 	x = r;
 	//*/
 	
-	return texture2D(accumulation, vec2(0.0, y)).r;
+	return texture2D(accumulation, vec2(x, y)).r;
 }
 
 void main() {

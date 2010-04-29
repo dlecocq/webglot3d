@@ -242,7 +242,7 @@ function nurbs(string, options) {
 	
 	this.reduce = function(scr) {
 		scr.sfq();
- 		this.gl.viewport(0, 0, 5, 300);
+ 		this.gl.viewport(0, 0, 1, 300);
 		this.setUniforms(scr, this.reduce_program);
 		
 		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "width") , 5  );

@@ -34,7 +34,6 @@ function cptexture(context, height) {
 			mid += 1;
 		}
 		
-		//*
 		for (var i = 0; i < height; ++i) {
 			// Set the first column as the parameter value
 			var u = i / height;
@@ -52,14 +51,6 @@ function cptexture(context, height) {
 				pixels[(width * i + j) * 4 + 3] = this.cps[mid + j][3];
 			}
 		}
-		//*/
-		
-		/*
-		for (var i = 0; i < width * height; ++i) {
-			pixels[i * 4    ] = 1.0;
-			pixels[i * 4 + 3] = 1.0;
-		}
-		*/
 
 		this.gl.texImage2D(this.gl.TEXTURE_2D, 0, 0x8814, width, height, 0, this.gl.RGBA, this.gl.FLOAT, pixels);
 		

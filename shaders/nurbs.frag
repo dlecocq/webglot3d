@@ -30,7 +30,8 @@ vec4 color(float value) {
 }
 
 void main() {
-	vec4 texture = texture2D(accumulation, vec2(0.0, vTextureCoord.t));
+	//vec4 texture = texture2D(accumulation, vec2(0.0, vTextureCoord.t));
+	vec4 texture = vec4(0.5, 0.0, 0.0, 1.0);
 
 	// Scaling The Input Vector To Length 1
 	vec3 norm_normal = normalize(normal);

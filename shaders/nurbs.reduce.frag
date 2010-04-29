@@ -28,15 +28,20 @@ float u     = ty;
 
 void main () {
 	vec4 cumulative = vec4(0.0, 0.0, 0.0, 0.0);
+	vec4 cp;
 	
-	for (float i = 0.0; i < width - 1.0; ++i) {
-		cumulative += texture2D(basis, vec2(i * bdx, u)).r * texture2D(control_points, vec2(i * cpdx, u));
+	//*
+	for (float i = 0.0; i < width - 1.1; i = i + 1.0) {
+		cp = texture2D(control_points, vec2(i * cpdx, u));
+		cumulative += texture2D(basis, vec2(i * bdx, u)).r * cp * cp.w;
 	}
+	//*/
 
 	//gl_FragColor = texture2D(control_points, vTextureCoord) * texture2D(basis, vec2(tx * (width - 1.0) / width, u));
 	//cumulative = cumulative.w * cumulative;
 	gl_FragColor = cumulative;
+	//gl_FragColor = texture2D(basis, vec2(i * bdx, u)) * texture2D(control_points, vec2(i * cpdx, u));
 	//gl_FragColor.a = 1.0;
-	//gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+	//gl_FragColor = texture2D(control_points, vTextureCoord) * texture2D(basis, vTextureCoord).r;
 	//gl_FragColor = texture2D(basis, vTextureCoord);
 }
