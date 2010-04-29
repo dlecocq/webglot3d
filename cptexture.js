@@ -2,17 +2,17 @@
  */
 function cptexture(context, height) {
 	
-	this.knots = new Array(0.1, 0.1, 0.5, 1.0, 1.0, 1.0, 1.0);
+	this.knots = new Array(0.5, 1.0, 1.0, 1.0);
 	// Need 7 control points
-	this.cps   = new Array([0, 0, 0, 1], [0, 1, 0, 1], [1, 1, 0, 1], 
-		[2, 1, 2, 1], [3, 5, 7, 1], [3, 6, 7, 1], [3, 8, 8, 1]);
+	// X = [0.0  3.3  6.7  10],  Y = [1.0  2.0   0.0  3.0], control points for x and y
+	this.cps   = new Array([0.0, 1.0, 0, 1], [3.3, 2.0, 0, 1], [6.7, 0.0, 0, 1], [10.0, 3.0, 0, 1]);
 	
 	this.texture = null;
 	this.image	 = null;
 	
 	this.gl			 = context;
 	
-	this.width  = 4;
+	this.width  = 2;
 	this.height = 0;
 
 	this.initialize = function(width, height) {

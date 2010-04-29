@@ -70,8 +70,8 @@ function nurbs(string, options) {
 		
 		if (!this.source) {
 			// Used for ping-pong rendering
-			this.ping = new zerobasistexture(this.gl, 5, 300);
-			this.pong = new zerobasistexture(this.gl, 5, 300);
+			this.ping = new zerobasistexture(this.gl, 3, 300);
+			this.pong = new zerobasistexture(this.gl, 3, 300);
 			this.source = new nurbstexture(this.gl, 300);
 			this.controls = new cptexture(this.gl, 300);
 
@@ -80,6 +80,7 @@ function nurbs(string, options) {
 			//*
 			this.calculate(scr);
 			this.p += 1;
+			/*
 			this.calculate(scr);
 			this.p += 1;
 			//*/
@@ -194,12 +195,12 @@ function nurbs(string, options) {
 	
 	this.calculate = function(scr) {
 		scr.sfq();
- 		this.gl.viewport(0, 0, 5, 300);
+ 		this.gl.viewport(0, 0, 3, 300);
 		this.setUniforms(scr, this.calc_program);
 		
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 5  );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 3  );
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 300);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 8);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 6);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "basis"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
 		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "p"), this.p);
@@ -245,9 +246,9 @@ function nurbs(string, options) {
  		this.gl.viewport(0, 0, 1, 300);
 		this.setUniforms(scr, this.reduce_program);
 		
-		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "width") , 5  );
+		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "width") , 3  );
 		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "height"), 300);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "knots"), 8);
+		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "knots"), 6);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.reduce_program, "basis"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.reduce_program, "control_points"), 1);
 		

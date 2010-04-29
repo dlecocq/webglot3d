@@ -2,14 +2,14 @@
  */
 function nurbstexture(context, height) {
 	
-	this.knots = new Array(0, 0, 0, 0, 0.1, 0.1, 0.5, 1.0, 1.0, 1.0, 1.0);
+	this.knots = new Array(0, 0, 0, 0, 0.5, 1.0, 1.0, 1.0);
 	
 	this.texture = null;
 	this.image	 = null;
 	
 	this.gl			 = context;
 	
-	this.width  = 9;
+	this.width  = 7;
 	this.height = 0;
 
 	this.initialize = function(width, height) {
