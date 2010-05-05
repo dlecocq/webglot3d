@@ -24,9 +24,9 @@ function nurbs(string, options) {
 	
 	this.source   = null;
 	// From the example at http://gul.sourceforge.net/viewdog-manual/node20.html
-	this.us       = [0, 0, 1, 1];
+	this.us       = [0, 0, 0.5, 1];
 	this.usTex    = null;
-	this.vs       = [0, 0, 1, 1];
+	this.vs       = [0, 0, 0.25, 1];
 	this.vsTex    = null;
 	this.cps      = [[[0, 0, 0, 1][10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
 	this.cpsTex   = null;
@@ -119,6 +119,7 @@ function nurbs(string, options) {
 			while (this.vs[lv + 1] <= v) {
 				lv = lv + 1;
 			}
+			lu = 0;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(u);
 				vertices.push(v);
@@ -199,6 +200,9 @@ function nurbs(string, options) {
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "usTex" ), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "vsTex" ), 1);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "cpsTex"), 2);
+		
+		this.gl.bindAttribLocation(this.program, 0, "position");
+	    this.gl.bindAttribLocation(this.program, 1, "ls");
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
