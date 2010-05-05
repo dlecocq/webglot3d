@@ -19,7 +19,7 @@ function nurbs(string, options) {
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count      = 150;
+	this.count      = 10;
 	this.index_ct   = 0;
 	
 	this.source   = null;
@@ -228,7 +228,7 @@ function nurbs(string, options) {
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "cpsTex"), 2);
 		
 		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "knotCounts"), this.us.length , this.vs.length);
-		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "cpDim"     ), this.cps.length, this.cps[0].length);
+		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "cpCounts"  ), this.cps.length, this.cps[0].length);
 		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "n"         ), this.nu, this.nv);
 		
 		this.gl.bindAttribLocation(this.program, 0, "position");
