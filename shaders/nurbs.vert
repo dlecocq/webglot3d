@@ -29,14 +29,14 @@ float function(float x, float y) {
 }
 
 void main() {
-	vec4 tex = texture2D(cpsTex, position.xy);
+	vec4 tex = texture2D(vsTex, position.xy);
 	
 	vec4 result = position;
 	
 	float x = position.x;
 	float y = position.y;
 	//result.z = function(x, y);
-	result.z = (tex.y + tex.x + tex.z) / 30.0;
+	result.z = (tex.x + tex.y);
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	
