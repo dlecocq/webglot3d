@@ -151,6 +151,20 @@ function grapher() {
 		this.scr.rotate();
 	}
 	
+	this.scroll = function(event) {
+		if (!event) event = window.event;
+		
+		if (event.wheelDelta) {
+			delta = event.wheelDelta / 60;
+		} else if (event.detail) {
+			delta = -event.detail / 2;
+		}
+		
+		//this.gl.console.log("delta: " + delta);
+		//this.scr.alpha *= 1.1;
+		this.scr.alpha *= (1.0 - delta * 0.1);
+	}
+	
 	/* The keyboard event handler.  Again, the browser wars make life
 	 * difficult, as it seems (though I'm not a JavaScript expert) that
 	 * this varies between browsers.  As I understood it, keyCode was
@@ -218,6 +232,9 @@ function grapher() {
 		
 		f = function(event) { this.getElementById("glot").glot.keyboard(event) };
 		document.onkeydown = f;
+		
+		f = function(event) { this.glot.scroll(event) };
+		canvas.onmousewheel = f;
 	
 		this.gl = this.getContext();
 		var gl = this.gl;
