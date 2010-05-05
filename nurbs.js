@@ -23,17 +23,15 @@ function nurbs(string, options) {
 	this.index_ct   = 0;
 	
 	this.source   = null;
-	this.ping     = null;
-	this.pong     = null;
-	this.fbo      = null;
+	// From the example at http://gul.sourceforge.net/viewdog-manual/node20.html
+	this.us       = [0, 0, 1, 1];
+	this.usTex    = null;
+	this.vs       = [0, 0, 1, 1];
+	this.vsTex    = null;
 	this.p		  = 1;
-	this.controls = null;
-	
-	this.basis  = null;
+	this.cps      = [[[0, 0, 0, 1][10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
 	
 	this.texture = null;
-	
-	this.calc_program = null;
 
 	/* This will likely be depricated, but it currently is hidden from
 	 * the end programmer.
@@ -56,43 +54,40 @@ function nurbs(string, options) {
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		
-		if (this.ping) {
-			// Delete texture
+		us = this.us;
+		f = function(pixels) {
+			for (var i = 0; i < us.length; i += 1) {
+				pixels[i * 4] = us[i];
+			}
+			return pixels;
 		}
+		this.usTex = ftexture(this.gl, us.length, 1, f);
 		
-		if (this.pong) {
-			// Delete texture
+		vs = this.vs;
+		f = function(pixels) {
+			for (var i = 0; i < vs.length; i += 1) {
+				pixels[i * 4] = vs[i];
+			}
+			return pixels;
 		}
+		this.vsTex = ftexture(this.gl, vs.length, 1, f);
 		
-		if (!this.fbo) {
-			this.fbo = this.gl.createFramebuffer();
+		cps = this.cps;
+		f = function(pixels) {
+			// For every column
+			for (var i = 0; i < cps.length; i += 1) {
+				// For every row
+				row = cps[i];
+				for (var j = 0; j < row.length; j += 1) {
+					el = row[j];
+					for (var k = 0; k < el.length; k += 1) {
+						pixels[(i * row.length + j) * el.length + k] = el[k];
+					}
+				}
+			}
+			return pixels;
 		}
-		
-		if (!this.source) {
-			// Used for ping-pong rendering
-			this.ping = new zerobasistexture(this.gl, 3, 300);
-			this.pong = new zerobasistexture(this.gl, 3, 300);
-			this.source = new nurbstexture(this.gl, 300);
-			this.controls = new cptexture(this.gl, 300);
-
-			this.calculate(scr);
-			this.p += 1;
-			//*
-			this.calculate(scr);
-			this.p += 1;
-			/*
-			this.calculate(scr);
-			this.p += 1;
-			//*/
-			
-			this.basis = this.ping;
-			
-			this.reduce(scr);
-			
-			this.basis = this.ping;
-			
-			this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-		}
+		this.cpsTex = ftexture(this.gl, cps.length, cps[0].length, f);
 	}
 
 	/* All primitives are responsible for knowing how to construct them-
@@ -330,17 +325,7 @@ function nurbs(string, options) {
 	 * the fragment and vertex shader sources.  The primitive class also
 	 * provides free access to functionality for reading files.
 	 */
-	this.gen_program = function() {
-		var vertex_source = this.read("shaders/nurbs.basis.vert").replace("USER_FUNCTION", this.f);
-		var frag_source   = this.read("shaders/nurbs.basis.frag").replace("USER_FUNCTION", this.f);
-
-		this.calc_program = this.compile_program(vertex_source, frag_source);
-		
-		var vertex_source = this.read("shaders/nurbs.reduce.vert").replace("USER_FUNCTION", this.f);
-		var frag_source   = this.read("shaders/nurbs.reduce.frag").replace("USER_FUNCTION", this.f);
-
-		this.reduce_program = this.compile_program(vertex_source, frag_source);
-		
+	this.gen_program = function() {		
 		var vertex_source = this.read("shaders/nurbs.vert").replace("USER_FUNCTION", this.f);
 		var frag_source   = this.read("shaders/nurbs.frag").replace("USER_FUNCTION", this.f);
 
