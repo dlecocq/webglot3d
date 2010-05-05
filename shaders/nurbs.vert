@@ -8,6 +8,10 @@ uniform sampler2D usTex;
 uniform sampler2D vsTex;
 uniform sampler2D cpsTex;
 
+vec2 knotCounts;
+vec2 cpDim;
+vec2 n;
+
 uniform float t;
 
 varying vec2 coord;
@@ -36,7 +40,7 @@ void main() {
 	float x = position.x;
 	float y = position.y;
 	//result.z = function(x, y);
-	result.z = (tex.x + tex.y);
+	result.z = ls.x;//(tex.x + tex.y);
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	

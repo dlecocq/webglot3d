@@ -26,11 +26,14 @@ function nurbs(string, options) {
 	// From the example at http://gul.sourceforge.net/viewdog-manual/node20.html
 	this.us       = [0, 0, 0.5, 1];
 	this.usTex    = null;
-	this.vs       = [0, 0, 0.25, 1];
+	this.vs       = [0, 0.25, 0.7, 1];
 	this.vsTex    = null;
 	this.cps      = [[[0, 0, 0, 1], [10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
 	this.cpsTex   = null;
-	this.p		  = 1;
+	
+	// This is the degree in the u direction, and v direction respectively
+	this.nu		  = 1;
+	this.nv       = 1;
 	
 	this.texture = null;
 
@@ -139,17 +142,17 @@ function nurbs(string, options) {
 		 */
 		for (i = 0; i <= this.count; ++i) {
 			v = 0;
-			while (this.vs[lv + 1] <= v) {
-				lv = lv + 1;
+			while (this.us[lu + 1] <= u) {
+				lu = lu + 1;
 			}
-			lu = 0;
+			lv = 0;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(u);
 				vertices.push(v);
-				
-				while (this.us[lu + 1] <= u) {
-					lu = lu + 1;
-				}
+			
+				while (this.vs[lv + 1] <= v) {
+					lv = lv + 1;
+				}	
 				ls.push(lu);
 				ls.push(lv);
 				
@@ -223,6 +226,10 @@ function nurbs(string, options) {
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "usTex" ), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "vsTex" ), 1);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "cpsTex"), 2);
+		
+		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "knotCounts"), this.us.length , this.vs.length);
+		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "cpDim"     ), this.cps.length, this.cps[0].length);
+		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "n"         ), this.nu, this.nv);
 		
 		this.gl.bindAttribLocation(this.program, 0, "position");
 	    this.gl.bindAttribLocation(this.program, 1, "ls");
