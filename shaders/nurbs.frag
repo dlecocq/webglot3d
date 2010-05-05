@@ -32,7 +32,7 @@ vec4 color(float value) {
 }
 
 void main() {
-	vec4 texture = texture2D(usTex, coord);
+	//vec4 texture = texture2D(usTex, coord);
 	//vec4 texture = vec4(0.5, 0.0, 0.0, 1.0);
 
 	/*
@@ -61,5 +61,6 @@ void main() {
 	//gl_FragColor = color(texture.r / 10.0);
 	//gl_FragColor = texture;
 	//gl_FragColor.a = 1.0;
-	gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+	gl_FragColor = vec4(coord.x, coord.y, 0.0, 1.0);
 }

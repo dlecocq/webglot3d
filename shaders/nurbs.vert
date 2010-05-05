@@ -23,17 +23,20 @@ float function(float x, float y) {
 	x = r;
 	//*/
 	
-	return USER_FUNCTION;
+	//return USER_FUNCTION;
+	return 0.0;
 	//return texture2D(accumulation, vec2(x, y)).r;
 }
 
 void main() {
+	vec4 tex = texture2D(cpsTex, position.xy);
 	
 	vec4 result = position;
 	
 	float x = position.x;
 	float y = position.y;
-	result.z = function(x, y);
+	//result.z = function(x, y);
+	result.z = (tex.y + tex.x + tex.z) / 30.0;
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	

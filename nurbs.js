@@ -28,7 +28,7 @@ function nurbs(string, options) {
 	this.usTex    = null;
 	this.vs       = [0, 0, 0.25, 1];
 	this.vsTex    = null;
-	this.cps      = [[[0, 0, 0, 1][10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
+	this.cps      = [[[0, 0, 0, 1], [10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
 	this.cpsTex   = null;
 	this.p		  = 1;
 	
@@ -89,6 +89,29 @@ function nurbs(string, options) {
 			return pixels;
 		}
 		this.cpsTex = ftexture(this.gl, cps.length, cps[0].length, f);
+		
+		/*
+		// For testing purposes, I wanted to make sure everything was there.
+		for (var i = 0; i < cps.length; i += 1) {
+			// For every row
+			row = cps[i];
+			str = "[";
+			for (var j = 0; j < row.length; j += 1) {
+				el = row[j];
+				str += "[";
+				for (var k = 0; k < el.length; k += 1) {
+					if (k < el.length - 1) {
+						str += el[k] + ", ";
+					} else {
+						str += el[k];
+					}
+				}
+				str += "]";
+			}
+			str += "]";
+			this.gl.console.log(str);
+		}
+		//*/
 	}
 
 	/* All primitives are responsible for knowing how to construct them-
