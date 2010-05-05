@@ -1,9 +1,11 @@
-varying vec2 vTextureCoord;
+varying vec2 coord;
 varying vec3 normal;
 varying vec3 light;
 varying vec3 halfVector;
 
-uniform sampler2D accumulation;
+uniform sampler2D usTex;
+uniform sampler2D vsTex;
+uniform sampler2D cpsTex;
 
 vec4 color(float value) {
 	float red = 1.0;
@@ -30,9 +32,10 @@ vec4 color(float value) {
 }
 
 void main() {
-	//vec4 texture = texture2D(accumulation, vec2(0.0, vTextureCoord.t));
-	vec4 texture = vec4(0.5, 0.0, 0.0, 1.0);
+	vec4 texture = texture2D(usTex, coord);
+	//vec4 texture = vec4(0.5, 0.0, 0.0, 1.0);
 
+	/*
 	// Scaling The Input Vector To Length 1
 	vec3 norm_normal = normalize(normal);
 	vec3 norm_light = normalize(light);
@@ -54,4 +57,9 @@ void main() {
 	/* A normal map
 	gl_FragColor = vec4(norm_normal.r, norm_normal.g, norm_normal.b, 1.0);
 	//*/
+	
+	//gl_FragColor = color(texture.r / 10.0);
+	//gl_FragColor = texture;
+	//gl_FragColor.a = 1.0;
+	gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }

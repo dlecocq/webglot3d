@@ -11,15 +11,15 @@ function nurbs(string, options) {
 	 * the implementation to use vertex-buffer objects.  These are
 	 * those.
 	 */
-	this.vertexVBO	= null;
-	this.textureVBO = null;
-	this.indexVBO		= null;
+	this.vertexVBO = null;
+	this.lVBO      = null;
+	this.indexVBO  = null;
 	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 150;
+	this.count      = 150;
 	this.index_ct   = 0;
 	
 	this.source   = null;
@@ -28,8 +28,9 @@ function nurbs(string, options) {
 	this.usTex    = null;
 	this.vs       = [0, 0, 1, 1];
 	this.vsTex    = null;
-	this.p		  = 1;
 	this.cps      = [[[0, 0, 0, 1][10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
+	this.cpsTex   = null;
+	this.p		  = 1;
 	
 	this.texture = null;
 
@@ -96,39 +97,41 @@ function nurbs(string, options) {
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
-		var texture  = [];
+		var ls       = [];
 		var indices  = [];
 		
-		var x = scr.minx;
-		var y = scr.miny;
-		var tx = 0.0;
-		var ty = 0.0;
-		
-		var dx = (scr.maxx - scr.minx) / this.count;
-		var dy = (scr.maxy - scr.miny) / this.count;
-		var dt = 1.0 / this.count;
+		var u = 0;
+		var v = 0;
+		var du = 1.0 / this.count;
 		
 		var i = 0;
 		var j = 0;
+		
+		var lu = 0;
+		var lv = 0;
 		
 		/* This could probably still be optimized, but at least it's now
 		 * using a single triangle strip to render the mesh.  Much better
 		 * than the alternative.
 		 */
 		for (i = 0; i <= this.count; ++i) {
-			y = scr.miny;
-			ty = 0.0;
-			for (j = 0; j <= this.count; ++j) {
-				vertices.push(x);
-				vertices.push(y);
-				texture.push(tx);
-				texture.push(ty);
-				
-				y += dy;
-				ty += dt;
+			v = 0;
+			while (this.vs[lv + 1] <= v) {
+				lv = lv + 1;
 			}
-			x += dx;
-			tx += dt;
+			for (j = 0; j <= this.count; ++j) {
+				vertices.push(u);
+				vertices.push(v);
+				
+				while (this.us[lu + 1] <= u) {
+					lu = lu + 1;
+				}
+				ls.push(lu);
+				ls.push(lv);
+				
+				v += du;
+			}
+			u += du;
 		}
 		
 		var c = 0;
@@ -172,14 +175,10 @@ function nurbs(string, options) {
 		this.vertexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
 		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(vertices), this.gl.STATIC_DRAW);
-
-		/* One of the options (currently anticipated from this version) is
-		 * to color the surface with a normal map or a regular texture and
-		 * lighting information for the perception of depth on the object.
-		 */
-		this.textureVBO = this.gl.createBuffer();
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(texture), this.gl.STATIC_DRAW);
+		
+		this.lVBO = this.gl.createBuffer();
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.lVBO);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(ls), this.gl.STATIC_DRAW);
 		
 		this.indexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
@@ -188,109 +187,18 @@ function nurbs(string, options) {
 		this.index_ct = indices.length;
 	}
 	
-	this.calculate = function(scr) {
-		scr.sfq();
- 		this.gl.viewport(0, 0, 3, 300);
-		this.setUniforms(scr, this.calc_program);
-		
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "width") , 3  );
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "height"), 300);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "knots"), 6);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "basis"), 0);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "knots_vector"), 1);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.calc_program, "p"), this.p);
-		
-		this.gl.enableVertexAttribArray(0);
-		this.gl.enableVertexAttribArray(1);
-		
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-		
-		// More texture support
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
-		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-		
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
-		
-		var tmp = this.ping;
-		this.ping = this.pong;
-		this.pong = tmp;
-		
-		// First, set up Framebuffer we'll render into
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
-		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
-		
-		this.gl.enable(this.gl.TEXTURE_2D);
-		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
-		this.gl.activeTexture(this.gl.TEXTURE1);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.source);
-		this.checkFramebuffer();
-		
-		// Then drawing the triangle strip using the calc program
-		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
-				
-		this.gl.disableVertexAttribArray(0);
-		this.gl.disableVertexAttribArray(1);
-		
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-	}
-	
-	this.reduce = function(scr) {
-		scr.sfq();
- 		this.gl.viewport(0, 0, 1, 300);
-		this.setUniforms(scr, this.reduce_program);
-		
-		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "width") , 3  );
-		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "height"), 300);
-		this.gl.uniform1f(this.gl.getUniformLocation(this.reduce_program, "knots"), 6);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.reduce_program, "basis"), 0);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.reduce_program, "control_points"), 1);
-		
-		this.gl.enableVertexAttribArray(0);
-		this.gl.enableVertexAttribArray(1);
-		
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-		
-		// More texture support
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
-		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
-		
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
-		
-		// First, set up Framebuffer we'll render into
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
-		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
-		
-		this.gl.enable(this.gl.TEXTURE_2D);
-		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.basis);
-		this.gl.activeTexture(this.gl.TEXTURE1);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.controls);
-		this.checkFramebuffer();
-		
-		// Then drawing the triangle strip using the calc program
-		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
-				
-		this.gl.disableVertexAttribArray(0);
-		this.gl.disableVertexAttribArray(1);
-		
-		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
-	}
-	
 	/* Every primitive is also responsible for knowing how to draw itself,
 	 * and that behavior is encapsulated in this function. It should be 
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
 	this.draw = function(scr) {
-		//this.calculate(scr);
-		
 		scr.perspective();
 		this.gl.viewport(0, 0, scr.width, scr.height);
 		this.setUniforms(scr, this.program);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "accumulation"), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "usTex" ), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "vsTex" ), 1);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "cpsTex"), 2);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -299,7 +207,7 @@ function nurbs(string, options) {
 		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		// More texture support
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.lVBO);
 		this.gl.vertexAttribPointer(1, 2, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
@@ -310,7 +218,11 @@ function nurbs(string, options) {
 		// the recently-drawn texture
 		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.activeTexture(this.gl.TEXTURE0);
-		this.gl.bindTexture(this.gl.TEXTURE_2D, this.basis);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.usTex);
+		this.gl.activeTexture(this.gl.TEXTURE1);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.vsTex);
+		this.gl.activeTexture(this.gl.TEXTURE2);
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this.cpsTex);
 		this.checkFramebuffer();
 		
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);

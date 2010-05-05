@@ -2,13 +2,15 @@ uniform mat4 u_modelViewMatrix;
 uniform mat4 u_projectionMatrix;
 
 attribute vec4 position;
-attribute vec2 aTextureCoord;
+attribute vec2 ls;
 
-uniform sampler2D accumulation;
+uniform sampler2D usTex;
+uniform sampler2D vsTex;
+uniform sampler2D cpsTex;
 
 uniform float t;
 
-varying vec2 vTextureCoord;
+varying vec2 coord;
 varying vec3 normal;
 varying vec3 light;
 varying vec3 halfVector;
@@ -21,20 +23,21 @@ float function(float x, float y) {
 	x = r;
 	//*/
 	
-	return texture2D(accumulation, vec2(x, y)).r;
+	return USER_FUNCTION;
+	//return texture2D(accumulation, vec2(x, y)).r;
 }
 
 void main() {
 	
 	vec4 result = position;
 	
-	float x = aTextureCoord.x;
-	float y = aTextureCoord.y;
+	float x = position.x;
+	float y = position.y;
 	result.z = function(x, y);
 	
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	
-	vTextureCoord = aTextureCoord;
+	coord = position.xy;
 	
 	// Normal calculation
 	const float h = 0.001;
