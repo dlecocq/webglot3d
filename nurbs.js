@@ -24,15 +24,32 @@ function nurbs(string, options) {
 	
 	this.source   = null;
 	// From the example at http://gul.sourceforge.net/viewdog-manual/node20.html
-	this.us       = [0, 0, 0.5, 1];
+	/*
+	this.us       = [0, 0, 1, 1];
 	this.usTex    = null;
-	this.vs       = [0, 0.25, 0.7, 1];
+	this.vs       = [0, 0, 1, 1];
 	this.vsTex    = null;
 	this.cps      = [[[0, 0, 0, 1], [10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
 	this.cpsTex   = null;
+	//*/
+
+	/*
+	// Nathan Collier's example
+	glot.add(new nurbs([0, 0, 0, 0.5, 1, 1, 1], [[0.0, 1.0, 0, 1], [3.3, 2.0, 0, 1], [6.7, 0.0, 0, 1], [10, 3, 0, 1]], 2, [0, 0, 1, 1]));
+	//*/
+	
+	this.us     = [0, 0, 0, 0.5, 1, 1, 1];
+	this.usTex  = null;
+	this.vs     = [0, 0, 1, 1];
+	this.vsTex  = null;
+	//this.cps    = [[[0, 1, 0, 1], [3.3, 2, 0, 1], [6.7, 0, 0, 1], [10, 3, 0, 1]], [[0, 1, 0, 1], [3.3, 2, 0, 1], [6.7, 0, 0, 1], [10, 3, 0, 1]]];
+	//this.cps    = [[[0, 1, 0, 1], [0, 1, 0, 1]], [[3.3, 2, 0, 1], [3.3, 2, 0, 1]], [[6.7, 0, 0, 1], [6.7, 0, 0, 1]], [[10, 3, 0, 1], [10, 3, 0, 1]]];
+	//this.cpsTex = null;
+	this.cps    = [[0, 1, 0, 1], [3.3, 2, 0, 1], [6.7, 0, 0, 1], [10, 3, 0, 1]];
+	this.cpsTex = null;
 	
 	// This is the degree in the u direction, and v direction respectively
-	this.nu		  = 1;
+	this.nu		  = 2;
 	this.nv       = 1;
 	
 	this.texture = null;
@@ -76,6 +93,7 @@ function nurbs(string, options) {
 		}
 		this.vsTex = ftexture(this.gl, vs.length, 1, f);
 		
+		/*
 		cps = this.cps;
 		f = function(pixels) {
 			// For every column
@@ -92,6 +110,19 @@ function nurbs(string, options) {
 			return pixels;
 		}
 		this.cpsTex = ftexture(this.gl, cps.length, cps[0].length, f);
+		//*/
+		
+		cps = this.cps;
+		f = function(pixels) {
+			for (var i = 0; i < cps.length; i += 1) {
+				tmp = cps[i];
+				for (var j = 0; j < tmp.length; j += 1) {
+					pixels[i * 4 + j] = tmp[j];
+				}
+			}
+			return pixels;
+		}
+		this.cpsTexture = ftexture(this.gl, this.cps.length, 1, f);
 		
 		/*
 		// For testing purposes, I wanted to make sure everything was there.

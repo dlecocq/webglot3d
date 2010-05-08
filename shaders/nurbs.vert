@@ -8,9 +8,9 @@ uniform sampler2D usTex;
 uniform sampler2D vsTex;
 uniform sampler2D cpsTex;
 
-vec2 knotCounts;
-vec2 cpCounts;
-vec2 n;
+uniform vec2 knotCounts;
+uniform vec2 cpCounts;
+uniform vec2 n;
 
 vec2 cpEps = 1.0 / (cpCounts   + vec2(1, 1));
 vec2 knEps = 1.0 / (knotCounts + vec2(1, 1));
@@ -22,9 +22,9 @@ varying vec3 normal;
 varying vec3 light;
 varying vec3 halfVector;
 
-vec4  ds[20];
-float as[20];
-float us[20];
+vec4  ds[10];
+float as[10];
+float us[10];
 
 void main() {
 	vec4 result = vec4(0.0, 0.0, 0.0, 1.0);
@@ -72,8 +72,10 @@ void main() {
 	//result.xy = cpsValue.xy;
 	//result.x = knotsValue.r;
 	
-	result.xy = ds[nx].xy / ds[nx].w;
+	//result.xy = ds[nx].xy / ds[nx].w;
 	//result.x = l;
+	result.xy = ds[nx].xy / ds[nx].w;
+	result.z = v;
 	
 	// COORDINATE_TRANSFORMATION
 
