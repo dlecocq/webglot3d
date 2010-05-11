@@ -27,13 +27,13 @@ function surface(string, options, source) {
 	 */
 	this.vertexVBO	= null;
 	this.textureVBO = null;
-	this.indexVBO		= null;
+	this.indexVBO	= null;
 	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 150;
+	this.count		= 250;
 	this.index_ct   = 0;
 	
 	this.texture    = null;

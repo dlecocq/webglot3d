@@ -87,6 +87,17 @@ function primitive(context) {
 		this.gl.attachShader(this.program, vertex_shader);
 		this.gl.attachShader(this.program, frag_shader);
 
+		// Bind attribute locations - this could be very dangerous.
+		//*
+		this.gl.bindAttribLocation(this.program, 0, "position");
+		this.gl.bindAttribLocation(this.program, 1, "aTextureCoord");
+		//*/
+		/*
+		this.gl.bindAttribLocation(this.program, 0, "vPosition");
+		this.gl.bindAttribLocation(this.program, 1, "vTexCoord");
+		*/
+		
+
 		// Link the program
 		this.gl.linkProgram(this.program);
 
@@ -116,7 +127,7 @@ function primitive(context) {
 		var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
 
 		if (status == gl.FRAMEBUFFER_COMPLETE) {
-			gl.console.log("Framebuffer complete");
+			//gl.console.log("Framebuffer complete");
 		} else if (status == gl.FRAMEBUFFER_UNSUPPORTED) {
 			gl.console.log("Framebuffer unsupported");
 		} else if (status == gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT) {
@@ -146,7 +157,8 @@ function primitive(context) {
 		
 			modelview_location  = this.gl.getUniformLocation(program, "u_modelViewMatrix");
 			projection_location = this.gl.getUniformLocation(program, "u_projectionMatrix");
-			time_location	      = this.gl.getUniformLocation(program, "t");
+			inversemv_location  = this.gl.getUniformLocation(program, "u_modelViewInverse");
+			time_location	    = this.gl.getUniformLocation(program, "t");
 			dx_location         = this.gl.getUniformLocation(program, "dx");
 			dy_location         = this.gl.getUniformLocation(program, "dy");
 			scale_location      = this.gl.getUniformLocation(program, "scale");
@@ -154,6 +166,7 @@ function primitive(context) {
 
 			this.gl.uniformMatrix4fv(modelview_location , false, scr.modelview.getAsWebGLFloatArray());
 			this.gl.uniformMatrix4fv(projection_location, false, scr.projection.getAsWebGLFloatArray());
+			this.gl.uniformMatrix4fv(inversemv_location , false, scr.inversemv.getAsWebGLFloatArray());
 			this.gl.uniform1f(time_location, scr.wall.time());
 
 			if (this.color) {

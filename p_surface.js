@@ -17,7 +17,7 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function p_surface(string, options, source) {
+function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	
 	this.gl      = null;
 	this.f       = string;
@@ -27,6 +27,11 @@ function p_surface(string, options, source) {
 	this.vertexVBO	= null;
 	this.textureVBO = null;
 	this.indexVBO		= null;
+	
+	this.umin = umin;
+	this.umax = umax;
+	this.vmin = vmin;
+	this.vmax = vmax;
 	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (u and v) samples are taken. Being
@@ -68,10 +73,10 @@ function p_surface(string, options, source) {
 		var texture  = [];
 		var indices  = [];
 		
-		var x = 0;
-		var y = 0;
-		var dx = 1.0 / this.count;
-		var dy = 1.0 / this.count;
+		var x = umin;
+		var y = vmin;
+		var dx = (umax - umin) / this.count;
+		var dy = (vmax - vmin) / this.count;
 		
 		var xrepeat = 5;
 		var yrepeat = 30;
@@ -89,7 +94,7 @@ function p_surface(string, options, source) {
 		 * calculated later.
 		 */
 		for (i = 0; i <= this.count; ++i) {
-			y = 0;
+			y = vmin;
 			ty = yrepeat;
 			for (j = 0; j <= this.count; ++j) {
 				vertices.push(x);

@@ -15,7 +15,7 @@ float dx = 2.0 / (width  - 1.0);
 
 const float alpha = 1.0;
 
-const float omega = 80.0;
+const float omega = 120.0;
 
 // USER_PARAMETERS
 
@@ -95,6 +95,5 @@ void main () {
 		
 		gl_FragColor = vec4(r, g, b, a);
 	}
-	
-	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+
 }

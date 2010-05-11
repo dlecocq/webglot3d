@@ -178,7 +178,7 @@ function flow(string, options) {
 	
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-    this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
+    	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "source"), 1);
 		
 		this.gl.enableVertexAttribArray(0);

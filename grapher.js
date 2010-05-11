@@ -151,6 +151,20 @@ function grapher() {
 		this.scr.rotate();
 	}
 	
+	this.scroll = function(event) {
+		if (!event) event = window.event;
+		
+		if (event.wheelDelta) {
+			delta = event.wheelDelta / 60;
+		} else if (event.detail) {
+			delta = -event.detail / 2;
+		}
+		
+		//this.gl.console.log("delta: " + delta);
+		//this.scr.alpha *= 1.1;
+		this.scr.alpha *= (1.0 - delta * 0.1);
+	}
+	
 	/* The keyboard event handler.  Again, the browser wars make life
 	 * difficult, as it seems (though I'm not a JavaScript expert) that
 	 * this varies between browsers.  As I understood it, keyCode was
@@ -218,6 +232,9 @@ function grapher() {
 		
 		f = function(event) { this.getElementById("glot").glot.keyboard(event) };
 		document.onkeydown = f;
+		
+		f = function(event) { this.glot.scroll(event) };
+		canvas.onmousewheel = f;
 	
 		this.gl = this.getContext();
 		var gl = this.gl;
@@ -281,10 +298,6 @@ function grapher() {
 		 */
 		this.wall = new stopwatch();
 		this.wall.start();
-
-		// Determine the axes and grid
-		//this.axes_dl = this.axes_dl_gen();
-		//this.grid_dl = this.grid_dl_gen();
 		
 		/* Normally we'd run some checks about what capabilities are enabled
 		 * (like fragment, vertex and geometry shaders), but for now it at
@@ -294,21 +307,6 @@ function grapher() {
 		 */
 	
 		this.framecount = 0;
-		
-		/* This is truly ugly as sin, but for the time being, it works.
-		 *
-		 * I can't figure out how to get grapher::display to work when called
-		 * explicitly from glot.html, and the only way I've been able to figure
-		 * out to display, is to use an interval function.  If I just want it
-		 * to display once, then that means setTimeout.  Otherwise, that calls
-		 * for animation.
-		 *
-		 * An unfortunate consequence of this is that it implies that there's a
-		 * single grapher in the context of a webpage, but the roadmap would not
-		 * like to limit grapher to this.
-		 */
-		window.glot = this;
-		window.setTimeout(function() { this.glot.display(); }, 1);
 	
 		// In the future, this ought to return some encoded value of success or failure.
 		return 0;
@@ -350,7 +348,8 @@ function grapher() {
 		 */
 		this.framecount = this.framecount + 1;
 		if (this.framecount == 150) {
-			document.getElementById("framerate").innerHTML = "Framerate : " + 150 / this.framerate.time();
+			//document.getElementById("framerate").innerHTML = "Framerate : " + 150 / this.framerate.time();
+			this.gl.console.log("Framerate : " + 150 / this.framerate.time());
 			this.framecount = 0;
 			this.framerate = new stopwatch();
 			this.framerate.start();
@@ -399,11 +398,13 @@ function grapher() {
 		if (w == this.scr.width && h == this.scr.height) {
 			return;
 		}
-	
+		
+		this.gl.console.log("Setting viewport to be (" + w + " x " + h + ")");
 		context.viewport(0, 0, w, h);
 		
-		this.scr.aspect = w / h;
-		this.scr.alpha  = this.alpha;
+		this.scr.width = w;
+		this.scr.height = h;
+		//this.scr.alpha  = this.alpha;
 	}
 	
 	/* Add a primitive to the container.

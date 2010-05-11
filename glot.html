@@ -20,35 +20,36 @@
 		C++ for this task so that only one script must be included.  For the
 		time being, just copy-and-paste this.
 	-->
-	<script src="emptytexture.js"> </script>
-	<script src="texture.js">      </script>
-	<script src="ray.js">          </script>
-	<script src="primitive.js">    </script>
-	<script src="datasurface.js">  </script>
-	<script src="box.js">          </script>
-	<script src="pde.js">          </script>
-	<script src="noisetexture.js"> </script>
-	<script src="flow.js">         </script>
-	<script src="sphere.js">       </script>
-	<script src="stopwatch.js">    </script>
-	<script src="screen.js">       </script>
-	<script src="surface.js">      </script>
-	<script src="p_surface.js">    </script>
-	<script src="grapher.js">      </script>
-	<script src="isosurface.js">   </script>
+	<script src="emptytexture.js">     </script>
+	<script src="texture.js">          </script>
+	<script src="ray.js">              </script>
+	<script src="primitive.js">        </script>
+	<script src="datasurface.js">      </script>
+	<script src="box.js">              </script>
+	<script src="pde3d.js">            </script>
+	<script src="pde.js">              </script>
+	<script src="ftexture.js">         </script>
+	<script src="nurbs.js">            </script>
+	<script src="noisetexture.js">     </script>
+	<script src="flow.js">             </script>
+	<script src="sphere.js">           </script>
+	<script src="stopwatch.js">        </script>
+	<script src="screen.js">           </script>
+	<script src="surface.js">          </script>
+	<script src="p_surface.js">        </script>
+	<script src="grapher.js">          </script>
+	<script src="isosurface.js">       </script>
 
 	<script>
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
 		if (key == 65) {
-			console.log("Setting isovalue to " + (glot.get("alpha") + 0.01));
-			glot.set("alpha", glot.get("alpha") + 0.01);
+			glot.set("isovalue", glot.get("isovalue") + 0.01);
 			glot.display();
 		} else if (key == 90) {
-			console.log("Setting isovalue to " + (glot.get("alpha") + 0.01));
-			glot.set("alpha", glot.get("alpha") - 0.01);
+			glot.set("isovalue", glot.get("isovalue") - 0.01);
 			glot.display();
-		}	
+		}
 	}
 	
 	var mySurface = null;
@@ -76,8 +77,9 @@
 		glot.setKeyboardFunction(keyboard);
 				
 		glot.setDomain(-2, 2, -2, 2);
+		//glot.set("alpha", 0.5);
 		
-		/*
+		//*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
@@ -228,12 +230,20 @@
 		glot.set("k", 1.2);
 		glot.set("k2", 1.2);
 		glot.set("a", 1.5);
-		glot.add(new p_surface("pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*cos(18.85 * u), pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*sin(18.85 * u), pow(k, 18.85 * u) * sin(6.3 * v) - a * pow(k2, 18.85 * u)"));
+		glot.add(new p_surface("pow(k, u)*(1.0 + cos(v))*cos(u), pow(k, u)*(1.0 + cos(v))*sin(u), pow(k, u) * sin(v) - a * pow(k2, u)", 0, Math.PI, 0, 2 * Math.PI));
 		//*/
 		
-		//* Test surface - a funky "sphere" - a sphere with changing radius.
+		/* Test surface - a funky "sphere" - a sphere with changing radius.
 		// You can have a lot of fun with it.
-		glot.add(new p_surface("abs(cos(20.0 * v * u + t) * sin(20.0 * v * u)), 3.14159265 * u, 6.3 * v", SPHERICAL));
+		glot.set("a", 0.4);
+		glot.set("b", 1.2);
+		glot.add(new p_surface("2.0 * abs(cos(v * u) * sin(b * v * u)), u, a * v / 3.0", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
+		//*/
+		
+		/*
+		glot.set("a", 1.0);
+		glot.set("b", 1.0);
+		glot.add(new p_surface("2.0 + 0.5 * sin(a * u) * sin(b * v), u, v", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
 		//*/
 		
 		/* Test surface - a cylinder with isosurfacing
@@ -253,15 +263,78 @@
 		//*/
 		
 		/* Test surface - using cylindrical coordinates with surface class
-		glot.set("speed", 3.0);
-		glot.add(new surface("sin(4.0 * x - speed * t) / 5.0", CYLINDRICAL));
+		glot.set("a", 3.0);
+		glot.set("b", 1.0)
+		glot.add(new surface("b * sin(a * x - 3.0 * t) / 5.0", CYLINDRICAL, "textures/kaust.png"));
 		//*/
 		
 		//glot.add(new pde());
 		
-		//glot.add(new box());
+		/* Some implicit surfaces from http://virtualmathmuseum.org/
+		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
+		81.0*(pow(x,3.0) + pow(y,3.0) + pow(z,3.0)) - 189.0*(x*x*y + x*x*z + y*y*x + y*y*z + z*z*x + z*z*y) + 54.0*(x*y*z) + 126.0*(x*y + x*z + y*z) - 9.0*(x * x + y * y + z * z) - 9.0*(x + y + z) + 1.0
+		
+		// http://virtualmathmuseum.org/Surface/orthocircles/orthocircles.html
+		(pow(x*x + y*y - 1.0,2.0) + z * z)*(pow(y * y + z * z - 1.0,2.0) + x * x)*(pow(z * z + x * x - 1.0, 2.0) + y * y) - pow(0.075, 2.0)*(1.0 + 3.0*(x * x + y * y + z * z))
+		
+		// This description does not appear to be correct
+		// http://virtualmathmuseum.org/Surface/bretzel5/bretzel5.html
+		(x * x + y * y * 0.25 - 1.0) * ( x * x * 0.25 + y * y - 1.0) - 0.075
+		
+		// Incomplete description?
+		// http://virtualmathmuseum.org/Surface/pilz/pilz.html
+		pow(pow(x*x + y*y - 1.0, 2.0) + pow(z - 0.5, 2.0),2.0) * (pow(y * y * 0.64 + pow(z + 0.03, 2.0) - 1.0,2.0) + x * x) - 0.28 * (1.0 + 3.0*(pow(z - 0.5, 2.0)))
+		
+		// http://virtualmathmuseum.org/Surface/barth_sextic/barth_sextic.html
+		glot.set("phi", 1.61803);
+		glot.set("w", 1.0);
+		4.0*(phi*phi*x*x - y*y) * (phi*phi*y*y - z*z) * (phi*phi*z*z - x*z) - (1.0 + 2.0*phi) * pow(x*x + y*y + z*z - w*w, 2.0) * w*w == 0
+		*/
+		
+		/*
+		Parametric surfaces
+		*/
+		
+		/*
+		var aa = 0.9;
+		var w = Math.sqrt(1 - aa * aa);
+		glot.set("aa", aa);
+		glot.set("w", w);
+		glot.add(new surface("4.0 * atan( (aa / w) * (sin(w * y))) / (cosh(aa * x))"));
+		*/
+		
+		/*
+		var aa = 0.7;
+		var wsqr = 1 - aa * aa;
+		var w = Math.sqrt(wsqr);
+		glot.set("aa", aa);
+		glot.set("wsqr", wsqr);
+		glot.set("w", w);
+		
+		var x = "-u + (2.0 * wsqr * cosh(aa * u) * sinh(aa * u) / (aa * (pow(w * cosh(aa * u), 2.0) + pow(aa * sin(w * v), 2.0))))";
+		var y = "2.0 * w * cosh(aa * u) * (-(w * cos(v) * cos(w * v)) - sin(v) * sin(w * v)) / (aa * (pow(w * cosh(aa * u), 2.0) + pow(aa * sin(w * v), 2.0)))";
+		var z = "2.0 * w * cosh(aa * u) * (-(w * sin(v) * cos(w * v)) - cos(v) * sin(w * v)) / (aa * (pow(w * cosh(aa * u), 2.0) + pow(aa * sin(w * v), 2.0)))";
+		
+		glot.add(new p_surface(x + "," + y + "," + z, 0, 5, 0, 5))
+		//*/
+		
+		/*
+		glot.add(new p_surface("u - u * u * u / 3.0 + u * v * v, v - v * v * v / 3.0 + v * u * u, u * u - v * v", 0, 3, 0, 3));
+		//x = u - u * u * u / 3 + u * v * v
+		//y = v - v * v * v / 3 + v * u * u
+		//z = u * u - v * v
+		//*/
+		
+		glot.set("isovalue", 0.1);
+	
 		//glot.add(new pde());
-		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0) * 0.25"));
+		//glot.set("alpha", 0.2);
+		//glot.add(new pde3d());
+		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
+		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
+		
+		glot.add(new box());
+		//glot.add(new nurbs("0.0"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
@@ -277,7 +350,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:94%;
+		height:95%;
 	}
 	</style>
 </head>

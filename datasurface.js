@@ -36,6 +36,7 @@ function datasurface(source, width, height, b_width, b_height) {
 	this.index_ct   = 0;
 	
 	this.texture    = null;
+	this.transfer	= null;
 	this.source     = source || "volumes/orange.png";
 	
 	this.width      = width;
@@ -54,6 +55,7 @@ function datasurface(source, width, height, b_width, b_height) {
 		this.refresh(scr);
 		this.gen_program();
 		this.texture = new texture(this.gl, this.source);
+		this.transfer = new noisetexture(this.gl, 256, 1);
 	}
 	
 	/* Refresh is a way for the grapher instance to notify surface of
@@ -124,10 +126,11 @@ function datasurface(source, width, height, b_width, b_height) {
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
-	this.draw = function() {
-		this.setUniforms();
+	this.draw = function(scr) {
+		this.setUniforms(scr);
 		//scr.set_uniforms(this.gl, this.program);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler" ), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "transfer"), 1);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -139,7 +142,10 @@ function datasurface(source, width, height, b_width, b_height) {
 		this.gl.vertexAttribPointer(1, 3, this.gl.FLOAT, this.gl.FALSE, 0, 0);
 		
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
+		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.texture.bind();
+		this.gl.activeTexture(this.gl.TEXTURE1);
+		this.transfer.bind();
 		
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
 		

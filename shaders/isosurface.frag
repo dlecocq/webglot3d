@@ -1,7 +1,7 @@
 uniform mat4 u_modelViewMatrix;
 
 varying vec3 direction;
-varying vec3 position;
+varying vec3 vposition;
 varying vec3 v_texCoord;
 varying vec3 light;
 varying vec3 halfVector;
@@ -37,7 +37,7 @@ float function(float x, float y, float z) {
 	x = rho;
 	//*/
 	
-	return USER_FUNCTION - alpha;
+	return USER_FUNCTION - isovalue;
 }
 
 vec3 f_normal(float x, float y, float z, float h) {
@@ -97,6 +97,18 @@ void main () {
 			temp1 = sign(point - min);
 			temp2 = sign(max - point);
 			if (dot(temp1, temp2) < 3.0) {
+				s -= ds * 0.75;
+				point = start + direction * s;
+				temp1 = sign(point - min);
+				temp2 = sign(max - point);
+				if (dot(temp1, temp2) < 3.0) {
+					break;
+				} else {
+					value = function(point.x, point.y, point.z);
+					if ((value * v_previous) < 0.0) {
+						gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+					}
+				}
 				break;
 			}
 		}
