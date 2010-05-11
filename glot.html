@@ -246,13 +246,19 @@
 		glot.set("k", 1.2);
 		glot.set("k2", 1.2);
 		glot.set("a", 1.5);
-		glot.add(new p_surface("pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*cos(18.85 * u), pow(k, 18.85 * u)*(1.0 + cos(6.3 * v))*sin(18.85 * u), pow(k, 18.85 * u) * sin(6.3 * v) - a * pow(k2, 18.85 * u)"));
+		glot.add(new p_surface("pow(k, u)*(1.0 + cos(v))*cos(u), pow(k, u)*(1.0 + cos(v))*sin(u), pow(k, u) * sin(v) - a * pow(k2, u)", 0, Math.PI, 0, 2 * Math.PI));
 		//*/
 		
 		/* Test surface - a funky "sphere" - a sphere with changing radius.
 		// You can have a lot of fun with it.
-		glot.add(new p_surface("abs(cos(20.0 * v * u) * sin(20.0 * v * u)), 3.14159265 * u, 6.3 * v", SPHERICAL));
+		glot.set("a", 0.4);
+		glot.set("b", 1.2);
+		glot.add(new p_surface("2.0 * abs(cos(v * u) * sin(b * v * u)), u, a * v / 3.0", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
 		//*/
+		
+		glot.set("a", 1.0);
+		glot.set("b", 1.0);
+		glot.add(new p_surface("2.0 + sin(a * u) * sin(b * v), u, v", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
 		
 		/* Test surface - a cylinder with isosurfacing
 		glot.set("alpha", 1.0);
@@ -270,7 +276,7 @@
 		glot.add(new isosurface("x / d", SPHERICAL));
 		//*/
 		
-		//* Test surface - using cylindrical coordinates with surface class
+		/* Test surface - using cylindrical coordinates with surface class
 		glot.set("a", 3.0);
 		glot.set("b", 1.0)
 		glot.add(new surface("b * sin(a * x - 3.0 * t) / 5.0", CYLINDRICAL, "textures/kaust.png"));
