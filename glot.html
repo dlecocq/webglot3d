@@ -43,6 +43,8 @@
 	<script>
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
+		var a = this.parameters["a"];
+		var b = this.parameters["b"];
 		if (key == 65) {
 			console.log("Setting offset to " + (glot.get("offset") + 0.5));
 			glot.set("offset", glot.get("offset") + 0.5);
@@ -51,7 +53,19 @@
 			console.log("Setting offset to " + (glot.get("offset") - 0.5));
 			glot.set("offset", glot.get("offset") - 0.5);
 			glot.display();
-		}	
+		} else if (key == 83) {
+			//this.gl.console.log("Pressed s");
+			this.set("a", a * 0.9);
+		} else if (key == 70) {
+			//this.gl.console.log("Pressed f");
+			this.set("a", a / 0.9);
+		} else if (key == 80) {
+			//this.gl.console.log("Pressed p");
+			this.set("b", b / 0.9);
+		} else if (key == 77) {
+			//this.gl.console.log("Pressed m");
+			this.set("b", b * 0.9);
+		}
 	}
 	
 	var mySurface = null;
@@ -256,9 +270,10 @@
 		glot.add(new isosurface("x / d", SPHERICAL));
 		//*/
 		
-		/* Test surface - using cylindrical coordinates with surface class
-		glot.set("speed", 3.0);
-		glot.add(new surface("sin(4.0 * x - speed * t) / 5.0", CYLINDRICAL));
+		//* Test surface - using cylindrical coordinates with surface class
+		glot.set("a", 3.0);
+		glot.set("b", 1.0)
+		glot.add(new surface("b * sin(a * x - 3.0 * t) / 5.0", CYLINDRICAL, "textures/kaust.png"));
 		//*/
 		
 		//glot.add(new pde());
@@ -326,18 +341,8 @@
 		//glot.add(new flow("sin(3.0 * sqrt(x * x + y * y) - 1.5 * t) * cos(5.0 * sqrt((x - 1.5) * (x - 1.5) + (y - 0.75) * (y - 0.75)) - 2.0 * t) * 0.3"));
 		//glot.add(new flow("sin(sqrt(x * x + y * y) * 4.0 - t) * 0.25"));
 		
-		// glot.set("d1", 0.00225);
-		// glot.set("d2", 0.0045);
-		// glot.set("t1", 0.02);
-		// glot.set("t2", 0.2);
-		// glot.set("a", 0.899);
-		// glot.set("b", -0.91);
-		// glot.set("g", -0.899);
-		//glot.add(new surface("a * x * (1.0 - t1 * y * y) + y * ( 1.0 - t2 * x)"));
-		//glot.add(new surface("b * y * (1.0 - a * t1 * x * y / b) + x * ( g + t2 * y)"));
-		
 		glot.add(new box());
-		glot.add(new nurbs("0.0"));
+		//glot.add(new nurbs("0.0"));
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
