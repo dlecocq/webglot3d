@@ -177,7 +177,6 @@ function grapher() {
 	this.keyboard = function(key_event) {
 		var key = Number(key_event.keyCode);
 		//this.gl.console.log(key + " key pressed.");
-		/*
 		if (key == 189) {
 			this.zoom_out();
 			this.display();
@@ -185,7 +184,6 @@ function grapher() {
 			this.zoom_in();
 			this.display();
 		}
-		*/
 		if (this.userKeyboardFunction) {
 			try {
 				this.userKeyboardFunction(key_event);
