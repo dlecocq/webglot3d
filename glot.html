@@ -55,16 +55,16 @@
 			glot.display();
 		} else if (key == 83) {
 			//this.gl.console.log("Pressed s");
-			this.set("a", a * 0.9);
+			this.set("a", a + 1);
 		} else if (key == 70) {
 			//this.gl.console.log("Pressed f");
-			this.set("a", a / 0.9);
+			this.set("a", a - 1);
 		} else if (key == 80) {
 			//this.gl.console.log("Pressed p");
-			this.set("b", b / 0.9);
+			this.set("b", b - 1);
 		} else if (key == 77) {
 			//this.gl.console.log("Pressed m");
-			this.set("b", b * 0.9);
+			this.set("b", b + 1);
 		}
 	}
 	
@@ -258,7 +258,7 @@
 		
 		glot.set("a", 1.0);
 		glot.set("b", 1.0);
-		glot.add(new p_surface("2.0 + sin(a * u) * sin(b * v), u, v", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
+		glot.add(new p_surface("2.0 + 0.5 * sin(a * u) * sin(b * v), u, v", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
 		
 		/* Test surface - a cylinder with isosurfacing
 		glot.set("alpha", 1.0);
