@@ -62,5 +62,5 @@ void main() {
 	//gl_FragColor = texture;
 	//gl_FragColor.a = 1.0;
 	//gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-	gl_FragColor = vec4(coord.x, coord.y, 0.0, 1.0);
+	gl_FragColor = vec4(coord.x, 0.2, 0.2, 1.0);
 }

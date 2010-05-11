@@ -24,7 +24,7 @@ function nurbs(string, options) {
 	
 	this.source   = null;
 	// From the example at http://gul.sourceforge.net/viewdog-manual/node20.html
-	/*
+	//*
 	this.us       = [0, 0, 1, 1];
 	this.usTex    = null;
 	this.vs       = [0, 0, 1, 1];
@@ -37,7 +37,8 @@ function nurbs(string, options) {
 	// Nathan Collier's example
 	glot.add(new nurbs([0, 0, 0, 0.5, 1, 1, 1], [[0.0, 1.0, 0, 1], [3.3, 2.0, 0, 1], [6.7, 0.0, 0, 1], [10, 3, 0, 1]], 2, [0, 0, 1, 1]));
 	//*/
-	
+
+	/*	
 	this.us     = [0, 0, 0, 0.5, 1, 1, 1];
 	this.usTex  = null;
 	this.vs     = [0, 0, 1, 1];
@@ -47,6 +48,7 @@ function nurbs(string, options) {
 	//this.cpsTex = null;
 	this.cps    = [[0, 1, 0, 1], [3.3, 2, 0, 1], [6.7, 0, 0, 1], [10, 3, 0, 1]];
 	this.cpsTex = null;
+	//*/
 	
 	// This is the degree in the u direction, and v direction respectively
 	this.nu		  = 2;

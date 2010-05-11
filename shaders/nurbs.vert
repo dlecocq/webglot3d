@@ -23,7 +23,8 @@ varying vec3 light;
 varying vec3 halfVector;
 
 vec4  ds[10];
-float as[10];
+// Basis function values (u direction)
+float ns[10];
 float us[10];
 
 void main() {
@@ -37,33 +38,36 @@ void main() {
 	
 	int li = int(ls.x);
 	
-	//*
 	// Grab all the control points early on
 	for (int i = 0; i <= nx; ++i) {
 		ds[i] = texture2D(cpsTex, vec2(float(li - nx + i) / (cpCounts.x + 1.0) + cpEps.x, 0));
-		ds[i].xyz *= ds[i].w;
 	}
-	//*/
 	
-	//result.x = ds[0].xy;
-	
-	//*
 	// Grab all the u's early on
 	for (int i = 0; i < 2 * nx; ++i) {
 		us[i] = texture2D(usTex, vec2(float(li - nx + 1 + i) / (knotCounts.x + 1.0) + knEps.x, 0)).r;
 	}
-	//*/
 	
-	// For all degrees, starting with the lowest...
+	// Initialize all to zero, except n(i)
+	for (int i = 0; i < nx; ++i) {
+		ns[i] = 0.0;
+	}
+	ns[nx    ] = 1.0;
+	ns[nx + 1] = 0.0;
+	
+	// Calculate the basis functions
+	// For every row, starting at bottom,
 	for (int k = 1; k <= nx; ++k) {
-		// For all knots necessary
-		// It's important to begin with i and move left
-		// because of data dependencies
-		for (int i = nx; i >= k; --i) {
-			// Watch out for divide-by-zeros
-			as[i-1] = (u - us[i-1]) / (us[i + nx - k] - us[i -1]);
-			ds[i] = (1.0 - as[i - 1]) * ds[i - 1] + as[i - 1] * ds[i];
+		// For every non-zero column
+		for (int i = nx - k; i <= nx; ++i) {
+			ns[i] = (u - us[i]) / (us[i + k] - us[i]) * ns[i] + (us[i + k + 1] - u) / (us[i + k + 1] - us[i+1]) * ns[i + 1]; 
 		}
+	}
+	
+	result = vec4(0.0, 0.0, 0.0, 1.0);
+	
+	for (int i = 0; i <= nx; ++i) {
+		result += ds[i] * ns[i];
 	}
 	
 	vec4 knotsValue = texture2D(usTex, vec2(u, 0.0));
@@ -74,10 +78,12 @@ void main() {
 	
 	//result.xy = ds[nx].xy / ds[nx].w;
 	//result.x = l;
-	result.xy = ds[nx].xy / ds[nx].w;
-	result.z = v;
 	
 	// COORDINATE_TRANSFORMATION
+
+	result.x = ns[0];
+	
+	result.yzw = position.yzw;
 
 	gl_Position = u_projectionMatrix * u_modelViewMatrix * result;
 	
