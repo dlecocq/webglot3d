@@ -43,15 +43,11 @@
 	<script>
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
-		var a = this.parameters["a"];
-		var b = this.parameters["b"];
 		if (key == 65) {
-			console.log("Setting offset to " + (glot.get("offset") + 0.5));
-			glot.set("offset", glot.get("offset") + 0.5);
+			glot.set("isovalue", glot.get("isovalue") + 0.1);
 			glot.display();
 		} else if (key == 90) {
-			console.log("Setting offset to " + (glot.get("offset") - 0.5));
-			glot.set("offset", glot.get("offset") - 0.5);
+			glot.set("isovalue", glot.get("isovalue") - 0.1);
 			glot.display();
 		} else if (key == 83) {
 			//this.gl.console.log("Pressed s");
@@ -256,9 +252,11 @@
 		glot.add(new p_surface("2.0 * abs(cos(v * u) * sin(b * v * u)), u, a * v / 3.0", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
 		//*/
 		
+		/*
 		glot.set("a", 1.0);
 		glot.set("b", 1.0);
 		glot.add(new p_surface("2.0 + 0.5 * sin(a * u) * sin(b * v), u, v", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL));
+		//*/
 		
 		/* Test surface - a cylinder with isosurfacing
 		glot.set("alpha", 1.0);
@@ -364,7 +362,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:94%;
+		height:85%;
 	}
 	</style>
 </head>
@@ -376,14 +374,12 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
-	<!--
 	<div id="function_form">
 		<form name="function" onsubmit="gen_isosurface(); return false">
 			f(x, y, z, t) = <input size='100' name="fn" /> = 0
 		</form>
 		<p><em>Note:</em> If you need to enter numerical constants, make sure they are written as floating-point numbers. Eg, 2.0, not 2</p>
 	</div>
-	-->
 	
 	<div id="framerate">Framerate: </div>
 </body>
