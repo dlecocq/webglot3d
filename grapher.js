@@ -163,6 +163,7 @@ function grapher() {
 		//this.gl.console.log("delta: " + delta);
 		//this.scr.alpha *= 1.1;
 		this.scr.alpha *= (1.0 - delta * 0.1);
+		this.display();
 	}
 	
 	/* The keyboard event handler.  Again, the browser wars make life
