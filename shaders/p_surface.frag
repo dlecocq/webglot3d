@@ -13,7 +13,7 @@ void main () {
 	vec3 norm_light = normalize(light);
 
 	// Calculating The Diffuse Term And Clamping It To [0;1]
-	float DiffuseTerm = clamp(dot(norm_normal, norm_light), 0.0, 1.0);
+	float DiffuseTerm = clamp(abs(dot(norm_normal, norm_light)), 0.0, 1.0);
 
 	// Calculating The Final Color
 	gl_FragColor = 0.4 * texture + 0.6 * texture * DiffuseTerm;
