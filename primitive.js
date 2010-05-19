@@ -43,8 +43,8 @@ function primitive(context) {
 			vertex_source = vertex_source.replace("// USER_PARAMETERS", params);
 			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
 			
-			vertex_source = vertex_source.replace(/([^\d\w\.]|^)(\d+)([^\d\w\.]|$)/g, "$1$2.0$3");
-			frag_source   = frag_source.replace(/([^\d\w\.]|^)(\d+)([^\d\w\.]|$)/g, "$1$2.0$3");
+			vertex_source = vertex_source.replace(/([^\d\w\.]|^)(\d+)(?![\w\.\d])/g, "$1$2.0");
+			frag_source   = frag_source.replace(/([^\d\w\.]|^)(\d+)(?![\w\.\d])/g, "$1$2.0");
 		}
 		
 		/*
