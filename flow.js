@@ -180,6 +180,7 @@ function flow(string, options) {
 		this.setUniforms(scr, this.calc_program);
     	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "source"), 1);
+		this.gl.viewport(0, 0, scr.width, scr.height);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -230,7 +231,8 @@ function flow(string, options) {
 	this.draw = function(scr) {
 		scr.sfq();
 		this.calculate(scr);
-		this.calculate(scr);		
+		this.calculate(scr);
+		this.gl.viewport(0, 0, scr.width, scr.height);		
 
 		scr.perspective();
 		this.setUniforms(scr, this.program);
