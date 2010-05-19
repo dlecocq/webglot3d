@@ -430,6 +430,11 @@ function grapher() {
 		window.setInterval(function() { this.glot.display(); }, 10);
 	}
 	
+	this.draw = function() {
+		window.glot = this;
+		window.setTimeout(function() { this.glot.display(); }, 10);
+	}
+	
 	this.setDomain = function(minx, maxx, miny, maxy) {
 		this.scr.minx = minx;
 		this.scr.maxx = maxx;
