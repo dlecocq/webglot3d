@@ -65,6 +65,7 @@
 	examples["epicycloid" ] = ["(a + cos(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + sin(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v))) * cos(u)",
 								"(a + cos(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + sin(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v))) * sin(u)",
 								"(-sin(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + cos(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v)))", "CARTESIAN", [0, 2 * Math.PI, 0, 2 * Math.PI]];
+	examples["toroid"     ] = ["2 * u", "3 + sin(u) + cos(v)", "sin(v) + 2 * cos(u)", "CYLINDRICAL", [0, 2 * Math.PI, 0, 2 * Math.PI]];
 	
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
@@ -150,7 +151,7 @@
 		glot.set("a", 7);
 		glot.set("b", 7);
 		glot.set("c", 0.4);
-		prefill("epicycloid");
+		prefill("toroid");
 		
 		/* Some implicit surfaces from http://virtualmathmuseum.org/
 		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
