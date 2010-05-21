@@ -85,8 +85,14 @@
 		
 		// You can add new primitives to the display with the add function.
 		
+		/*
 		glot.set("isovalue", 0.2);
 		mySurface = new isosurface("(pow(x*x + y*y - 1.0,2.0) + z * z)*(pow(y * y + z * z - 1.0,2.0) + x * x)*(pow(z * z + x * x - 1.0, 2.0) + y * y) - pow(0.075, 2.0)*(1.0 + 3.0*(x * x + y * y + z * z))");
+		glot.add(mySurface);
+		//*/
+		
+		glot.set("isovalue", 0.2);
+		mySurface = new isosurface("sin(x * z * y + y * y + z - t)");
 		glot.add(mySurface);
 				
 		/* Some implicit surfaces from http://virtualmathmuseum.org/
@@ -100,8 +106,7 @@
 		 * that is to say, it will only refresh when the perpective changes,
 		 * like with zooming in and out, or rotating it.
 		 */
-		//glot.run();
-		glot.draw();
+		glot.run();
 	}
 	</script>
 	
