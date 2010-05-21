@@ -14,10 +14,16 @@
 	-->
 	<script src="CanvasMatrix.js"> </script>
 	
-	<script src="js/range.js" > </script>
-	<script src="js/timer.js" > </script>
-	<script src="js/slider.js"> </script>
-	
+	<!-- This is for the jQuery slider I use -->
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<style type="text/css">
+    	.slider { 	margin: 10px;
+					width : 180px; }
+  	</style>
+	<!-- finish -->
+
 	<!--
 		These are the class files used in WebGLot. I'm not really an expert
 		in JavaScript, and would prefer an analog to the #include macro in
@@ -44,22 +50,14 @@
 	<script src="isosurface.js">       </script>
 	<script src="grapher.js">          </script>
 
-	<link type="text/css" rel="StyleSheet" href="css/winclassic.css" />
-
 	<script>
 	var mySurface = null;
 	var glot = null;
 	var aSlider = null;
 	
-	function change(key, delta) {
-		try {
-			glot.set(key, glot.get(key) + delta);
-			document.getElementById(key + "_value").innerHTML = glot.get(key);
-		} catch(e) {
-			
-		}
-		return false;
-	}
+	var examples = new Array();
+	examples["wobble"] = ["3 + c * sin(2.7 * t) * sin(a * u - t) * cos(b * v - 1.3 * t)", "u", "v"          , "SPHERICAL"];
+	examples["bumpy" ] = ["2.0 * abs(cos(v * u) * sin(b * v * u))"                      , "u", "a * v / 3.0", "SPHERICAL"];
 	
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
@@ -72,7 +70,19 @@
 		}
 	}
 	
-	function gen_isosurface(string) {
+	function prefill(name) {
+		if (name == "null" || name == null) {
+			name = document.forms["function"].elements.examples.value;
+		} 
+		example = examples[name];
+		document.forms["function"].elements.fx.value = example[0];
+		document.forms["function"].elements.fy.value = example[1];
+		document.forms["function"].elements.fz.value = example[2];
+		document.forms["function"].elements.coordinate.value = example[3];
+		gen_surface();
+	}
+	
+	function gen_surface(string) {
 		if (mySurface) {
 			glot.primitives.pop();
 		}
@@ -81,8 +91,16 @@
 			var fx = document.forms["function"].elements.fx.value;
 			var fy = document.forms["function"].elements.fy.value;
 			var fz = document.forms["function"].elements.fz.value;
+			var coord = document.forms["function"].elements.coordinate.value;
 		
-			mySurface = new p_surface(fx + ", " + fy + ", " + fz, 0, 1, 0, 1);
+			if (coord == "SPHERICAL") {
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, 0, Math.PI, 0, 2 * Math.PI, SPHERICAL);
+			} else if (coord == "CYLINDRICAL") {
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, 0, 1, 0, 2 * Math.PI, CYLINDRICAL);
+			} else {
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, 0, 1, 0, 1);
+			}
+	
 			glot.add(mySurface);
 			glot.restart();
 			glot.display();
@@ -113,31 +131,16 @@
 		mySurface = new isosurface("(pow(x*x + y*y - 1.0,2.0) + z * z)*(pow(y * y + z * z - 1.0,2.0) + x * x)*(pow(z * z + x * x - 1.0, 2.0) + y * y) - pow(0.075, 2.0)*(1.0 + 3.0*(x * x + y * y + z * z))");
 		glot.add(mySurface);
 		//*/
+		$(document).ready(function() {
+			$("#aSlider").slider({min: 3  , max: 10 , step: 1  , value: 7  , slide: function(event, ui) { glot.set("a", ui.value); document.getElementById("a-value").innerHTML = ui.value; } });
+			$("#bSlider").slider({min: 3  , max: 10 , step: 1  , value: 7  , slide: function(event, ui) { glot.set("b", ui.value); document.getElementById("b-value").innerHTML = ui.value; } });
+			$("#cSlider").slider({min: 0.1, max: 1.5, step: 0.1, value: 0.4, slide: function(event, ui) { glot.set("c", ui.value); document.getElementById("c-value").innerHTML = ui.value; } });
+		});
 		
 		glot.set("a", 7);
 		glot.set("b", 7);
 		glot.set("c", 0.4);
-		mySurface = new p_surface("3 + c * sin(2.7 * t) * sin(a * u - t) * cos(b * v - 1.3 * t), u, v", 0, Math.PI, 0, 2 * Math.PI, SPHERICAL);
-		glot.add(mySurface);
-		
-		change("a", 0);
-		change("b", 0);
-		change("c", 0);
-	
-		aSlider = new Slider(document.getElementById("a-slider"), document.getElementById("a-slider-input"));
-		aSlider.setMinimum(1);
-		aSlider.setMaximum(15);
-		aSlider.onchange = function() { glot.set("a", aSlider.getValue()); document.getElementById("a-value").innerHTML = aSlider.getValue(); }
-		
-		bSlider = new Slider(document.getElementById("b-slider"), document.getElementById("b-slider-input"));
-		bSlider.setMinimum(1);
-		bSlider.setMaximum(15);
-		bSlider.onchange = function() { glot.set("b", bSlider.getValue()); }
-		
-		cSlider = new Slider(document.getElementById("c-slider"), document.getElementById("c-slider-input"));
-		cSlider.setMinimum(1);
-		cSlider.setMaximum(25);
-		cSlider.onchange = function() { glot.set("c", cSlider.getValue() / 10); }
+		prefill("wobble");
 		
 		/* Some implicit surfaces from http://virtualmathmuseum.org/
 		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
@@ -158,7 +161,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:80%;
+		height:73%;
 	}
 	</style>
 </head>
@@ -171,23 +174,40 @@
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
 	<div id="function_form">
-		<form name="function" onsubmit="gen_isosurface(); return false">
-			fx(u, v, t) = <input size='100' name="fx" /> <br/>
-			fy(u, v, t) = <input size='100' name="fy" /> <br/>
-			fz(u, v, t) = <input size='100' name="fz" />
+		<form name="function" onsubmit="gen_surface(); return false">
+			<select name="examples" onclick="prefill(); return false">
+				<option value="wobble">Wobbly sphere</option>
+				<option value="bumpy" >Bumpy sphere</option>
+			</select> <br/>
+			x(u, v, t) = <input size='32' name="fx" /> <br/>
+			y(u, v, t) = <input size='32' name="fy" /> <br/>
+			z(u, v, t) = <input size='32' name="fz" /> <br/>
+			<select name="coordinate" onclick="gen_surface(); return false">
+				<option value="CARTESIAN"  >cartesian</option>
+				<option value="CYLINDRICAL">cylindrical</option>
+				<option value="SPHERICAL"  >spherical</option>
+			</select>
 		</form>
 	</div>
 
-	<div class="slider" id="a-slider">
-		a : <input class="slider-input" id="a-slider-input" /> <span id="a-value"></span>
-	</div>
-	
-	<div class="slider" id="b-slider">
-		b : <input class="slider-input" id="b-slider-input" /> <span id="b-value"></span>
-	</div>
-	
-	<div class="slider" id="c-slider">
-		c : <input class="slider-input" id="c-slider-input" /> <span id="c-value"></span>
+	<div id="sliders">
+		<table>
+			<tr>
+				<td>a = </td>
+				<td id="a-value">7</td>
+				<td><div class="slider" id="aSlider"></div></td>
+			</tr>
+			<tr>
+				<td>b = </td>
+				<td id="b-value">7</td>
+				<td><div class="slider" id="bSlider"></div></td>
+			</tr>
+			<tr>
+				<td>c = </td>
+				<td id="c-value">0.4</td>
+				<td><div class="slider" id="cSlider"></div></td>
+			</tr>
+		</table>
 	</div>
 </body>
 </html>
