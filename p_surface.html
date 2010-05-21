@@ -57,11 +57,14 @@
 	var domain = null;
 	
 	var examples = new Array();
-	examples["wobble"    ] = ["3 + c * sin(2.7 * t) * sin(a * u - t) * cos(b * v - 1.3 * t)", "u", "v"          , "SPHERICAL"];
-	examples["bumpy"     ] = ["2.0 * abs(cos(v * u) * sin(b * v * u))"                      , "u", "a * v / 3.0", "SPHERICAL"];
-	examples["epicycloid"] = ["(a + cos(u / 3.0) * (2.0 * b * cos(v) + b * cos(2.0 * v))  + sin(u / 3.0) * (2.0 * b * sin(v) - b * sin(2.0 * v))) * cos(u)",
-								"(a + cos(u / 3.0) * (2.0 * b * cos(v) + b * cos(2.0 * v)) + sin(u / 3.0) * (2.0 * b * sin(v) - b * sin(2.0 * v))) * sin(u)",
-								"(a - sin(u / 3.0) * (2.0 * b * cos(v) + b * cos(2.0 * v))  + cos(u / 3.0) * (2.0 * b * sin(v) - b * sin(2.0 * v)))", "CARTESIAN", [0, 2 * Math.PI, 0, 2 * Math.PI]];
+	examples["wobble"     ] = ["3 + c * sin(2.7 * t) * sin(a * u - t) * cos(b * v - 1.3 * t)", "u", "v"          , "SPHERICAL"];
+	examples["bumpy"      ] = ["2.0 * abs(cos(v * u) * sin(b * v * u))"                      , "u", "a * v / 3.0", "SPHERICAL"];
+	examples["hypocycloid"] = ["(a + cos(3.0 * u) * (2.0 * cos(v) - cos(2.0 * v)) + sin(3.0 * u) * (2.0 * sin(v) - sin(2.0 * v))) * cos(u)",
+								"(a - sin(3.0 * u) * (2.0 * cos(v) - cos(2.0 * v)) + cos(3.0 * u) * (2.0 * sin(v) - sin(2.0 * v))) - a",
+								"(a + cos(3.0 * u) * (2.0 * cos(v) - cos(2.0 * v)) + sin(3.0 * u) * (2.0 * sin(v) - sin(2.0 * v))) * sin(u)", "CARTESIAN", [0, 2 * Math.PI, 0, 2 * Math.PI]];
+	examples["epicycloid" ] = ["(a + cos(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + sin(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v))) * cos(u)",
+								"(a + cos(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + sin(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v))) * sin(u)",
+								"(-sin(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + cos(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v)))", "CARTESIAN", [0, 2 * Math.PI, 0, 2 * Math.PI]];
 	
 	function keyboard(key_event) {
 		var key = Number(key_event.keyCode);
@@ -103,9 +106,9 @@
 			if (coord == "SPHERICAL") {
 				mySurface = new p_surface(fx + ", " + fy + ", " + fz, domain[0] || 0, domain[1] || Math.PI, domain[2] || 0, domain[3] || 2 * Math.PI, SPHERICAL);
 			} else if (coord == "CYLINDRICAL") {
-				mySurface = new p_surface(fx + ", " + fy + ", " + fz, 0, 1, 0, 2 * Math.PI, CYLINDRICAL);
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, domain[0] || 0, domain[1] || 1, domain[2] || 0, domain[3] || 2 * Math.PI, CYLINDRICAL);
 			} else {
-				mySurface = new p_surface(fx + ", " + fy + ", " + fz, 0, 1, 0, 1);
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, domain[0] || 0, domain[1] || 1, domain[2] || 0, domain[3] || 1);
 			}
 	
 			glot.add(mySurface);
@@ -147,7 +150,7 @@
 		glot.set("a", 7);
 		glot.set("b", 7);
 		glot.set("c", 0.4);
-		prefill("wobble");
+		prefill("epicycloid");
 		
 		/* Some implicit surfaces from http://virtualmathmuseum.org/
 		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
@@ -183,9 +186,10 @@
 	<div id="function_form">
 		<form name="function" onsubmit="gen_surface(); return false">
 			<select name="examples" onclick="prefill(); return false">
-				<option value="wobble"    >Wobbly sphere</option>
-				<option value="bumpy"     >Bumpy sphere</option>
-				<option value="epicycloid">Epicycloid</option>
+				<option value="wobble"     >Wobbly sphere</option>
+				<option value="bumpy"      >Bumpy sphere</option>
+				<option value="epicycloid" >Epicycloid</option>
+				<option value="hypocycloid">Hypocycloid</option>
 			</select> <br/>
 			x(u, v, t) = <input size='32' name="fx" /> <br/>
 			y(u, v, t) = <input size='32' name="fy" /> <br/>
