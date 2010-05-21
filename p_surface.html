@@ -14,6 +14,10 @@
 	-->
 	<script src="CanvasMatrix.js"> </script>
 	
+	<script src="js/range.js" > </script>
+	<script src="js/timer.js" > </script>
+	<script src="js/slider.js"> </script>
+	
 	<!--
 		These are the class files used in WebGLot. I'm not really an expert
 		in JavaScript, and would prefer an analog to the #include macro in
@@ -40,9 +44,12 @@
 	<script src="isosurface.js">       </script>
 	<script src="grapher.js">          </script>
 
+	<link type="text/css" rel="StyleSheet" href="css/winclassic.css" />
+
 	<script>
 	var mySurface = null;
 	var glot = null;
+	var aSlider = null;
 	
 	function change(key, delta) {
 		try {
@@ -116,6 +123,21 @@
 		change("a", 0);
 		change("b", 0);
 		change("c", 0);
+	
+		aSlider = new Slider(document.getElementById("a-slider"), document.getElementById("a-slider-input"));
+		aSlider.setMinimum(1);
+		aSlider.setMaximum(15);
+		aSlider.onchange = function() { glot.set("a", aSlider.getValue()); document.getElementById("a-value").innerHTML = aSlider.getValue(); }
+		
+		bSlider = new Slider(document.getElementById("b-slider"), document.getElementById("b-slider-input"));
+		bSlider.setMinimum(1);
+		bSlider.setMaximum(15);
+		bSlider.onchange = function() { glot.set("b", bSlider.getValue()); }
+		
+		cSlider = new Slider(document.getElementById("c-slider"), document.getElementById("c-slider-input"));
+		cSlider.setMinimum(1);
+		cSlider.setMaximum(25);
+		cSlider.onchange = function() { glot.set("c", cSlider.getValue() / 10); }
 		
 		/* Some implicit surfaces from http://virtualmathmuseum.org/
 		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
@@ -155,9 +177,17 @@
 			fz(u, v, t) = <input size='100' name="fz" />
 		</form>
 	</div>
+
+	<div class="slider" id="a-slider">
+		a : <input class="slider-input" id="a-slider-input" /> <span id="a-value"></span>
+	</div>
 	
-	<span onclick='change("a",   -1)'>-</span> a <span onclick='change("a",   1)'>+</span> : <span id="a_value"></span> <br />
-	<span onclick='change("b",   -1)'>-</span> b <span onclick='change("b",   1)'>+</span> : <span id="b_value"></span> <br />
-	<span onclick='change("c", -0.1)'>-</span> c <span onclick='change("c", 0.1)'>+</span> : <span id="c_value"></span>
+	<div class="slider" id="b-slider">
+		b : <input class="slider-input" id="b-slider-input" /> <span id="b-value"></span>
+	</div>
+	
+	<div class="slider" id="c-slider">
+		c : <input class="slider-input" id="c-slider-input" /> <span id="c-value"></span>
+	</div>
 </body>
 </html>
