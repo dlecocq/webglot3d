@@ -55,18 +55,18 @@
 	var glot = null;
 	
 	var data = new Array();
-	data["orange" ] = ["volumes/orange.png",        256, 256, 8,  8 , 0.2];
-	data["foot"   ] = ["volumes/foot.png",          256, 256, 16, 16, 0.4];
-	data["bruce"  ] = ["volumes/bruce.png",         256, 256, 13, 12, 0.2];
-	data["cadaver"] = ["volumes/cadaver-small.png", 256, 256, 11, 10, 0.2];
-	data["bucky"  ] = ["volumes/bucky.png",         32,  32,  6,  6 , 0.4];
-	data["daisy"  ] = ["volumes/daisy.png",         192, 180, 14, 12, 0.06];
-	data["neghip" ] = ["volumes/neghip.png",        64,  64,  8,  8 , 0.27];
-	data["piggy"  ] = ["volumes/pig-small.png",     256, 256, 14, 10, 0.39];
-	data["sheep"  ] = ["volumes/sheep-small.png",   176, 176, 16, 16, 0.37];
-	data["teddy"  ] = ["volumes/teddy.png",         512, 512, 8,  8 , 0.17];
-	data["tomato" ] = ["volumes/tomato.png",        256, 256, 8,  8 , 0.07];
-	data["engine" ] = ["volumes/engine.png",        256, 256, 16, 16, 0.2];
+	data["orange" ] = ["volumes/orange.png",        256, 256, 8,  8 , 64 , 0.2];
+	data["foot"   ] = ["volumes/foot.png",          256, 256, 16, 16, 256, 0.4];
+	data["bruce"  ] = ["volumes/bruce.png",         256, 256, 13, 12, 156, 0.2];
+	data["cadaver"] = ["volumes/cadaver-small.png", 256, 256, 11, 10, 110, 0.2];
+	data["bucky"  ] = ["volumes/bucky.png",         32,  32,  6,  6 , 32 , 0.4];
+	data["daisy"  ] = ["volumes/daisy.png",         192, 180, 14, 12, 168, 0.06];
+	data["neghip" ] = ["volumes/neghip.png",        64,  64,  8,  8 , 64 , 0.27];
+	data["piggy"  ] = ["volumes/pig-small.png",     256, 256, 14, 10, 134, 0.33];
+	data["sheep"  ] = ["volumes/sheep-small.png",   176, 176, 16, 16, 256, 0.37];
+	data["teddy"  ] = ["volumes/teddy.png",         512, 512, 8,  8 , 64 , 0.17];
+	data["tomato" ] = ["volumes/tomato.png",        256, 256, 8,  8 , 64 , 0.07];
+	data["engine" ] = ["volumes/engine.png",        256, 256, 16, 16, 256, 0.2];
 	//data["tyler"  ] = ["volumes/thorax-small.png",  256, 256, 28, 20, 0.2];
 	
 	function keyboard(key_event) {
@@ -87,12 +87,13 @@
 		name = string || document.forms["dataform"].elements.data.value;
 		try {
 			datum = data[name];
-			glot.set("isovalue", datum[5]);
-			glot.set("width",    datum[1]);
-			glot.set("height",   datum[2]);
-			glot.set("b_width",  datum[3]);
+			glot.set("isovalue", datum[6]);
+			glot.set("depth"   , datum[5]);
+			glot.set("width"   , datum[1]);
+			glot.set("height"  , datum[2]);
+			glot.set("b_width" , datum[3]);
 			glot.set("b_height", datum[4]);
-			$("#slider").slider({min: 0  , max: 1 , step: 0.01  , value: datum[5], slide: function(event, ui) { glot.set("isovalue", ui.value); glot.display(); document.getElementById("iso-value").innerHTML = ui.value; } });
+			$("#slider").slider({min: 0  , max: 1 , step: 0.01  , value: datum[6], slide: function(event, ui) { glot.set("isovalue", ui.value); glot.display(); document.getElementById("iso-value").innerHTML = ui.value; } });
 			document.getElementById("iso-value").innerHTML = datum[5];
 			mySurface = new datasurface(datum[0], datum[1], datum[2], datum[3], datum[4]);
 			glot.add(mySurface);
