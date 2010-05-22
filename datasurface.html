@@ -14,6 +14,16 @@
 	-->
 	<script src="CanvasMatrix.js"> </script>
 	
+	<!-- This is for the jQuery slider I use -->
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<style type="text/css">
+    	.slider { 	margin: 10px;
+					width : 180px; }
+  	</style>
+	<!-- finish -->
+	
 	<!--
 		These are the class files used in WebGLot. I'm not really an expert
 		in JavaScript, and would prefer an analog to the #include macro in
@@ -74,7 +84,7 @@
 		if (mySurface) {
 			glot.primitives.pop();
 		}
-		name = document.forms["dataform"].elements.data.value;
+		name = string || document.forms["dataform"].elements.data.value;
 		try {
 			datum = data[name];
 			glot.set("isovalue", datum[5]);
@@ -82,6 +92,8 @@
 			glot.set("height",   datum[2]);
 			glot.set("b_width",  datum[3]);
 			glot.set("b_height", datum[4]);
+			$("#slider").slider({min: 0  , max: 1 , step: 0.01  , value: datum[5], slide: function(event, ui) { glot.set("isovalue", ui.value); glot.display(); document.getElementById("iso-value").innerHTML = ui.value; } });
+			document.getElementById("iso-value").innerHTML = datum[5];
 			mySurface = new datasurface(datum[0], datum[1], datum[2], datum[3], datum[4]);
 			glot.add(mySurface);
 			glot.restart();
@@ -106,11 +118,8 @@
 		glot.setDomain(-2, 2, -2, 2);
 		
 		glot.add(new box());
-		
-		// You can add new primitives to the display with the add function.
-		
-		glot.setDomain(-2, 2, -2, 2);
-		//glot.set("alpha", 0.5);
+		gen_isosurface("engine");
+		glot.draw();
 				
 		/* If you've got a function that's time-dependent and thus you'd like
 		 * for it to animate, then call glot.run.  It makes sure it constantly
@@ -118,7 +127,6 @@
 		 * that is to say, it will only refresh when the perpective changes,
 		 * like with zooming in and out, or rotating it.
 		 */
-		glot.run();
 	}
 	</script>
 	
@@ -126,7 +134,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:95%;
+		height:93%;
 	}
 	</style>
 </head>
@@ -138,7 +146,7 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
-	<div id="function_form">
+	<div id="function_form" style="float:left">
 		<form name="dataform" onsubmit="gen_isosurface(); return false">
 			Choose your dataset: <select name="data" onclick="gen_isosurface(); return false">
 				<option value="orange">An orange</option>
@@ -155,6 +163,18 @@
 				<!--<option value="tyler" >Tyler's Chest</option>-->
 				</select>
 		</form>
+	</div>
+
+	<div id="sliders" style="float:right">
+		<div style="float:left">
+			<table>
+				<tr>
+					<td>isovalue = </td>
+					<td id="iso-value"></td>
+					<td><div class="slider" id="slider" style="float:right"></div></td>
+				</tr>
+			</table>
+		</div>
 	</div>
 </body>
 </html>
