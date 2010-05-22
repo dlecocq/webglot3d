@@ -1,5 +1,3 @@
-#version 120
-
 uniform mat4 u_modelViewMatrix;
 
 varying vec3 direction;
@@ -22,31 +20,31 @@ uniform sampler2D sampler;
 uniform float t;
 
 float function(float x, float y, float z) {
+	float scale = 1.0 / 4.07;
 	// Eventually you should do linear interpolation.
 	// Do this first with the low z, then the high z
-	float zint = floor((z / 4.0 + 0.5) * depth);
+	float zint = floor((z * scale + 0.5) * depth);
 	
-	float alpha = (z / 4.0 + 0.5) * depth - zint;
+	float alpha = (z * scale + 0.5) * depth - zint;
 	
 	float row = floor(zint / b_width);
 	float col = floor(mod(zint, b_width));
 	
-	float xcoord = ((x / 4.0 + 0.5) + col) / b_width;
-	float ycoord = ((y / 4.0 + 0.5) + row) / b_height;
+	float xcoord = ((x * scale + 0.5) + col) / b_width;
+	float ycoord = ((y * scale + 0.5) + row) / b_height;
 
 	float lo = texture2D(sampler, vec2(xcoord, ycoord)).r;
 	
 	//return lo;
-	
 	zint += 1.0;
 	row = floor(zint / b_width);
 	col = floor(mod(zint, b_width));
-	
-	xcoord = ((x / 4.0 + 0.5) + col) / b_width;
-	ycoord = ((y / 4.0 + 0.5) + row) / b_height;
-	
+
+	xcoord = ((x * scale + 0.5) + col) / b_width;
+	ycoord = ((y * scale + 0.5) + row) / b_height;
+
 	float hi = texture2D(sampler, vec2(xcoord, ycoord)).r;
-	
+
 	return alpha * hi + (1.0 - alpha) * lo - isovalue;
 }
 

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!--
+		This is a very early version of what will become WebGLot - a WebGL-
+		based plotting library for mathematical primitives.
+	-->
+	<title>WebGLot Alpha</title>
+	
+	<!--
+		This is a matrix library I have been using for the time being, though
+		I may move to something more standard.  I originally got this code from
+		http://webkit.org/blog/603/webgl-now-available-in-webkit-nightlies/
+	-->
+	<script src="CanvasMatrix.js"> </script>
+	
+	<!--
+		These are the class files used in WebGLot. I'm not really an expert
+		in JavaScript, and would prefer an analog to the #include macro in
+		C++ for this task so that only one script must be included.  For the
+		time being, just copy-and-paste this.
+	-->
+	<script src="emptytexture.js">     </script>
+	<script src="texture.js">          </script>
+	<script src="ray.js">              </script>
+	<script src="primitive.js">        </script>
+	<script src="datasurface.js">      </script>
+	<script src="box.js">              </script>
+	<script src="pde3d.js">            </script>
+	<script src="pde.js">              </script>
+	<script src="ftexture.js">         </script>
+	<script src="nurbs.js">            </script>
+	<script src="noisetexture.js">     </script>
+	<script src="flow.js">             </script>
+	<script src="sphere.js">           </script>
+	<script src="stopwatch.js">        </script>
+	<script src="screen.js">           </script>
+	<script src="surface.js">          </script>
+	<script src="p_surface.js">        </script>
+	<script src="isosurface.js">       </script>
+	<script src="grapher.js">          </script>
+
+	<script>
+	var mySurface = null;
+	var glot = null;
+	
+	function keyboard(key_event) {
+		var key = Number(key_event.keyCode);
+		if (key == 65) {
+			glot.set("isovalue", glot.get("isovalue") + 0.01);
+			glot.display();
+		} else if (key == 90) {
+			glot.set("isovalue", glot.get("isovalue") - 0.01);
+			glot.display();
+		}
+	}
+	
+	function gen_isosurface(string) {
+		if (mySurface) {
+			glot.primitives.pop();
+			mySurface = new flow(document.forms["function"].elements.fn.value);
+			glot.add(mySurface);
+		} else {
+			mySurface = new flow(document.forms["function"].elements.fn.value);
+			glot.add(mySurface);
+		}
+		glot.restart();
+		glot.display();
+		return false;
+	}
+	
+	function start() {
+		/* Instantiate a grapher
+		 *
+		 * In the C++ version, it's a singleton, and so it's possible that
+		 * this interface will change, so use with caution.
+		 */
+		glot = new grapher();
+		
+		glot.setKeyboardFunction(keyboard);
+				
+		glot.setDomain(-2, 2, -2, 2);
+		
+		glot.add(new box());
+		
+		// You can add new primitives to the display with the add function.
+		
+		/*
+		glot.set("isovalue", 0.2);
+		mySurface = new isosurface("(pow(x*x + y*y - 1.0,2.0) + z * z)*(pow(y * y + z * z - 1.0,2.0) + x * x)*(pow(z * z + x * x - 1.0, 2.0) + y * y) - pow(0.075, 2.0)*(1.0 + 3.0*(x * x + y * y + z * z))");
+		glot.add(mySurface);
+		//*/
+		
+		mySurface = new flow("0.3 * sin(x * y + y * y + x * x * x - t)");
+		glot.add(mySurface);
+				
+		/* Some implicit surfaces from http://virtualmathmuseum.org/
+		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
+		81.0*(pow(x,3.0) + pow(y,3.0) + pow(z,3.0)) - 189.0*(x*x*y + x*x*z + y*y*x + y*y*z + z*z*x + z*z*y) + 54.0*(x*y*z) + 126.0*(x*y + x*z + y*z) - 9.0*(x * x + y * y + z * z) - 9.0*(x + y + z) + 1.0
+		//*/
+				
+		/* If you've got a function that's time-dependent and thus you'd like
+		 * for it to animate, then call glot.run.  It makes sure it constantly
+		 * refreshes, otherwise the plot will be interactive, but static.  Well,
+		 * that is to say, it will only refresh when the perpective changes,
+		 * like with zooming in and out, or rotating it.
+		 */
+		glot.run();
+	}
+	</script>
+	
+	<style type="text/css">
+	canvas {
+		border: 1px solid black;
+		width:100%;
+		height:92%;
+	}
+	</style>
+</head>
+<body onload="start()">
+	<!--
+		WebGLot currently requires there to be a canvas with id="glot" to work.
+		This will likely remain the default behavior, but there may be a new 
+		interface added so that drawing on multiple canvases can take place.
+		Though, it's a long way down on the roadmap.
+	-->
+	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
+	<div id="function_form">
+		<form name="function" onsubmit="gen_isosurface(); return false">
+			f(x, y, t) = <input size='100' name="fn" /> = 0
+		</form>
+		For example: sin(x * x - y * x + y * y - t) * cos(x + y * y + 1.7 * t) * 0.2 - 0.1 * sin(y + x * x * x - 1.3 * t)
+	</div>
+</body>
+</html>

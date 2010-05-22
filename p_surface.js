@@ -26,7 +26,7 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	// The buffer objects for displaying
 	this.vertexVBO	= null;
 	this.textureVBO = null;
-	this.indexVBO		= null;
+	this.indexVBO	= null;
 	
 	this.umin = umin;
 	this.umax = umax;
@@ -38,7 +38,7 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 * JavaScript (at least in WebKit) seems to only want up to 250x250
 	 */
-	this.count			= 150;
+	this.count		= 250;
 	this.index_ct   = 0;
 	
 	// Set a default texture source
@@ -79,7 +79,7 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		var dy = (vmax - vmin) / this.count;
 		
 		var xrepeat = 5;
-		var yrepeat = 30;
+		var yrepeat = 5;
 		
 		var tx = 0.0;
 		var ty = yrepeat;

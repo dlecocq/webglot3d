@@ -17,7 +17,7 @@ uniform float t;
 varying vec2 vTextureCoord;
 
 const float h = 0.001;
-const float dt = 0.00001;
+const float dt = 0.001;
 
 float function(float x, float y) {
 	return USER_FUNCTION;

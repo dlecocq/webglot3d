@@ -13,13 +13,13 @@ function flow(string, options) {
 	 */
 	this.vertexVBO	= null;
 	this.textureVBO = null;
-	this.indexVBO		= null;
+	this.indexVBO	= null;
 	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 150;
+	this.count		= 250;
 	this.index_ct   = 0;
 	
 	this.source = null;
@@ -180,6 +180,7 @@ function flow(string, options) {
 		this.setUniforms(scr, this.calc_program);
     	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "source"), 1);
+		this.gl.viewport(0, 0, scr.width, scr.height);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -230,7 +231,8 @@ function flow(string, options) {
 	this.draw = function(scr) {
 		scr.sfq();
 		this.calculate(scr);
-		this.calculate(scr);		
+		this.calculate(scr);
+		this.gl.viewport(0, 0, scr.width, scr.height);		
 
 		scr.perspective();
 		this.setUniforms(scr, this.program);

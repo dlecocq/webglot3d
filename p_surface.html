@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!--
+		This is a very early version of what will become WebGLot - a WebGL-
+		based plotting library for mathematical primitives.
+	-->
+	<title>WebGLot Alpha</title>
+	
+	<!--
+		This is a matrix library I have been using for the time being, though
+		I may move to something more standard.  I originally got this code from
+		http://webkit.org/blog/603/webgl-now-available-in-webkit-nightlies/
+	-->
+	<script src="CanvasMatrix.js"> </script>
+	
+	<!-- This is for the jQuery slider I use -->
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<style type="text/css">
+    	.slider { 	margin: 10px;
+					width : 180px; }
+  	</style>
+	<!-- finish -->
+
+	<!--
+		These are the class files used in WebGLot. I'm not really an expert
+		in JavaScript, and would prefer an analog to the #include macro in
+		C++ for this task so that only one script must be included.  For the
+		time being, just copy-and-paste this.
+	-->
+	<script src="emptytexture.js">     </script>
+	<script src="texture.js">          </script>
+	<script src="ray.js">              </script>
+	<script src="primitive.js">        </script>
+	<script src="datasurface.js">      </script>
+	<script src="box.js">              </script>
+	<script src="pde3d.js">            </script>
+	<script src="pde.js">              </script>
+	<script src="ftexture.js">         </script>
+	<script src="nurbs.js">            </script>
+	<script src="noisetexture.js">     </script>
+	<script src="flow.js">             </script>
+	<script src="sphere.js">           </script>
+	<script src="stopwatch.js">        </script>
+	<script src="screen.js">           </script>
+	<script src="surface.js">          </script>
+	<script src="p_surface.js">        </script>
+	<script src="isosurface.js">       </script>
+	<script src="grapher.js">          </script>
+
+	<script>
+	var mySurface = null;
+	var glot = null;
+	var aSlider = null;
+	var domain = null;
+	
+	var examples = new Array();
+	examples["wobble"     ] = ["3 + c * sin(2.7 * t) * sin(a * u - t) * cos(b * v - 1.3 * t)", "u", "v"          , "SPHERICAL"];
+	examples["bumpy"      ] = ["2.0 * abs(cos(v * u) * sin(b * v * u))"                      , "u", "a * v / 3.0", "SPHERICAL"];
+	examples["hypocycloid"] = ["(a + cos(3.0 * u) * (2.0 * cos(v) - cos(2.0 * v)) + sin(3.0 * u) * (2.0 * sin(v) - sin(2.0 * v))) * cos(u)",
+								"(a - sin(3.0 * u) * (2.0 * cos(v) - cos(2.0 * v)) + cos(3.0 * u) * (2.0 * sin(v) - sin(2.0 * v))) - a",
+								"(a + cos(3.0 * u) * (2.0 * cos(v) - cos(2.0 * v)) + sin(3.0 * u) * (2.0 * sin(v) - sin(2.0 * v))) * sin(u)", "CARTESIAN", [0, 2 * Math.PI, 0, 2 * Math.PI]];
+	examples["epicycloid" ] = ["(a + cos(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + sin(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v))) * cos(u)",
+								"(a + cos(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + sin(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v))) * sin(u)",
+								"(-sin(u / 3.0) * (2.0 * cos(v) + cos(2.0 * v)) + cos(u / 3.0) * (2.0 * sin(v) - sin(2.0 * v)))", "CARTESIAN", [0, 2 * Math.PI, 0, 2 * Math.PI]];
+	examples["toroid"     ] = ["2 * u", "3 + sin(u) + cos(v)", "sin(v) + 2 * cos(u)", "CYLINDRICAL", [0, 2 * Math.PI, 0, 2 * Math.PI]];
+	
+	function keyboard(key_event) {
+		var key = Number(key_event.keyCode);
+		if (key == 65) {
+			glot.set("a", glot.get("a") + 1);
+			glot.display();
+		} else if (key == 90) {
+			glot.set("a", glot.get("a") - 1);
+			glot.display();
+		}
+	}
+	
+	function prefill(name) {
+		if (name == "null" || name == null) {
+			name = document.forms["function"].elements.examples.value;
+		} 
+		example = examples[name];
+		document.forms["function"].elements.fx.value = example[0];
+		document.forms["function"].elements.fy.value = example[1];
+		document.forms["function"].elements.fz.value = example[2];
+		document.forms["function"].elements.coordinate.value = example[3];
+		domain = example[4];
+		gen_surface();
+	}
+	
+	function gen_surface(string) {
+		if (mySurface) {
+			glot.primitives.pop();
+		}
+		
+		try {
+			var fx = document.forms["function"].elements.fx.value;
+			var fy = document.forms["function"].elements.fy.value;
+			var fz = document.forms["function"].elements.fz.value;
+			var coord = document.forms["function"].elements.coordinate.value;
+			
+			domain = domain || [];
+			
+			if (coord == "SPHERICAL") {
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, domain[0] || 0, domain[1] || Math.PI, domain[2] || 0, domain[3] || 2 * Math.PI, SPHERICAL);
+			} else if (coord == "CYLINDRICAL") {
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, domain[0] || 0, domain[1] || 1, domain[2] || 0, domain[3] || 2 * Math.PI, CYLINDRICAL);
+			} else {
+				mySurface = new p_surface(fx + ", " + fy + ", " + fz, domain[0] || 0, domain[1] || 1, domain[2] || 0, domain[3] || 1);
+			}
+	
+			glot.add(mySurface);
+			glot.restart();
+			glot.display();
+		} catch (e) {
+			
+		}
+		return false;
+	}
+	
+	function start() {
+		/* Instantiate a grapher
+		 *
+		 * In the C++ version, it's a singleton, and so it's possible that
+		 * this interface will change, so use with caution.
+		 */
+		glot = new grapher();
+		
+		glot.setKeyboardFunction(keyboard);
+				
+		glot.setDomain(-2, 2, -2, 2);
+		
+		glot.add(new box());
+		
+		// You can add new primitives to the display with the add function.
+		
+		glot.set("a", 7);
+		glot.set("b", 7);
+		glot.set("c", 0.4);
+		$(document).ready(function() {
+			$("#aSlider").slider({min: 1  , max: 10 , step: 1  , value: glot.get("a"), slide: function(event, ui) { glot.set("a", ui.value); document.getElementById("a-value").innerHTML = ui.value; } });
+			$("#bSlider").slider({min: 1  , max: 10 , step: 1  , value: glot.get("b"), slide: function(event, ui) { glot.set("b", ui.value); document.getElementById("b-value").innerHTML = ui.value; } });
+			$("#cSlider").slider({min: 0.1, max: 1.5, step: 0.1, value: glot.get("c"), slide: function(event, ui) { glot.set("c", ui.value); document.getElementById("c-value").innerHTML = ui.value; } });
+		});
+		
+		prefill("wobble");
+		
+		/* Some implicit surfaces from http://virtualmathmuseum.org/
+		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
+		81.0*(pow(x,3.0) + pow(y,3.0) + pow(z,3.0)) - 189.0*(x*x*y + x*x*z + y*y*x + y*y*z + z*z*x + z*z*y) + 54.0*(x*y*z) + 126.0*(x*y + x*z + y*z) - 9.0*(x * x + y * y + z * z) - 9.0*(x + y + z) + 1.0
+		//*/
+				
+		/* If you've got a function that's time-dependent and thus you'd like
+		 * for it to animate, then call glot.run.  It makes sure it constantly
+		 * refreshes, otherwise the plot will be interactive, but static.  Well,
+		 * that is to say, it will only refresh when the perpective changes,
+		 * like with zooming in and out, or rotating it.
+		 */
+		glot.run();
+	}
+	</script>
+	
+	<style type="text/css">
+	canvas {
+		border: 1px solid black;
+		width:100%;
+		height:85%;
+	}
+	</style>
+</head>
+<body onload="start()">
+	<!--
+		WebGLot currently requires there to be a canvas with id="glot" to work.
+		This will likely remain the default behavior, but there may be a new 
+		interface added so that drawing on multiple canvases can take place.
+		Though, it's a long way down on the roadmap.
+	-->
+	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
+	<div id="function_form" style="float:left">
+		<form name="function" onsubmit="gen_surface(); return false">
+			<select name="examples" onclick="prefill(); return false">
+				<option value="wobble"     >Wobbly sphere</option>
+				<option value="epicycloid" >Epicycloid</option>
+				<option value="hypocycloid">Hypocycloid</option>
+				<option value="toroid"     >Toroid</option>
+			</select> <br/>
+			x(u, v, t) = <input size='100' name="fx" /> <br/>
+			y(u, v, t) = <input size='100' name="fy" /> <br/>
+			z(u, v, t) = <input size='100' name="fz" /> <br/>
+			<select name="coordinate" onclick="gen_surface(); return false">
+				<option value="CARTESIAN"  >cartesian</option>
+				<option value="CYLINDRICAL">cylindrical</option>
+				<option value="SPHERICAL"  >spherical</option>
+			</select>
+		</form>
+	</div>
+
+	<div id="sliders" style="float:right">
+		<table>
+			<tr>
+				<td>a = </td>
+				<td id="a-value">7</td>
+				<td><div class="slider" id="aSlider"></div></td>
+			</tr>
+			<tr>
+				<td>b = </td>
+				<td id="b-value">7</td>
+				<td><div class="slider" id="bSlider"></div></td>
+			</tr>
+			<tr>
+				<td>c = </td>
+				<td id="c-value">0.4</td>
+				<td><div class="slider" id="cSlider"></div></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

@@ -163,6 +163,7 @@ function grapher() {
 		//this.gl.console.log("delta: " + delta);
 		//this.scr.alpha *= 1.1;
 		this.scr.alpha *= (1.0 - delta * 0.1);
+		this.display();
 	}
 	
 	/* The keyboard event handler.  Again, the browser wars make life
@@ -400,11 +401,10 @@ function grapher() {
 		}
 		
 		this.gl.console.log("Setting viewport to be (" + w + " x " + h + ")");
-		context.viewport(0, 0, w, h);
+		//context.viewport(0, 0, w, h);
 		
 		this.scr.width = w;
 		this.scr.height = h;
-		//this.scr.alpha  = this.alpha;
 	}
 	
 	/* Add a primitive to the container.
@@ -427,6 +427,11 @@ function grapher() {
 	this.run = function() {
 		window.glot = this;
 		window.setInterval(function() { this.glot.display(); }, 10);
+	}
+	
+	this.draw = function() {
+		window.glot = this;
+		window.setTimeout(function() { this.glot.display(); }, 10);
 	}
 	
 	this.setDomain = function(minx, maxx, miny, maxy) {
