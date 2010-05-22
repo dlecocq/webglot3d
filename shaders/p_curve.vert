@@ -53,7 +53,7 @@ void main() {
 	
 	normal = sin(y) * normal + cos(y) * fpp.xyz;
 	
-	gl_Position = gl_Position + 0.4 * vec4(normal, 0.0);
+	gl_Position = gl_Position + 0.1 * vec4(normal, 0.0);
 	
 	normal = normalize((u_modelViewMatrix * vec4(normal, 1.0)).xyz);
 	
