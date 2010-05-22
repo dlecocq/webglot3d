@@ -137,21 +137,16 @@
 		
 		// You can add new primitives to the display with the add function.
 		
-		/*
-		glot.set("isovalue", 0.2);
-		mySurface = new isosurface("(pow(x*x + y*y - 1.0,2.0) + z * z)*(pow(y * y + z * z - 1.0,2.0) + x * x)*(pow(z * z + x * x - 1.0, 2.0) + y * y) - pow(0.075, 2.0)*(1.0 + 3.0*(x * x + y * y + z * z))");
-		glot.add(mySurface);
-		//*/
-		$(document).ready(function() {
-			$("#aSlider").slider({min: 1  , max: 10 , step: 1  , value: 7  , slide: function(event, ui) { glot.set("a", ui.value); document.getElementById("a-value").innerHTML = ui.value; } });
-			$("#bSlider").slider({min: 1  , max: 10 , step: 1  , value: 7  , slide: function(event, ui) { glot.set("b", ui.value); document.getElementById("b-value").innerHTML = ui.value; } });
-			$("#cSlider").slider({min: 0.1, max: 1.5, step: 0.1, value: 0.4, slide: function(event, ui) { glot.set("c", ui.value); document.getElementById("c-value").innerHTML = ui.value; } });
-		});
-		
 		glot.set("a", 7);
 		glot.set("b", 7);
 		glot.set("c", 0.4);
-		prefill("toroid");
+		$(document).ready(function() {
+			$("#aSlider").slider({min: 1  , max: 10 , step: 1  , value: glot.get("a"), slide: function(event, ui) { glot.set("a", ui.value); document.getElementById("a-value").innerHTML = ui.value; } });
+			$("#bSlider").slider({min: 1  , max: 10 , step: 1  , value: glot.get("b"), slide: function(event, ui) { glot.set("b", ui.value); document.getElementById("b-value").innerHTML = ui.value; } });
+			$("#cSlider").slider({min: 0.1, max: 1.5, step: 0.1, value: glot.get("c"), slide: function(event, ui) { glot.set("c", ui.value); document.getElementById("c-value").innerHTML = ui.value; } });
+		});
+		
+		prefill("wobble");
 		
 		/* Some implicit surfaces from http://virtualmathmuseum.org/
 		// http://virtualmathmuseum.org/Surface/clebsch_cubic/clebsch_cubic.html
@@ -172,7 +167,7 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:73%;
+		height:85%;
 	}
 	</style>
 </head>
@@ -184,18 +179,17 @@
 		Though, it's a long way down on the roadmap.
 	-->
 	<canvas id="glot">It seems you do not have support for WebGL.</canvas>
-	<div id="function_form">
+	<div id="function_form" style="float:left">
 		<form name="function" onsubmit="gen_surface(); return false">
 			<select name="examples" onclick="prefill(); return false">
 				<option value="wobble"     >Wobbly sphere</option>
-				<option value="bumpy"      >Bumpy sphere</option>
 				<option value="epicycloid" >Epicycloid</option>
 				<option value="hypocycloid">Hypocycloid</option>
 				<option value="toroid"     >Toroid</option>
 			</select> <br/>
-			x(u, v, t) = <input size='32' name="fx" /> <br/>
-			y(u, v, t) = <input size='32' name="fy" /> <br/>
-			z(u, v, t) = <input size='32' name="fz" /> <br/>
+			x(u, v, t) = <input size='100' name="fx" /> <br/>
+			y(u, v, t) = <input size='100' name="fy" /> <br/>
+			z(u, v, t) = <input size='100' name="fz" /> <br/>
 			<select name="coordinate" onclick="gen_surface(); return false">
 				<option value="CARTESIAN"  >cartesian</option>
 				<option value="CYLINDRICAL">cylindrical</option>
@@ -204,7 +198,7 @@
 		</form>
 	</div>
 
-	<div id="sliders">
+	<div id="sliders" style="float:right">
 		<table>
 			<tr>
 				<td>a = </td>
