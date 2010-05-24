@@ -6,7 +6,7 @@
  * include support for what coordinate space this function
  * is defined in, and so forth.
  */
-function sphere(x, y, z, radius, options, source) {
+function sphere(x, y, z, radius, options, color) {
 	
 	this.gl   = null;
 	
@@ -23,17 +23,17 @@ function sphere(x, y, z, radius, options, source) {
 	 */
 	this.vertexVBO	= null;
 	this.textureVBO = null;
-	this.indexVBO		= null;
+	this.indexVBO	= null;
 	
 	/* A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
-	this.count			= 50;
+	this.count		= 50;
 	this.index_ct   = 0;
 	
 	this.texture    = null;
-	this.source     = source || "textures/deisa.jpg";
+	this.color      = color || [Math.random() * 0.8 + 0.2, Math.random() * 0.8 + 0.2, Math.random() * 0.8 + 0.2, 1];
 	//"textures/saudi-flag.gif"
 	//"textures/dan.jpg"
 
@@ -152,9 +152,8 @@ function sphere(x, y, z, radius, options, source) {
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
-	this.draw = function() {
-		//scr.set_uniforms(this.gl, this.program);
-		this.gl.uniform1i(this.gl.getUniformLocation(this.program, "sampler"), 0);
+	this.draw = function(scr) {		
+		this.setUniforms(scr);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
@@ -181,7 +180,7 @@ function sphere(x, y, z, radius, options, source) {
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/sphere.vert");
-		var frag_source		= this.read("shaders/sphere.frag");
+		var frag_source	  = this.read("shaders/sphere.frag");
 		
 		this.compile_program(vertex_source, frag_source);		
 	}
