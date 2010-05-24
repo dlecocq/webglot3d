@@ -152,8 +152,9 @@ function sphere(x, y, z, radius, options, color) {
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
 	 */
-	this.draw = function(scr) {		
+	this.draw = function(scr) {
 		this.setUniforms(scr);
+		this.gl.uniform3f(this.gl.getUniformLocation(this.program, "center"), this.x, this.y, this.z);
 		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
