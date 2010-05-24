@@ -96,8 +96,7 @@
 			document.getElementById("iso-value").innerHTML = datum[5];
 			mySurface = new datasurface(datum[0], datum[1], datum[2], datum[3], datum[4]);
 			glot.add(mySurface);
-			glot.restart();
-			glot.display();
+			glot.draw();
 		} catch (e) {
 			glot.gl.console.log("Could not load data " + name);
 		}
@@ -134,7 +133,11 @@
 	canvas {
 		border: 1px solid black;
 		width:100%;
-		height:93%;
+		height:91%;
+	}
+
+	div {
+		font-size: small;
 	}
 	</style>
 </head>

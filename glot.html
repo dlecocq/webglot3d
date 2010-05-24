@@ -88,12 +88,14 @@
 		glot.add(new datasurface("volumes/orange.png", 256, 256, 8, 8));
 		//*/
 		
+		/*
 		glot.set("isovalue", 0.2);
 		glot.set("width",    256);
 		glot.set("height",   256);
 		glot.set("b_width",  20);
 		glot.set("b_height", 12);
 		glot.add(new datasurface("volumes/ct-chest-small.png", 256, 256, 20, 12));
+		//*/
 		
 		/*
 		glot.set("isovalue", 0.2);
@@ -238,6 +240,19 @@
 		glot.set("k2", 1.2);
 		glot.set("a", 1.5);
 		glot.add(new p_surface("pow(k, u)*(1.0 + cos(v))*cos(u), pow(k, u)*(1.0 + cos(v))*sin(u), pow(k, u) * sin(v) - a * pow(k2, u)", 0, Math.PI, 0, 2 * Math.PI));
+		//*/
+		
+		glot.add(new surface("sin(x * x + y * y - 1.3 * t) + cos((x - 1.5) * (x - 1.5) + (y - 0.7) * (y - 0.7) + 1.7 * t)"));
+		
+		/*
+		// Epicycloid
+		glot.set("R", 6.0);
+		glot.set("r", 1.0);
+		glot.add(new p_surface("(R + cos(u / 3.0) * (2.0 * r * cos(v) + r * cos(2.0 * v))  + sin(u / 3.0) * (2.0 * r * sin(v) - r * sin(2.0 * v))) * cos(u), (R + cos(u / 3.0) * (2.0 * r * cos(v) + r * cos(2.0 * v)) + sin(u / 3.0) * (2.0 * r * sin(v) - r * sin(2.0 * v))) * sin(u),   (R - sin(u / 3.0) * (2.0 * r * cos(v) + r * cos(2.0 * v))  + cos(u / 3.0) * (2.0 * r * sin(v) - r * sin(2.0 * v)))", 0, 2 * Math.PI, 0, 2 * Math.PI))
+		
+		// s = u
+		// a = v
+		glot.add(new p_surface("(R + cos(3.0 * u) * (2.0 * r * cos(v) - r * cos(2.0 * v)) + sin(3.0 * u) * (2.0 * r * sin(v) - r * sin(2.0 * v))) * cos(u) + 7.0, (R - sin(3.0 * u) * (2.0 * r * cos(v) - r * cos(2.0 * v)) + cos(3.0 * u) * (2.0 * r * sin(v) - r * sin(2.0 * v))) - 6.0, (R + cos(3.0 * u) * (2.0 * r * cos(v) - r * cos(2.0 * v)) + sin(3.0 * u) * (2.0 * r * sin(v) - r * sin(2.0 * v))) * sin(u) + 6.0", 0, 2 * Math.PI, 0, 2 * Math.PI));
 		//*/
 		
 		/* Test surface - a funky "sphere" - a sphere with changing radius.
