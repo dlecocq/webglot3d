@@ -4,6 +4,8 @@ uniform mat4 u_projectionMatrix;
 attribute vec4 vTexCoord;
 attribute vec4 position;
 
+uniform vec3 center;
+
 varying vec2 v_texCoord;
 varying vec3 normal;
 varying vec3 light;
@@ -13,7 +15,7 @@ uniform float t;
 
 void main() {
 
-	gl_Position = u_projectionMatrix * u_modelViewMatrix * position;
+	gl_Position = u_projectionMatrix * u_modelViewMatrix * (position + vec4(center, 0.0));
 	
 	normal = position.xyz;
 	//normal = vec3(result.z, 0.0, 0.0);

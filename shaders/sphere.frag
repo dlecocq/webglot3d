@@ -4,9 +4,10 @@ varying vec3 light;
 varying vec3 halfVector;
 
 uniform sampler2D sampler;
+uniform vec4 color;
 
 void main () {
-	vec4 texture = texture2D(sampler, v_texCoord.st);
+	vec4 texture = color;
 
 	// Scaling The Input Vector To Length 1
 	vec3 norm_normal = normalize(normal);

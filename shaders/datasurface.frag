@@ -8,7 +8,7 @@ varying vec3 halfVector;
 
 // USER_PARAMETERS
 
-float depth    = b_width * b_height;
+//float depth    = b_width * b_height;
 
 const float hw = 2.0;
 
