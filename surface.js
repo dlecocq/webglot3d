@@ -1,4 +1,4 @@
-/* This class encapsulates the surface primitive.
+/* \brief This class encapsulates the surface primitive.
  * 
  * It requires the OpenGL context to be passed in, though 
  * this is an incredibly ugly interface, and hopefully I 

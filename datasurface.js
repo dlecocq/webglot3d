@@ -1,14 +1,14 @@
-/* This class encapsulates the data-based isosurface primitive.
- * 
- * It requires the OpenGL context to be passed in, though 
- * this is an incredibly ugly interface, and hopefully I 
- * will find a clean way to work around it at some point.
+/* \brief This class encapsulates the data-based isosurface 
+ * primitive.
  *
- * It also accepts a string version of the function to be
- * plotted.  It must be GLSL 1.0-compliant string version
- * of the function.  Parameters available are x, y, and t
- * representing the x and y coordinates, as well as a time
- * parameter.
+ * It expects to get a string path to an image containing volumetric
+ * data, stored in a tiled format.
+ *
+ * \param source a string path to the volumetric data image
+ * \param width the width of each slice
+ * \param height the height of each slice
+ * \param b_width the number of tiles stored in each row
+ * \param b_Height the number of tiles stored in each column
  *
  * Currently options is not used, but eventually it will
  * include support for what coordinate space this function
