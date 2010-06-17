@@ -1,4 +1,12 @@
-/* This class encapsulates the flow primitive.
+/* \brief This class encapsulates the flow surface primitive.
+ *
+ * It takes a string function of x, y, and t, renders it as
+ * surface and simultaneously does image-based flow visualization
+ * with the gradient of the function.  This gradient is approx-
+ * imated numerically in the shader.
+ *
+ * \param string is a function of x, y, and t for the surface
+ * \param options is just a place-holder for future changes
  */
 function flow(string, options) {
 	
@@ -31,8 +39,19 @@ function flow(string, options) {
 	
 	this.calc_program = null;
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/* \brief This function is called by the grapher class so that the box
+	 * has access to relevant information, but it is only initialized
+	 * when grapher deems appropriates
+	 *
+	 * In the particular case of flow, it copies the height and width of
+	 * the screen so that it knows how large of a random noise texture to
+	 * generate, and then it's business as usual.
+	 *
+	 * \param gl is an WebGL context, provided by grapher
+	 * \param scr is a reference to the screen object, provided by grapher
+	 * \param parameters is an array of strings that will be used as parameters to the function
+	 *
+	 * \sa grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.width  = scr.width ;
@@ -43,11 +62,16 @@ function flow(string, options) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	/* \brief Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.
+	 *
+	 * This method is meant to only be called by the grapher class.  It 
+	 * initializes the ping-pong textures (used for storing intermediate
+	 * states in the IBFV method), as well as a random noise texture, all
+	 * to the appropriate sizes.  Additionally, it ensures that a frame-
+	 * buffer object is available for use.
+	 *
+	 * \param scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -78,9 +102,17 @@ function flow(string, options) {
 		}
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
+	/* \brief All primitives are responsible for knowing how to construct
+	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
+	 *
+	 * This method is meant to be private, and it generates a triangle 
+	 * strip representation of a mesh of the resolucation this.count. For
+	 * JavaScript in particular, it's important to use triangle strips 
+	 * INSTEAD OF just triangles, because of the limits of array sizes.
+	 * You can obtain a much-higher resolution mesh by using strips.
+	 *
+	 * \param src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -176,9 +208,18 @@ function flow(string, options) {
 		this.index_ct = indices.length;
 	}
 	
+	/* \brief Calculate the next iteration of the IBFV algorithm
+	 *
+	 * As this primitive involves a two-pass process, the first (texture
+	 * calculation) pass is contained in the calculate function.  Is is
+	 * meant to only be called by draw.  Draw can make one (or more)
+	 * calls to calculate before rendering the actual surface.
+	 *
+	 * \param scr is the current screen object, passed in from draw
+	 */
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
-    	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
+		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "accumulation"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "source"), 1);
 		this.gl.viewport(0, 0, scr.width, scr.height);
 		
@@ -223,10 +264,19 @@ function flow(string, options) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
-	 * and that behavior is encapsulated in this function. It should be 
-	 * completely self-contained, returning the context state to what it
-	 * was before it's called.
+	/* \brief Every primitive is also responsible for knowing how to draw
+	 * itself, and that behavior is encapsulated in this function.
+	 *
+	 * This method can be called at any time after initialization to draw
+	 * the box to the screen.  Though, it is meant to be primarily called by
+	 * grapher.
+	 *
+	 * It makes two calls to the calculate function, which does ping-pong
+	 * rendering to calculate the IBFV texture (based again on the gradient
+	 * of the supplied function).  Then, it renders the surface itself, with
+	 * that texture applied.
+	 *
+	 * \param scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.sfq();
@@ -265,10 +315,14 @@ function flow(string, options) {
 		
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/* \brief Generates the shader programs necessary to render this
+	 * primitive
+	 *
+	 * This is a two-pass algorithm, and each pass requires a different
+	 * shader program.  Most other primitives need only a single one,
+	 * but this stores the calculate (calculation of the IBFV texture)
+	 * program in this.calc_program, and the rendering shader in this.
+	 * program.
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/flow.calc.vert").replace("USER_FUNCTION", this.f);
