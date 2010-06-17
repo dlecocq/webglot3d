@@ -1,8 +1,9 @@
-/* This class encapsulates the grapher.
+/* \brief This class is a container and administrator for all the
+ * primitives the user would like to plot.
  *
- * In the C++ implementation of OpenGLot, it's a singleton class,
- * but here it's a proper object.  This is mostly because I'm not
- * sure if JavaScript can describe the design pattern.
+ * It is with grapher that the user has most interaction, from
+ * setting parameters, changing the view direction and so forth
+ * to adding and removing primitives.
  */
 function grapher() {
 
@@ -34,10 +35,10 @@ function grapher() {
 	this.userClickFunction    = null;
 	this.userKeyboardFunction = null;
 
-	/* As the WebGL specification is still in flux, this is a wrapper
-	 * for getting a WebGL context for drawing.  Specifically, the 
-	 * string used to query for the context of the canvas is not only
-	 * browser specific, but version specific as well.
+	/* \brief As the WebGL specification is still in flux, this is a 
+	 * wrapper for getting a WebGL context for drawing.  Specifically,
+	 * the string used to query for the context of the canvas is not 
+	 * only browser specific, but version specific as well.
 	 */
 	this.getContext = function() {
 		/* Though the canvas name is hard-coded, it will likely be moved
@@ -65,10 +66,10 @@ function grapher() {
 		return gl;
 	}
 	
-	/* This returns the 3D point clicked, on a unit glass ball centered
-	 * at the origin.  This still has a couple of bugs, not the least of
-	 * which is that event coordinates are not cross-browser compatible.
-	 * Unhappiness about this fact ensues.
+	/* \brief This returns the 3D point clicked, on a unit glass ball
+	 * centered at the origin.  This still has a couple of bugs, not the
+	 * least of which is that event coordinates are not cross-browser
+	 * compatible. This is an unpleasant fact of life.
 	 */
 	this.coordinates = function(x, y) {
 		var canvas = document.getElementById("glot");
@@ -144,13 +145,27 @@ function grapher() {
 		}
 	}
 	
-	/* Mouse release handler
+	/* \brief Mouse release handler
+	 *
+	 * It records that the mouse is no longer moving, and then makes
+	 * a call to rotate, which applies the current rotation into the
+	 * stored rotation and reinitializes the current rotation matrix
+	 * to identity
 	 */
 	this.mouseup = function() {
 		this.scr.moving = false;
 		this.scr.rotate();
 	}
 	
+	/* \brief The scroll event handler
+	 *
+	 * We found it to be a tremendous pain to continually click -/+
+	 * to zoom in and out, and so we added a scroll event handler to
+	 * allow users to scroll for zooming functionality.  Unfortunately
+	 * it becomes a bit of a problem on pages that are themselves
+	 * scrollable.  I'm sure the is probably an elegant soluction, but
+	 * to date, we haven't found it.
+	 */
 	this.scroll = function(event) {
 		if (!event) event = window.event;
 		
@@ -194,18 +209,41 @@ function grapher() {
 		}
 	}
 	
+	/* \brief Although we provide generous click event handling (the
+	 * trackball interface), for some applications it is important
+	 * to be able to augment this functionality.
+	 *
+	 * This function is called IN ADDITION to the default behavior,
+	 * but we're working on a convenient interface for turning off
+	 * the default functionality completely at the user's request.
+	 *
+	 * \param myfunction is the callback handler to register
+	 */
 	this.setClickFunction = function(myfunction) {
 		this.userClickFunction = myfunction;
 	}
 	
+	/* \brief This sets the user keyboard event callback handler.
+	 *
+	 * This function is executed (if set) IN ADDITION to the default 
+	 * keyboard event handler.  It should take one argument, which is
+	 * the key event object received by out handler.
+	 *
+	 * \param myfunction is the callback handler to register.
+	 */
 	this.setKeyboardFunction = function(myfunction) {
 		this.userKeyboardFunction = myfunction;
 	}
 
-	/* This function must be called after an instance of glot has been
-	 * created and before it's used for drawing (read: primitives) added
-	 * to it.  Future work will automatically call this at instantiation
-	 * to avoid some headache.
+	/* \brief This function must be called after an instance of glot has
+	 * been created and before it's used for drawing primitives added
+	 * to it.
+	 *
+	 * This is automatically called upon instantiation of a grapher object.
+	 *
+	 * It initializes all the required WebGL parameters, options, etc.,
+	 * registers callback handlers and initializes timers for tracking
+	 * framerates and for providing to primitives as the t parameter
 	 */
 	this.initialize = function() {
 		/* This is some initialization that the OpenGL / GLUT version of
@@ -320,12 +358,13 @@ function grapher() {
 		
 	}
 
-	/* This function will draw a single frame to the canvas. It should in future
-	 * versions be the extent of the request to redraw (and it looks like that
-	 * will happen with a SetInterval call).  For now, it asks that reshape
-	 * be called once for each time it's called, or at least after any reshaping
-	 * takes place.  Perhaps it should be the end programmer's responsibility
-	 * to worry about this?  Perhaps not.
+	/* \brief Draw a single frame to the canvas.
+	 *
+	 * It is all that is necessary to call in order to request a redraw. For
+	 * example, if you capture an event that adjusts a parameter and then
+	 * changes what ought to be visualized.
+	 *
+	 * It is notably called elsewhere in the run() command.
 	 */
 	this.display = function() {
 		this.reshape();
@@ -407,33 +446,59 @@ function grapher() {
 		this.scr.height = h;
 	}
 	
-	/* Add a primitive to the container.
+	/* \brief Add a primitive to the scene
+	 *
+	 * \param primitive is the object to add
 	 */
 	this.add = function(primitive) {
 		this.primitives.push(primitive);
 		primitive.initialize(this.gl, this.scr, this.parameters);
 	}
 	
+	/* \brief Set a parameter to value for the scene
+	 *
+	 * \param parameter is the name of the parameter whose value needs setting
+	 * \param value is the value to set the new parameter to
+	 */
 	this.set = function(parameter, value) {
 		this.parameters[parameter] = value;
 	}
 	
+	/* \brief Get a parameter's value in the simulation.
+	 *
+	 * \param parameter is the name of the parameter
+	 */
 	this.get = function(parameter) {
 		return this.parameters[parameter];
 	}
 	
-	/* This wraps all the code for animation to take place.
+	/* \brief Set the scene animating
+	 *
+	 * It's not always a good assumption that the scene is dynamic.
+	 * That is, not all functions or objects are time-dependent,
+	 * but this can be called by the programmer to indicate that it
+	 * is indeed the case.  Unfortunately with WebGL there is no
+	 * idle function callback, but this seems to be the alternative.
 	 */
 	this.run = function() {
 		window.glot = this;
 		window.setInterval(function() { this.glot.display(); }, 10);
 	}
 	
+	/* \brief DEPRICATION WARNING This seems to repeat the same
+	 * functionality of run()
+	 */
 	this.draw = function() {
 		window.glot = this;
 		window.setTimeout(function() { this.glot.display(); }, 10);
 	}
 	
+	/* \brief Set the domain of the scene
+	 * 
+	 * The default domain is the unit cube: [-1 1] in all directions
+	 * but this call will change the dimensions.  It's a rough and
+	 * not-oft used feature.
+	 */
 	this.setDomain = function(minx, maxx, miny, maxy) {
 		this.scr.minx = minx;
 		this.scr.maxx = maxx;
@@ -442,6 +507,10 @@ function grapher() {
 		this.refresh();
 	}
 	
+	/* \brief Reset the t parameter for the scene.
+	 *
+	 * This has the effect of bringing back the simulation to t = 0
+	 */
 	this.restart = function() {
 		this.wall.start();
 	}
