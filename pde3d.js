@@ -1,4 +1,16 @@
-/* This class encapsulates the flow primitive.
+/* \brief This class encapsulates the 3D PDE primitive.
+ *
+ * Test class - This class approximates a 3D PDE through successive
+ * Jacobi iterations.  It uses the same tilling / packing technique
+ * as the datasurface class, but instead of merely interpreting the
+ * data stored in a texture, it also uses it for calculation.
+ *
+ * Every few iterations, it then visualizes the results as an
+ * isosurface, in the exact same fashion as the datasurface. At this
+ * point in development, everything is hard-coded in the shader.
+ *
+ * \param string NOT USED in this version
+ * \param options NOT USED in this version
  */
 function pde3d(string, options) {
 	
@@ -41,8 +53,19 @@ function pde3d(string, options) {
 	
 	this.calc_program = null;
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/* \brief This function is called by the grapher class so that the box
+	 * has access to relevant information, but it is only initialized
+	 * when grapher deems appropriates
+	 *
+	 * This initialize function is pretty typical of all primitives.  It
+	 * simply copies all the parameters passed into it as local objects,
+	 * and then generates the shader programs.
+	 *
+	 * \param gl is an WebGL context, provided by grapher
+	 * \param scr is a reference to the screen object, provided by grapher
+	 * \param parameters is an array of strings that will be used as parameters to the function
+	 *
+	 * \sa grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		/*
@@ -55,11 +78,14 @@ function pde3d(string, options) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	/* \brief Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.
+	 *
+	 * This method is meant to only be called by the grapher class.  It 
+	 * initializes the ping-pong textures used for storing itermediate
+	 * approximations from the Jacobi kernel.
+	 *
+	 * \param scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -85,9 +111,15 @@ function pde3d(string, options) {
 		this.fbo = this.gl.createFramebuffer();
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
+	/* \brief All primitives are responsible for knowing how to construct
+	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
+	 *
+	 * This method is meant to be private, and it generates the six faces
+	 * of a cube for the isosurface rendering.  It also uses one of the 
+	 * faces as the screen-filling quad for calculating the Jacobi iterates
+	 *
+	 * \param src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		// Victory! It works!
@@ -241,6 +273,27 @@ function pde3d(string, options) {
 		this.index_ct = indices.length;
 	}
 	
+	/* \brief Calculate the next iteration of the IBFV algorithm
+	 *
+	 * As this primitive involves a two-pass process, the first pass
+	 * is to advance the PDE solver.  This functionality is contained
+	 * in the calculate function, which may be called any time after
+	 * initialization, but it's intended to mostly be called by its
+	 * own draw method.
+	 *
+	 * While the 2D PDE surface can exploit four channels to do high-
+	 * order approximations, the efficiency of memory lookups is not 
+	 * as great in this case.  This is because we must also make
+	 * references to layers above and below it.  Thus, it uses two
+	 * different approximation schemes - a five-point stencil in
+	 * both the x and y directions, but only a three-point stencil
+	 * in the z direciton.  I'm investigating possible implicit 
+	 * topologies (how the cells are laid out in texture) to potent-
+	 * ially enable the same order accuracy in all directions, but
+	 * this seems non-trivial upon initial inspection.
+	 *
+	 * \param scr is the current screen object, passed in from draw
+	 */
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
 		this.gl.viewport(0, 0, this.width * this.b_width, this.height * this.b_height);
@@ -297,10 +350,18 @@ function pde3d(string, options) {
 		*/
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
-	 * and that behavior is encapsulated in this function. It should be 
-	 * completely self-contained, returning the context state to what it
-	 * was before it's called.
+	/* \brief Every primitive is also responsible for knowing how to draw
+	 * itself, and that behavior is encapsulated in this function.
+	 *
+	 * This method can be called at any time after initialization to draw
+	 * the primitive to the screen.  Though, it is meant to be primarily 
+	 * called by grapher.
+	 *
+	 * It makes two calls to the calculate function, which does ping-pong
+	 * rendering to calculate the iterations, and then performs isosurface
+	 * rendering in exactly the same way as the datasurface.
+	 *
+	 * \param scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.sfq();
@@ -354,10 +415,14 @@ function pde3d(string, options) {
 		
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/* \brief Generates the shader programs necessary to render this
+	 * primitive
+	 *
+	 * This is a two-pass algorithm, and each pass requires a different
+	 * shader program.  Most other primitives need only a single one,
+	 * but this stores the calculate (calculation of the PDE approx.)
+	 * program in this.calc_program, and the rendering shader in this.
+	 * program.
 	 */
 	this.gen_program = function() {
 		//*
