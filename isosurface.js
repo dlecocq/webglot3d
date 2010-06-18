@@ -1,18 +1,14 @@
-/* This class encapsulates the isosurface primitive.
- * 
- * It requires the OpenGL context to be passed in, though 
- * this is an incredibly ugly interface, and hopefully I 
- * will find a clean way to work around it at some point.
+/* \brief This class encapsulates the isosurface primitive.
  *
- * It also accepts a string version of the function to be
- * plotted.  It must be GLSL 1.0-compliant string version
- * of the function.  Parameters available are x, y, and t
- * representing the x and y coordinates, as well as a time
- * parameter.
+ * It accepts a string representation of a function in x, y,
+ * z and t, that should be visualized by isosurface rendering
+ * changing the isovalue parameter
  *
- * Currently options is not used, but eventually it will
- * include support for what coordinate space this function
- * is defined in, and so forth.
+ * \param string is the function
+ * \param options is a bitwise and'ing of options.  Currently
+ *    the only options are CYLINDRICAL and SPHERICAL for changing
+ *    the coordinate system
+ * \param source DEPRECATION WARNING is not used.
  */
 function isosurface(string, options, source) {
 	
@@ -44,8 +40,17 @@ function isosurface(string, options, source) {
 	//"textures/saudi-flag.gif"
 	//"textures/dan.jpg"
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/* \brief This function is called by the grapher class so that the box
+	 * has access to relevant information, but it is only initialized
+	 * when grapher deems appropriates
+	 *
+	 * In the particular case of isosurface, it's business as usual
+	 *
+	 * \param gl is an WebGL context, provided by grapher
+	 * \param scr is a reference to the screen object, provided by grapher
+	 * \param parameters is an array of strings that will be used as parameters to the function
+	 *
+	 * \sa grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
@@ -54,20 +59,27 @@ function isosurface(string, options, source) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	/* \brief Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.
+	 *
+	 * This method is meant to only be called by the grapher class. It
+	 * just makes a call to generate the vertex buffer object to draw
+	 *
+	 * \param scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		this.texture = new texture(this.gl, this.source);
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
+	/* \brief All primitives are responsible for knowing how to construct
+	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
+	 *
+	 * This method is meant to be private, and it generates a VBO for the
+	 * six faces of a cube in the same fashion as datasurface.
+	 *
+	 * \param src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		// Victory! It works!
@@ -111,10 +123,14 @@ function isosurface(string, options, source) {
 		this.index_ct = indices.length;
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
-	 * and that behavior is encapsulated in this function. It should be 
-	 * completely self-contained, returning the context state to what it
-	 * was before it's called.
+	/* \brief Every primitive is also responsible for knowing how to draw
+	 * itself, and that behavior is encapsulated in this function.
+	 *
+	 * This method can be called at any time after initialization to draw
+	 * the box to the screen.  Though, it is meant to be primarily called by
+	 * grapher.
+	 *
+	 * \param scr the current screen
 	 */
 	this.draw = function(scr) {
 		this.setUniforms(scr);
@@ -139,10 +155,11 @@ function isosurface(string, options, source) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/* \brief Generates the shader programs necessary to render this
+	 * primitive
+	 *
+	 * Generates the shader program, and replaces the code blocks (if
+	 * necessary) to do coordinate conversions in the shader.
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/isosurface.vert").replace("USER_FUNCTION", this.f);
