@@ -226,7 +226,9 @@ function pde(string, options) {
 	 * floating-point precision. The implicit cell topology is that 
 	 * {r | g} are on top, and {b | a} are on bottom.  In this way,
 	 * with the same number of texture fetches as the one-texel-per-cell
-	 * method, we can evaluate a much higher-order stencil.
+	 * method, we can evaluate a much higher-order stencil.  This stencil
+	 * is extremely sensitive to high-frequency portions of the solution
+	 * and so multigrid will be essential to its usability and success.
 	 *
 	 * It uses ping-pong rendering to accomplish the calculations.
 	 *
