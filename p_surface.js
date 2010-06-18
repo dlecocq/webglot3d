@@ -1,21 +1,28 @@
-/* This class encapsulates the parametric surface primitive.
- * 
- * It requires the OpenGL context to be passed in, though 
- * this is an incredibly ugly interface, and hopefully I 
- * will find a clean way to work around it at some point.
+/* \brief This class encapsulates the parametric surface primitive.
  *
- * It also accepts a string version of the function to be
- * plotted.  It must be GLSL 1.0-compliant string version
- * of the function.  Parameters available are u, v, and t
- * representing the parametric coordinates u and v, and
- * a time variable t.  This string should provide three 
- * comma-separated expressions for the x, y and z coordinates.
+ * Parameters available are u, v, and t representing the 
+ * parametric coordinates u and v, and a time variable t.  This 
+ * string should provide three comma-separated expressions for
+ * the x, y and z coordinates (or r, theta, phi for spherical
+ * coordinates and r, theta, z for cylindrical coordinates)
+ * 
  * For example, this would be a traditional surface:
  *    "u, v, f(u, v, t)"
  *
- * Currently options is not used, but eventually it will
- * include support for what coordinate space this function
- * is defined in, and so forth.
+ * The default is to use cartesian coordinates, but the programmer
+ * can use cylindrical or spherical coordinates by passing in
+ * SPHERICAL or CYLINDRICAL as the options parameter.  These constants
+ * are defined elsewhere in the primitive class.
+ *
+ * \param string is a function of u, v, and t for the surface
+ * \param umin is the u-parameter minimum
+ * \param umax is the u-parameter maximum
+ * \param vmin is the v-parameter minimum
+ * \param vmax is the v-parameter maximum
+ * \param options is for the user to specify coordinate system
+ * \param source is a path to an image to be used as the texture.
+ *
+ * \sa primitive
  */
 function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	
@@ -46,8 +53,19 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	this.source     = source || "textures/kaust.png"
 	this.parameters = null;
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/* \brief This function is called by the grapher class so that the box
+	 * has access to relevant information, but it is only initialized
+	 * when grapher deems appropriates
+	 *
+	 * This is a very typical initialize function - just copies the supplied
+	 * objects to member variables for later access, and then generates the
+	 * shader program.
+	 *
+	 * \param gl is an WebGL context, provided by grapher
+	 * \param scr is a reference to the screen object, provided by grapher
+	 * \param parameters is an array of strings that will be used as parameters to the function
+	 *
+	 * \sa grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
@@ -56,17 +74,35 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.
+	/* \brief Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.
+	 *
+	 * In the particular case of p_surface, it makes a call to generate the
+	 * vertex buffer object, and then grabs the image in this.source to 
+	 * use as a texture.
+	 *
+	 * \param scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		this.texture = new texture(this.gl, this.source);
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
+	/* \brief All primitives are responsible for knowing how to construct
+	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
+	 *
+	 * This method is meant to be private, and it generates a triangle 
+	 * strip representation of a mesh of the resolucation this.count. For
+	 * JavaScript in particular, it's important to use triangle strips 
+	 * INSTEAD OF just triangles, because of the limits of array sizes.
+	 * You can obtain a much-higher resolution mesh by using strips.
+	 *
+	 * It's very similar to the mesh used in flow and surface, but with
+	 * the distinction that the coordinates are in [umin, vmin] x [umax
+	 * vmax].
+	 *
+	 * \param src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -168,10 +204,14 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		this.index_ct = indices.length;
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
-	 * and that behavior is encapsulated in this function. It should be 
-	 * completely self-contained, returning the context state to what it
-	 * was before it's called.
+	/* \brief Every primitive is also responsible for knowing how to draw
+	 * itself, and that behavior is encapsulated in this function.
+	 *
+	 * This method can be called at any time after initialization to draw
+	 * the box to the screen.  Though, it is meant to be primarily called by
+	 * grapher.
+	 *
+	 * \param scr the current screen
 	 */
 	this.draw = function(scr) {
 		this.setUniforms(scr);
@@ -196,10 +236,13 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/* \brief Generates the shader programs necessary to render this
+	 * primitive
+	 *
+	 * This injects the string representation of the function into the
+	 * shader source at the appropriate location.  It also activates
+	 * the embedded (in the shader source) coordinate transformation 
+	 * blocks if necessary.
 	 */
 	this.gen_program = function() {
 		// Prepare the vertex source
