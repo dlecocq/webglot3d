@@ -1,4 +1,14 @@
-/* This class encapsulates the flow primitive.
+/* \brief This class encapsulates the 2D PDE surface primitive.
+ *
+ * Test class - everything is hard-coded in the shader at this
+ * point, and works with the poisson equation.  It then visual-
+ * izes this result as a color-coded surface.  Currently it is
+ * having some problems with numerical stability.  Currently
+ * the solver is a Jacobi kernel, but we'll be exploring other
+ * algorithms to use in its place.
+ *
+ * \param string WARNING not used in this version
+ * \param options WARNING not used in this version
  */
 function pde(string, options) {
 	
@@ -36,8 +46,20 @@ function pde(string, options) {
 	
 	this.calc_program = null;
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/* \brief This function is called by the grapher class so that the 
+	 * primitive has access to relevant information, but it is only 
+	 * initialized when grapher deems appropriate
+	 *
+	 * In the particular case of pde, it copies the dimensions of the
+	 * canvas screen, which it uses to determine the resolution at which
+	 * to run the iterative solver.  This is the size of the ping and
+	 * pong framebuffer objects.
+	 *
+	 * \param gl is an WebGL context, provided by grapher
+	 * \param scr is a reference to the screen object, provided by grapher
+	 * \param parameters is an array of strings that will be used as parameters to the function
+	 *
+	 * \sa grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.width  = scr.width ;
@@ -48,11 +70,15 @@ function pde(string, options) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	/* \brief Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.
+	 *
+	 * This method is meant to only be called by the grapher class.  It 
+	 * initializes the ping-pong textures (used for storing intermediate
+	 * states in the Jacobi kernel).  Additionally, it ensures that a 
+	 * framebuff object is instantiated.
+	 *
+	 * \param scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -71,9 +97,21 @@ function pde(string, options) {
 		this.fbo = this.gl.createFramebuffer();
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
+	/* \brief All primitives are responsible for knowing how to construct
+	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
+	 *
+	 * This method is meant to be private, and it generates a triangle 
+	 * strip representation of a mesh of the resolucation this.count. For
+	 * JavaScript in particular, it's important to use triangle strips 
+	 * INSTEAD OF just triangles, because of the limits of array sizes.
+	 * You can obtain a much-higher resolution mesh by using strips.
+	 *
+	 * In the 2D implementation, it's just a screen-filling quad, but
+	 * as we are trying to visualize the result as a surface, it becomes
+	 * important to have sufficient sampling.
+	 *
+	 * \param src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		/*
@@ -174,6 +212,26 @@ function pde(string, options) {
 		this.index_ct = indices.length;
 	}
 	
+	/* \brief Calculate the next iteration of the Jacobi kernel
+	 *
+	 * As this primitive involves a two-pass process, the first (or in
+	 * some cases, the first few) are to calculate iterations of the Jacobi
+	 * kernel.  The essential idea is that it uses a finite-difference
+	 * approximation to adjust a texel's value based on the value of its
+	 * neighbors.  The calculate method can be called any time after
+	 * initialization.
+	 *
+	 * Another interesting feature about this arrangement is that it
+	 * makes use of all four channels of the texture, in full 32-bit
+	 * floating-point precision. The implicit cell topology is that 
+	 * {r | g} are on top, and {b | a} are on bottom.  In this way,
+	 * with the same number of texture fetches as the one-texel-per-cell
+	 * method, we can evaluate a much higher-order stencil.
+	 *
+	 * It uses ping-pong rendering to accomplish the calculations.
+	 *
+	 * \param scr is the current screen object, passed in from draw
+	 */
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
 		//this.gl.viewport(0, 0, this.ping.width, this.ping.height);
@@ -212,10 +270,18 @@ function pde(string, options) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
-	 * and that behavior is encapsulated in this function. It should be 
-	 * completely self-contained, returning the context state to what it
-	 * was before it's called.
+	/* \brief Every primitive is also responsible for knowing how to draw
+	 * itself, and that behavior is encapsulated in this function.
+	 *
+	 * This method can be called at any time after initialization to draw
+	 * the box to the screen.  Though, it is meant to be primarily called by
+	 * grapher.
+	 *
+	 * It makes four calls to the calculate function, which does ping-pong
+	 * rendering to calculate an approximation to the PDE solution.  Then it
+	 * interprets this result as a height-field surface.
+	 *
+	 * \param scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.sfq();
@@ -254,10 +320,14 @@ function pde(string, options) {
 		
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/* \brief Generates the shader programs necessary to render this
+	 * primitive
+	 *
+	 * This is a two-pass algorithm, and each pass requires a different
+	 * shader program.  Most other primitives need only a single one,
+	 * but this stores the calculate (calculation of the Jacobi kernel)
+	 * program in this.calc_program, and the rendering shader in this.
+	 * program.
 	 */
 	this.gen_program = function() {
 		//*
