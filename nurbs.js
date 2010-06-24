@@ -1,43 +1,49 @@
-/* \brief This class encapsulates the NURBS surface primitive.
+/** This class encapsulates the NURBS surface primitive.
  *
  * Test class - everything is hard-coded right now, but it should
  * accept two knot-vectors, their degrees, and the associated
  * control points to represent a NURBS (non-uniform rational
  * B-spline) surface
  *
- * \param string is a function of x, y, and t for the surface
- * \param options is just a place-holder for future changes
+ * @param {String} string A carry-over form previously-written \
+ *    classes, it doesn't make sense in the context of NURBS
+ * @param {int} options is just a place-holder for future changes
  */
 function nurbs(string, options) {
-	
+	/** The WebGLContext we'll need to use and reference */
 	this.gl   = null;
+	/** The string representation of the function.  Again, this
+	 * doesn't make sense in the context of NURBS
+	 *
+	 * @deprecated */
 	this.f    = string;
-	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that stores vertex information */
 	this.vertexVBO = null;
+	/** The VBO that stores information about contol points */
 	this.lVBO      = null;
+	/** The VBO that store index information */
 	this.indexVBO  = null;
-	
-	/* A more apt name might be "resolution," as count is the number
+	/** The number of indices in this.indexVBO to render */
+	this.index_ct   = 0;
+	/** A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
 	this.count      = 10;
-	this.index_ct   = 0;
-	
+
 	this.source   = null;
 	// From the example at http://gul.sourceforge.net/viewdog-manual/node20.html
-	//*
+	/** The u-direction knot vector */
 	this.us       = [0, 0, 1, 1];
+	/** The texture to store basis functions for the u direction */
 	this.usTex    = null;
+	/** the v-direction knot vector */
 	this.vs       = [0, 0, 1, 1];
+	/** The texture to store basis functions for the v direction */
 	this.vsTex    = null;
+	/** The control points */
 	this.cps      = [[[0, 0, 0, 1], [10, 0, 10, 1]],[[0, 10, 10, 1], [10, 10, 0, 1]]];
+	/** The texture to use to store control points. */
 	this.cpsTex   = null;
 	//*/
 
@@ -58,24 +64,25 @@ function nurbs(string, options) {
 	this.cpsTex = null;
 	//*/
 	
-	// This is the degree in the u direction, and v direction respectively
+	/** The degree of the NURBS surface in the u direction */
 	this.nu		  = 2;
+	/** The degree of the NURBS surface in the v direction */
 	this.nv       = 1;
 	
 	this.texture = null;
 
-	/* \brief This function is called by the grapher class so that the box
+	/** This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
 	 * In the particular case of nurbs, it copies the height and width of
 	 * the screen and then it's business as usual.
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings that will be used as parameters to the function
+	 * @param {WebGLContext} gl a WebGL context, provided by grapher
+	 * @param {screen} scr a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters array of strings that will be used as parameters to the function
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.width  = scr.width ;
@@ -86,7 +93,7 @@ function nurbs(string, options) {
 		this.refresh(scr);
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/** Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.
 	 *
 	 * In the particular case of nurbs, it stores the control points of
@@ -95,10 +102,10 @@ function nurbs(string, options) {
 	 * VBO, which is just a dense triangular mesh, similar to flow, surface
 	 * and p_surface.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr is required for information about the viewable screen
 	 *
-	 * \sa flow
-	 * \sa surface
+	 * @see flow
+	 * @see surface
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -176,7 +183,7 @@ function nurbs(string, options) {
 		//*/
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/** All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
@@ -186,7 +193,7 @@ function nurbs(string, options) {
 	 * INSTEAD OF just triangles, because of the limits of array sizes.
 	 * You can obtain a much-higher resolution mesh by using strips.
 	 *
-	 * \param scr is information about the viewable screen
+	 * @param {screen} scr is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -281,7 +288,7 @@ function nurbs(string, options) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/** Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function.
 	 *
 	 * This method can be called at any time after initialization to draw
@@ -292,7 +299,7 @@ function nurbs(string, options) {
 	 * the shader (the texture samplers, the number of knots, etc.) and 
 	 * also binds the associated textures (control points, and knot vector)
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.perspective();
@@ -341,7 +348,7 @@ function nurbs(string, options) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* \brief Generates the shader programs necessary to render this
+	/** Generates the shader programs necessary to render this
 	 * primitive
 	 *
 	 * This is the common case - one program, calling primitive's own
@@ -349,7 +356,7 @@ function nurbs(string, options) {
 	 *
 	 * NOTE: the calls to replace are a little misleading.  Remove them.
 	 *
-	 * \sa primitive
+	 * @see primitive
 	 */
 	this.gen_program = function() {		
 		var vertex_source = this.read("shaders/nurbs.vert").replace("USER_FUNCTION", this.f);
