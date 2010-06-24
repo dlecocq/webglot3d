@@ -8,6 +8,9 @@
  * @param {String} string A carry-over form previously-written \
  *    classes, it doesn't make sense in the context of NURBS
  * @param {int} options is just a place-holder for future changes
+ * @constructor
+ * @requires primitive is a primitive
+ * @requires screen has a reference to a screen
  */
 function nurbs(string, options) {
 	/** The WebGLContext we'll need to use and reference */
