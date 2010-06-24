@@ -1,55 +1,72 @@
-/* \brief This class encapsulates the data-based isosurface 
+/**
+ * This class encapsulates the data-based isosurface 
  * primitive.
  *
  * It expects to get a string path to an image containing volumetric
  * data, stored in a tiled format.
  *
- * \param source a string path to the volumetric data image
- * \param width the width of each slice
- * \param height the height of each slice
- * \param b_width the number of tiles stored in each row
- * \param b_Height the number of tiles stored in each column
+ * @param {string} source a string path to the volumetric data image
+ * @param {int} width the width of each slice
+ * @param {int} height the height of each slice
+ * @param {int} b_width the number of tiles stored in each row
+ * @param {int} b_height the number of tiles stored in each column
  *
  * Currently options is not used, but eventually it will
  * include support for what coordinate space this function
  * is defined in, and so forth.
+ *
+ * @constructor
+ * @requires primitive Inherits from primitive
+ * @requires screen    Has a reference to a screen object
  */
 function datasurface(source, width, height, b_width, b_height) {
-	
+	/** The WebGL context we'll be using */
 	this.gl   = null;
 	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that stores the vertices */
 	this.vertexVBO	= null;
+	/** The VBO that stores texture coordinates */
 	this.textureVBO = null;
-	this.indexVBO		= null;
-	
+	/** The VBO that stores the indices of the vertices */
+	this.indexVBO	= null;
+	/** The count of indices in indexVBO */
 	this.index_ct   = 0;
 	
+	/** The texture containing the volumetric data. It's stored
+	 * as slices in a 2D texture, and the image can be of any
+	 * format supported by the browser this is being used from
+	 */
 	this.texture    = null;
-	this.transfer	  = null;
+	/** The texture containing the transfer function.  Although
+	 * It's actually a 2D texture, it's got only one row.  This
+	 * is because WebGL doesn't support 1D textures.
+	 */
+	this.transfer	= null;
+	/** The source url for the volumetric data texture */
 	this.source     = source || "volumes/orange.png";
 	
+	/** The width of the volumetric data */
 	this.width      = width;
+	/** The height of the volumetric data */
 	this.height     = height;
+	/** The number of columns in the tiled texture */
 	this.b_width    = b_width;
+	/** The number of rows in the tiled texture */
 	this.b_height   = b_height;
 	
+	/** A placeholder for holding all the parameters used */
 	this.parameters = null;
 
-	/* \brief This function is called by the grapher class so that the box
+	/**
+	 * This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings for parameters used
+	 * @param {WebGLContext}  gl a WebGL context, provided by grapher
+	 * @param {screen}        scr a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters an array of strings for parameters used
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
@@ -60,26 +77,28 @@ function datasurface(source, width, height, b_width, b_height) {
 		this.transfer = new noisetexture(this.gl, 256, 1);
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/**
+	 * Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.  This just updates the VBO
 	 * to draw a box around the whole screen
 	 *
 	 * This method is meant to only be called by the grapher class.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/**
+	 * All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.  In the case of the datasurface, it constructs the six
 	 * faces of a cube, which is then used for the raycasting implementation
 	 *
 	 * This method is meant to be private
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		// Victory! It works!
@@ -130,7 +149,8 @@ function datasurface(source, width, height, b_width, b_height) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/**
+	 * Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function. It should
 	 * be completely self-contained, returning the context state to what it
 	 * was before it's called.
@@ -139,7 +159,7 @@ function datasurface(source, width, height, b_width, b_height) {
 	 * the box to the screen.  Though, it is meant to be primarily called by
 	 * grapher.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		this.setUniforms(scr);
@@ -168,7 +188,8 @@ function datasurface(source, width, height, b_width, b_height) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* \brief Any class who inherits from the primitive class gets free
+	/**
+	 * Any class who inherits from the primitive class gets free
 	 * access to shader compilation and program linking, but only must 
 	 * provide the fragment and vertex shader sources.  The primitive class
 	 * also provides free access to functionality for reading files.
@@ -176,6 +197,8 @@ function datasurface(source, width, height, b_width, b_height) {
 	 * This function generates its program, and stores it back in
 	 * this.program (this is done impliciatly through the call to
 	 * primitive.compile_program).
+	 *
+	 * @see primitive
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/datasurface.vert");

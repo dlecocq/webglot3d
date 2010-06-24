@@ -10,13 +10,13 @@
  */
 function box(options, source) {
 	
-	// The WebGL context
+	/** The WebGL context we'll be using */
 	this.gl         = null;
-	
-	// The VBOs used for drawing it
+	/** The VBO that stores the vertices */
 	this.vertexVBO	= null;
-	this.indexVBO		= null;
-	
+	/** The VBO that stores the indices of the vertices */
+	this.indexVBO	= null;
+	/** The count of indices in indexVBO */
 	this.index_ct   = 0;
 	
 	/**
