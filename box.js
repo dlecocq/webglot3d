@@ -1,8 +1,12 @@
-/* \brief This class encapsulates the box primitive.  It is mostly
+/** 
+ * This class encapsulates the box primitive.  It is mostly
  * meant for use with isosurface rendering to give the user
  * an impression of the orientation of an object.
  *
- * \param options is just a place-holder for future changes
+ * @param {int} options just a place-holder for future changes
+ * @constructor
+ * @requires primitive Inherits from primitive
+ * @requires screen    Has a reference to a screen object
  */
 function box(options, source) {
 	
@@ -15,14 +19,15 @@ function box(options, source) {
 	
 	this.index_ct   = 0;
 	
-	/* \brief This function is called by the grapher class so that the box
+	/**
+	 * This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
+	 * @param {WebGLContext} gl   a WebGL context, provided by grapher
+	 * @param {screen}       scr  a reference to the screen object, provided by grapher
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr) {
 		this.gl = gl;
@@ -30,25 +35,27 @@ function box(options, source) {
 		this.gen_program();
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/**
+	 * Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.  This just updates the VBO
 	 * to draw a box around the whole screen
 	 *
 	 * This method is meant to only be called by the grapher class.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/**
+	 * All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
 	 * This method is meant to be private
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} scr is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		// Victory! It works!
@@ -81,7 +88,8 @@ function box(options, source) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/**
+	 * Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function. It should
 	 * be completely self-contained, returning the context state to what it
 	 * was before it's called.
@@ -90,7 +98,7 @@ function box(options, source) {
 	 * the box to the screen.  Though, it is meant to be primarily called by
 	 * grapher.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.perspective();
@@ -107,7 +115,8 @@ function box(options, source) {
 		this.gl.disableVertexAttribArray(0);
 	}
 	
-	/* \brief Any class who inherits from the primitive class gets free
+	/**
+	 * Any class who inherits from the primitive class gets free
 	 * access to shader compilation and program linking, but only must 
 	 * provide the fragment and vertex shader sources.  The primitive class
 	 * also provides free access to functionality for reading files.
