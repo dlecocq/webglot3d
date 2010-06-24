@@ -1,5 +1,6 @@
-/* \brief This class encapsulates the parametric surface primitive.
+/** This class encapsulates the parametric surface primitive.
  *
+ * @class
  * Parameters available are u, v, and t representing the 
  * parametric coordinates u and v, and a time variable t.  This 
  * string should provide three comma-separated expressions for
@@ -14,46 +15,58 @@
  * SPHERICAL or CYLINDRICAL as the options parameter.  These constants
  * are defined elsewhere in the primitive class.
  *
- * \param string is a function of u, v, and t for the surface
- * \param umin is the u-parameter minimum
- * \param umax is the u-parameter maximum
- * \param vmin is the v-parameter minimum
- * \param vmax is the v-parameter maximum
- * \param options is for the user to specify coordinate system
- * \param source is a path to an image to be used as the texture.
+ * @constructor
+ * @param {String} string is a function of u, v, and t for the surface
+ * @param {Number} umin is the u-parameter minimum
+ * @param {Number} umax is the u-parameter maximum
+ * @param {Number} vmin is the v-parameter minimum
+ * @param {Number} vmax is the v-parameter maximum
+ * @param {int} options is for the user to specify coordinate system
+ * @param {String} source is a path to an image to be used as the texture.
  *
- * \sa primitive
+ * @depends primitive
+ * @depends screen
  */
 function p_surface(string, umin, umax, vmin, vmax, options, source) {
-	
+	/** The WebGLContext we'll be using */
 	this.gl      = null;
+	/** The local copy of the function we'd like to render */
 	this.f       = string;
+	/** The coordinate transformation options */
 	this.options = options;
-	
-	// The buffer objects for displaying
+	/** The VBO that stores the vertex information */
 	this.vertexVBO	= null;
+	/** The VBO that store texture information */
 	this.textureVBO = null;
+	/** The VBO that stores the indices to render */
 	this.indexVBO	= null;
+	/** The number of elements in indexVBO */
+	this.index_ct   = 0;
 	
+	/** The minimum value the u parameter should take on */
 	this.umin = umin;
+	/** The maximum value the u parameter should take on */
 	this.umax = umax;
+	/** The minimum value the v parameter should take on */
 	this.vmin = vmin;
+	/** The maximum value the v parameter should take on */
 	this.vmax = vmax;
 	
-	/* A more apt name might be "resolution," as count is the number
+	/** A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (u and v) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 * JavaScript (at least in WebKit) seems to only want up to 250x250
 	 */
 	this.count		= 250;
-	this.index_ct   = 0;
 	
-	// Set a default texture source
+	/** The WebGLTexture we'll apply to the surface */
 	this.texture    = null;
+	/** The path to the image we'll store as the texture */
 	this.source     = source || "textures/kaust.png"
+	/** The parameters that should be added to the shader source */
 	this.parameters = null;
 
-	/* \brief This function is called by the grapher class so that the box
+	/** This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
@@ -61,11 +74,11 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	 * objects to member variables for later access, and then generates the
 	 * shader program.
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings that will be used as parameters to the function
+	 * @param {WebGLContext} gl is an WebGL context, provided by grapher
+	 * @param {screen} scr is a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters is an array of strings that will be used as parameters to the function
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
@@ -74,21 +87,21 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		this.gen_program();
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/** Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.
 	 *
 	 * In the particular case of p_surface, it makes a call to generate the
 	 * vertex buffer object, and then grabs the image in this.source to 
 	 * use as a texture.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		this.texture = new texture(this.gl, this.source);
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/** All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
@@ -102,7 +115,7 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 	 * the distinction that the coordinates are in [umin, vmin] x [umax
 	 * vmax].
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -204,14 +217,14 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/** Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function.
 	 *
 	 * This method can be called at any time after initialization to draw
 	 * the box to the screen.  Though, it is meant to be primarily called by
 	 * grapher.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		this.setUniforms(scr);
@@ -236,7 +249,7 @@ function p_surface(string, umin, umax, vmin, vmax, options, source) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* \brief Generates the shader programs necessary to render this
+	/** Generates the shader programs necessary to render this
 	 * primitive
 	 *
 	 * This injects the string representation of the function into the
