@@ -1,41 +1,54 @@
-/* \brief This class is a container and administrator for all the
+/** This class is a container and administrator for all the
  * primitives the user would like to plot.
  *
  * It is with grapher that the user has most interaction, from
  * setting parameters, changing the view direction and so forth
  * to adding and removing primitives.
+ *
+ * @requires screen has a member reference to screen
+ * @requires primitive it maintains a list of primitives to render
+ * @requires stopwatch uses to keep track of framerates
+ * @constructor
  */
 function grapher() {
-
-	/* About the view environment.
-	 * Some of these are inherited from the 2d version, but do not
-	 * map well to the 3d version and will be depricated in future
-	 * releases
-	 */
+	/** The screen object manages all of the view matrices */
 	this.scr     = new screen();
+	/** @deprecated */
 	this.axes_dl = null;
+	/** @deprecated */
 	this.grid_dl = null;
-	this.gl			 = null;
-	this.wall		 = null;
-	
-	// Trackball interface variables
+	/** The WebGLContext we'll be using throughout this */
+	this.gl		 = null;
+	/** The stopwatch to keep track of the time variable */
+	this.wall	 = null;
+	/** The {@link ray} object that keeps track of where
+	 * the mouse was last clicked down.  This is used for
+	 * the trackbacll interface.
+	 */
 	this.mouse_down = null;
+	/** The axis about which the current rotation is happening */
 	this.axis       = [0, 0, 0];
+	/** The angle about axis that the current rotation is happening */
 	this.angle      = 0;
+	/** Whether or not we are actually moving the trackball */
 	this.moving     = false;
-	//this.rotation   = null;
 	
-	// A framerate timer
+	/** A {@link stopwatch} to keep track of framerates */
 	this.framerate	= null;
+	/** The number of frames we've rendered since we last reset 
+	 * the framerate stopwatch */
 	this.framecount = 0;
-	
+	/** An array of primitives that we should render */
 	this.primitives = new Array();
+	/** An array of strings, denoting the names of parameters 
+	 * we should insert into newly-created shader programs. */
 	this.parameters = new Array();
-	
+	/** A user-settable function that gets called when the mouse is clicked */
 	this.userClickFunction    = null;
+	/** A user-settable function that gets called when keys are pressed */
 	this.userKeyboardFunction = null;
 
-	/* \brief As the WebGL specification is still in flux, this is a 
+	/** As the WebGL specification is still in flux, this is a 
 	 * wrapper for getting a WebGL context for drawing.  Specifically,
 	 * the string used to query for the context of the canvas is not 
 	 * only browser specific, but version specific as well.
@@ -66,10 +79,13 @@ function grapher() {
 		return gl;
 	}
 	
-	/* \brief This returns the 3D point clicked, on a unit glass ball
+	/** This returns the 3D point clicked, on a unit glass ball
 	 * centered at the origin.  This still has a couple of bugs, not the
 	 * least of which is that event coordinates are not cross-browser
 	 * compatible. This is an unpleasant fact of life.
+	 *
+	 * @param {int} x the x coordinate in the screen that was pressed
+	 * @param {int} y the y coordinate in the screen that was pressed
 	 */
 	this.coordinates = function(x, y) {
 		var canvas = document.getElementById("glot");
@@ -114,11 +130,19 @@ function grapher() {
 		return new ray(i, j, k);
 	}
 
-	/* The mouse-down handler. It's provided with the context's x and y
+	/** The mouse-down handler. It's provided with the context's x and y
 	 * coordinates, but these are not guaranteed to be cross-browser
 	 * compatible.  Still, it's mostly an internal function.  Access to
 	 * specifying one's own click functions may be added, though it's
 	 * probably less valuable in the 3d version than the 2d.
+	 *
+	 * This is only used internally, and is the callback handler we
+	 * attach to the canvas
+	 *
+	 * @private
+	 *
+	 * @param {int} x the x coordinate where the mouse was clicked
+	 * @param {int} y the y coordinate where the mouse was clicked
 	 */
 	this.mousedown = function(x, y) {
 		this.mouse_down = this.coordinates(x, y);
@@ -130,10 +154,18 @@ function grapher() {
 		this.scr.moving = true;
 	}
 	
-	/* The call-back handler for mouse movement.  Like mousedown, it's
+	/** The call-back handler for mouse movement.  Like mousedown, it's
 	 * provided with the x and y coordinates of the event, though again
 	 * they are not cross-browser apparently.  Still have test some other
 	 * browsers.
+	 * 
+	 * This method is only used internally, and is the callback handler
+	 * we attach to the window
+	 *
+	 * @private
+	 *
+	 * @param {int} x the x coordinate where the mouse was moved
+	 * @param {int} y the y coordinate where the mouse was moved
 	 */
 	this.mousemove = function(x, y) {
 		if (this.scr.moving) {
@@ -145,8 +177,7 @@ function grapher() {
 		}
 	}
 	
-	/* \brief Mouse release handler
-	 *
+	/** Mouse release handler;
 	 * It records that the mouse is no longer moving, and then makes
 	 * a call to rotate, which applies the current rotation into the
 	 * stored rotation and reinitializes the current rotation matrix
@@ -157,7 +188,7 @@ function grapher() {
 		this.scr.rotate();
 	}
 	
-	/* \brief The scroll event handler
+	/** The scroll event handler
 	 *
 	 * We found it to be a tremendous pain to continually click -/+
 	 * to zoom in and out, and so we added a scroll event handler to
@@ -165,6 +196,8 @@ function grapher() {
 	 * it becomes a bit of a problem on pages that are themselves
 	 * scrollable.  I'm sure the is probably an elegant soluction, but
 	 * to date, we haven't found it.
+	 * 
+	 * @param {event} event the event object passed into us by the window
 	 */
 	this.scroll = function(event) {
 		if (!event) event = window.event;
@@ -181,7 +214,7 @@ function grapher() {
 		this.display();
 	}
 	
-	/* The keyboard event handler.  Again, the browser wars make life
+	/** The keyboard event handler.  Again, the browser wars make life
 	 * difficult, as it seems (though I'm not a JavaScript expert) that
 	 * this varies between browsers.  As I understood it, keyCode was
 	 * supposed to be an ASCII character code, but it's not been my
@@ -209,7 +242,7 @@ function grapher() {
 		}
 	}
 	
-	/* \brief Although we provide generous click event handling (the
+	/** Although we provide generous click event handling (the
 	 * trackball interface), for some applications it is important
 	 * to be able to augment this functionality.
 	 *
@@ -217,25 +250,25 @@ function grapher() {
 	 * but we're working on a convenient interface for turning off
 	 * the default functionality completely at the user's request.
 	 *
-	 * \param myfunction is the callback handler to register
+	 * @param {function(x, y)} myfunction is the callback handler to register
 	 */
 	this.setClickFunction = function(myfunction) {
 		this.userClickFunction = myfunction;
 	}
 	
-	/* \brief This sets the user keyboard event callback handler.
+	/** This sets the user keyboard event callback handler.
 	 *
 	 * This function is executed (if set) IN ADDITION to the default 
 	 * keyboard event handler.  It should take one argument, which is
 	 * the key event object received by out handler.
 	 *
-	 * \param myfunction is the callback handler to register.
+	 * @param {function(key)} myfunction is the callback handler to register.
 	 */
 	this.setKeyboardFunction = function(myfunction) {
 		this.userKeyboardFunction = myfunction;
 	}
 
-	/* \brief This function must be called after an instance of glot has
+	/** This function must be called after an instance of glot has
 	 * been created and before it's used for drawing primitives added
 	 * to it.
 	 *
@@ -351,14 +384,16 @@ function grapher() {
 		return 0;
 	}
 	
-	/* Yet to be written.  Really necessary in the 3D version?  Probably,
+	/** Yet to be written.  Really necessary in the 3D version?  Probably,
 	 * I guess.
+	 * 
+	 * @deprecated
 	 */
 	this.axes_dl_gen = function() {
 		
 	}
 
-	/* \brief Draw a single frame to the canvas.
+	/** Draw a single frame to the canvas.
 	 *
 	 * It is all that is necessary to call in order to request a redraw. For
 	 * example, if you capture an event that adjusts a parameter and then
@@ -398,7 +433,7 @@ function grapher() {
 		gl.finish();
 	}
 
-	/* Every time that VBOs need to be refreshed, this function can be 
+	/** Every time that VBOs need to be refreshed, this function can be 
 	 * called, and all included primitives will re-instantiate their VBOs
 	 * if necessary.  It's a primitive's responsibility to know if the
 	 * change requires it, based on the given new screen.
@@ -409,19 +444,19 @@ function grapher() {
 		}
 	}
 	
-	/* It's all in the name
+	/** It's all in the name
 	 */
 	this.zoom_in = function() {
 		this.scr.alpha /= 1.1;
 	}
 	
-	/* It's all in the name
+	/** It's all in the name
 	 */
 	this.zoom_out = function() {
 		this.scr.alpha *= 1.1;
 	}
 
-	/* Call this as often as you'd like, it will check to see if there
+	/** Call this as often as you'd like, it will check to see if there
 	 * have been any changes in the canvas' size, and if so, it performs
 	 * all the necessary operations.
 	 */
@@ -446,33 +481,33 @@ function grapher() {
 		this.scr.height = h;
 	}
 	
-	/* \brief Add a primitive to the scene
+	/** Add a primitive to the scene
 	 *
-	 * \param primitive is the object to add
+	 * @param {primitive} primitive is the object to add
 	 */
 	this.add = function(primitive) {
 		this.primitives.push(primitive);
 		primitive.initialize(this.gl, this.scr, this.parameters);
 	}
 	
-	/* \brief Set a parameter to value for the scene
+	/** Set a parameter to value for the scene
 	 *
-	 * \param parameter is the name of the parameter whose value needs setting
-	 * \param value is the value to set the new parameter to
+	 * @param {String} parameter is the name of the parameter whose value needs setting
+	 * @param {Number} value is the value to set the new parameter to
 	 */
 	this.set = function(parameter, value) {
 		this.parameters[parameter] = value;
 	}
 	
-	/* \brief Get a parameter's value in the simulation.
+	/** Get a parameter's value in the simulation.
 	 *
-	 * \param parameter is the name of the parameter
+	 * @param {String} parameter is the name of the parameter
 	 */
 	this.get = function(parameter) {
 		return this.parameters[parameter];
 	}
 	
-	/* \brief Set the scene animating
+	/** Set the scene animating
 	 *
 	 * It's not always a good assumption that the scene is dynamic.
 	 * That is, not all functions or objects are time-dependent,
@@ -485,19 +520,25 @@ function grapher() {
 		window.setInterval(function() { this.glot.display(); }, 10);
 	}
 	
-	/* \brief DEPRICATION WARNING This seems to repeat the same
-	 * functionality of run()
+	/** This seems to repeat the same functionality of run()
+	 *
+	 * @deprecated
 	 */
 	this.draw = function() {
 		window.glot = this;
 		window.setTimeout(function() { this.glot.display(); }, 10);
 	}
 	
-	/* \brief Set the domain of the scene
+	/** Set the domain of the scene
 	 * 
 	 * The default domain is the unit cube: [-1 1] in all directions
 	 * but this call will change the dimensions.  It's a rough and
 	 * not-oft used feature.
+	 *
+	 * @param {Number} minx the minimum x to see in the domain
+	 * @param {Number} maxx the maximum x to see in the domain
+	 * @param {Number} miny the minimum y to see in the domain
+	 * @param {Number} maxy the maximum y to see in the domain
 	 */
 	this.setDomain = function(minx, maxx, miny, maxy) {
 		this.scr.minx = minx;
@@ -507,7 +548,7 @@ function grapher() {
 		this.refresh();
 	}
 	
-	/* \brief Reset the t parameter for the scene.
+	/** Reset the t parameter for the scene.
 	 *
 	 * This has the effect of bringing back the simulation to t = 0
 	 */

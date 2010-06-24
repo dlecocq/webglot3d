@@ -1,45 +1,57 @@
-/* \brief This class encapsulates the flow surface primitive.
+/** This class encapsulates the flow surface primitive.
  *
  * It takes a string function of x, y, and t, renders it as
  * surface and simultaneously does image-based flow visualization
  * with the gradient of the function.  This gradient is approx-
  * imated numerically in the shader.
  *
- * \param string is a function of x, y, and t for the surface
- * \param options is just a place-holder for future changes
+ * @param {String} string is a function of x, y, and t for the surface
+ * @param {int} options is just a place-holder for future changes
+ * @requires primitive inherits from primitive
+ * @requires screen  has a member reference to screen
+ * @constructor
  */
 function flow(string, options) {
-	
+	/** The WebGLContext we'll be using */
 	this.gl   = null;
+	/** The function we would like to render */
 	this.f    = string;
 	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that holds vertex information */
 	this.vertexVBO	= null;
+	/** The VBO that holds texture information */
 	this.textureVBO = null;
+	/** The VBO that hold indices for rendering */
 	this.indexVBO	= null;
+	/** The number of indices in indexVBO to render */
+	this.index_ct   = 0;
 	
-	/* A more apt name might be "resolution," as count is the number
+	/** A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
 	this.count		= 250;
-	this.index_ct   = 0;
 	
+	/** The source texture to distort and composite with
+	 * to get the flow effect.  Typically, this will be a
+	 * random noise texture */
 	this.source = null;
+	/** An empty texture we'll use for ping-pong rendering */
 	this.ping   = null;
+	/** A second empty texture for ping-pong rendering */
 	this.pong   = null;
+	/** The framebuffer object that we'll render into for the
+	 * texture-advection calculations. */
 	this.fbo    = null;
 	
+	/** @deprecated */
 	this.texture = null;
 	
+	/** The shader program we'll use for calculating the
+	 * advected texture stuff. */
 	this.calc_program = null;
 
-	/* \brief This function is called by the grapher class so that the box
+	/** This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
@@ -47,11 +59,11 @@ function flow(string, options) {
 	 * the screen so that it knows how large of a random noise texture to
 	 * generate, and then it's business as usual.
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings that will be used as parameters to the function
+	 * @param {WebGLContext} gl a WebGL context, provided by grapher
+	 * @param {screen} scr a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters an array of strings that will be used as parameters to the function
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.width  = scr.width ;
@@ -62,7 +74,7 @@ function flow(string, options) {
 		this.gen_program();
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/** Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.
 	 *
 	 * This method is meant to only be called by the grapher class.  It 
@@ -71,7 +83,7 @@ function flow(string, options) {
 	 * to the appropriate sizes.  Additionally, it ensures that a frame-
 	 * buffer object is available for use.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -102,7 +114,7 @@ function flow(string, options) {
 		}
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/** All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
@@ -112,7 +124,7 @@ function flow(string, options) {
 	 * INSTEAD OF just triangles, because of the limits of array sizes.
 	 * You can obtain a much-higher resolution mesh by using strips.
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -208,14 +220,14 @@ function flow(string, options) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Calculate the next iteration of the IBFV algorithm
+	/** Calculate the next iteration of the IBFV algorithm
 	 *
 	 * As this primitive involves a two-pass process, the first (texture
 	 * calculation) pass is contained in the calculate function.  Is is
 	 * meant to only be called by draw.  Draw can make one (or more)
 	 * calls to calculate before rendering the actual surface.
 	 *
-	 * \param scr is the current screen object, passed in from draw
+	 * @param {screen} scr the current screen object, passed in from draw
 	 */
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
@@ -264,7 +276,7 @@ function flow(string, options) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/** Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function.
 	 *
 	 * This method can be called at any time after initialization to draw
@@ -276,7 +288,7 @@ function flow(string, options) {
 	 * of the supplied function).  Then, it renders the surface itself, with
 	 * that texture applied.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.sfq();
@@ -315,7 +327,7 @@ function flow(string, options) {
 		
 	}
 	
-	/* \brief Generates the shader programs necessary to render this
+	/** Generates the shader programs necessary to render this
 	 * primitive
 	 *
 	 * This is a two-pass algorithm, and each pass requires a different
