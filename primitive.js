@@ -2,20 +2,26 @@ CARTESIAN   = 0;
 CYLINDRICAL = 1;
 SPHERICAL   = 2;
 
-/* This is a parent class for all primitives.  Inheriting from
+/** This is a parent class for all primitives.  Inheriting from
  * it is not strictly necessary (as this is JavaScript), but it
  * provides access to some very valuable functions.
  *
  * For example, it encapsulates reading of filenames, and shader
  * program compilation and linking
+ *
+ * @constructor
+ * @param {WebGLContext} context - the rendering context we'll use
  */
 function primitive(context) {
-	
+	/** The primary shader program with which to render */
 	this.program = null;
 	
-	/* Encapsulates reading a file, usually for shader source inc-
+	/** Encapsulates reading a file, usually for shader source inc-
 	 * lusion. There may be a faster and/or more robust way of doing
 	 * this, but the encapsulation makes for easy changes.
+	 *
+	 * @param {String} filename the location of a XMLHttpRequest \
+	 *    accessible file
 	 */
 	this.read = function(filename) {
 		var request = new XMLHttpRequest();
@@ -25,11 +31,14 @@ function primitive(context) {
 		return request.responseText;
 	}
 	
-	/* Compile AND link the shader program
+	/** Compile AND link the shader program
 	 *
 	 * Give it vertex source and shader source, and it will populate
 	 * this.program with a shader program.  It prints out errors to 
 	 * the console, which can prove extremely helpful.
+	 *
+	 * @param {String} vertex_source the source of the vertex shader
+	 * @param {String} frag_source the source of the fragment shader
 	 */
 	this.compile_program = function(vertex_source, frag_source) {
 		// Add user parameters
@@ -125,6 +134,9 @@ function primitive(context) {
 		return this.program;
 	}
 	
+	/** Check on the status of the framebuffer, and report if it
+	 * has a problem.  It does so by printing to window.console
+	 */
 	this.checkFramebuffer = function() {
 		var gl = this.gl;
 		var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -152,6 +164,16 @@ function primitive(context) {
 		return status;
 	}
 	
+	/** Based on what parameters are found in this.parameters, set
+	 * them according to their values.  That is, of all the parameters
+	 * registered by the user ahead of time, set them to whatever the
+	 * appropriate value. Also set a few crucial parameters, like
+	 * the modelview matrix and so forth
+	 *
+	 * @param {screen} scr the screen object that contains view information
+	 * @param {program} program by default this.program, but provide any \
+	 *    valid shader program here.
+	 */
 	this.setUniforms = function(scr, program) {
 		try {
 			program = program || this.program;
