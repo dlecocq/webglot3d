@@ -1,15 +1,25 @@
-/* http://learningwebgl.com/blog/?p=507
+/** Noisetexture-generating function.  Some algorithms need
+ * a random noise texture as input.  Notably the flow surface
+ * 
+ * @param {WebGLContext} context the context in which we'll be working
+ * @param {int} width the width of the texture to generate
+ * @param {int} height the height of the texture to generate
+ *
+ * @see flow
  */
 function noisetexture(context, width, height) {
-	
+	/** The WebGLTexture object that we'll return */
 	this.texture = null;
+	/** @deprecated */
 	this.image	 = null;
-	
-	this.gl			 = context;
-	
+	/** The local copy of the WebGLContext we'll use */
+	this.gl		 = context;
+	/** Local copy of the width of the texture */
 	this.width   = width;
+	/** Local copy of the height of the texture */
 	this.height  = height;
 
+	/** Initialize the randomized noise texture */
 	this.initialize = function() {
 		this.texture = this.gl.createTexture();
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
