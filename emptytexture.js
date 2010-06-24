@@ -1,15 +1,35 @@
-/* http://learningwebgl.com/blog/?p=507
+/** 
+ * This class initializes an empty texture.  This is primarily
+ * meant for use with ping-pong rendering
+ *
+ * Originally, it was going to be a wrapper around WebGL textures
+ * but it turns out to mostly be unnecessary.  So, it simply 
+ * returns the generated WebGL texture.
+ *
+ * @param {WebGLContext} context The WebGL context in which we're operating
+ * @param {int} width The width of the texture to allocate
+ * @param {int} height The height of the texture to allocate
+ * @returns {WebGLTexture}
  */
 function emptytexture(context, width, height) {
-	
+	/** The texture object we'll be returning */
 	this.texture = null;
+	/** @deprecated */
 	this.image	 = null;
-	
-	this.gl			 = context;
-	
+	/** The local copy of the WebGLContext */
+	this.gl	     = context;
+	/** The local copy of the width of the generated texture */
 	this.width  = 0;
+	/** The local copy of the height of the generated texture */
 	this.height = 0;
 
+	/**
+	 * Work with the WebGL context to actually initialize the 
+	 * texture.
+	 *
+	 * @param {int} width The width to make the texture
+	 * @param {int} height The height to make the texture
+	 */
 	this.initialize = function(width, height) {
 		this.width  = width;
 		this.height = height;
@@ -30,6 +50,13 @@ function emptytexture(context, width, height) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 	}
 	
+	/**
+	 * Bind the texture in the WebGL context.  This class is just a
+	 * helper, and returns the actual texture, and not a wrapper around
+	 * the texture.
+	 *
+	 * @deprecated
+	 */
 	this.bind = function() {
 		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
