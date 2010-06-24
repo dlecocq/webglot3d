@@ -1,15 +1,35 @@
-/* http://learningwebgl.com/blog/?p=507
+/** Creates a WebGLTexture based on any function that the 
+ * programmer would like to use.  Include a function that
+ * when given a WebGLFloatArray, sets all the appropriate
+ * values.  It expects that the supplied data will be of
+ * the format RGBA in successive elements, and is stored
+ * internally in full 32-bit floats.  Thus, the array passed
+ * to the user-provided function has size width * height * 4
+ * 
+ * @param {WebGLContext} context the context to use to create textures
+ * @param {int} width the width to make the texture
+ * @param {int} height the height to make the texture
+ * @param {function(WebGLFloatArray)} a function that fills \
+ *     the provided array with the appropriate data
  */
 function ftexture(context, width, height, f) {
-	
+	/** The WebGLTexture to return */
 	this.texture = null;
+	/** @deprecated */
 	this.image	 = null;
-	
-	this.gl			 = context;
-	
+	/** The WebGL context to use */
+	this.gl	     = context;
+	/** local copy of the width of the texture */
 	this.width   = width;
+	/** local copy of the height of the texture */
 	this.height  = height;
 
+	/** This function does the heavy lifting, but the structure
+	 * of the class is going to change soon.  Currently, ftexture
+	 * actually returns a WebGLTexture, and not a wrapper of one.
+	 *
+	 * @param {function(WebGLFloatArray)} f
+	 */
 	this.initialize = function(f) {
 		this.texture = this.gl.createTexture();
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
@@ -27,6 +47,10 @@ function ftexture(context, width, height, f) {
 		this.gl.bindTexture(this.gl.TEXTURE_2D, null);
 	}
 	
+	/** Bind the texture
+	 *
+	 * @deprecated
+	 */
 	this.bind = function() {
 		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);

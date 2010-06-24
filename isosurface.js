@@ -1,56 +1,61 @@
-/* \brief This class encapsulates the isosurface primitive.
+/** This class encapsulates the isosurface primitive.
  *
  * It accepts a string representation of a function in x, y,
  * z and t, that should be visualized by isosurface rendering
  * changing the isovalue parameter
  *
- * \param string is the function
- * \param options is a bitwise and'ing of options.  Currently
- *    the only options are CYLINDRICAL and SPHERICAL for changing
+ * @param {String} string the function to render
+ * @param {int} options is a bitwise and'ing of options.  Currently \
+ *    the only options are CYLINDRICAL and SPHERICAL for changing \
  *    the coordinate system
- * \param source DEPRECATION WARNING is not used.
+ * @param {DEPRECATED} source is not used.
+ * @constructor
+ * @requires screen has a member reference to a screen object
+ * @requires primitive inherits from primitive
  */
 function isosurface(string, options, source) {
-	
+	/** The WebGLContext we'll be using */
 	this.gl      = null;
+	/** A string representation of the function */
 	this.f       = string;
+	/** The options for rendering.  Mostly used to
+	 * select the coordinate system to use */
 	this.options = options;
-	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementation.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that stores the vertices */
 	this.vertexVBO	= null;
+	/** The VBO that stores the texture coordinates */
 	this.textureVBO = null;
-	this.indexVBO		= null;
-	
+	/** The VBO that holds the indices to render */
+	this.indexVBO	= null;
+	/** The number of indices to render */
+	this.index_ct   = 0;
+	/** The set of parameters to include in the shader source */
 	this.parameters = null;
 	
-	/* A more apt name might be "resolution," as count is the number
+	/** A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
 	this.count			= 2;
-	this.index_ct   = 0;
-	
+	/** The WebGLTexture we'll use. It's a residual of the class 
+	 * references when writing the class. 
+	 * @deprecated */
 	this.texture    = null;
+	/** The string source for the texture we'll use 
+	 * @deprecated */
 	this.source     = source || "textures/deisa.jpg";
-	//"textures/saudi-flag.gif"
-	//"textures/dan.jpg"
 
-	/* \brief This function is called by the grapher class so that the box
+	/** This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
 	 * In the particular case of isosurface, it's business as usual
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings that will be used as parameters to the function
+	 * @param {WebGLContext} gl a WebGL context, provided by grapher
+	 * @param {screen} scr is a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters array of strings that will be used as parameters to the function
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
@@ -59,27 +64,27 @@ function isosurface(string, options, source) {
 		this.gen_program();
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/** Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.
 	 *
 	 * This method is meant to only be called by the grapher class. It
 	 * just makes a call to generate the vertex buffer object to draw
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		this.texture = new texture(this.gl, this.source);
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/** All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
 	 * This method is meant to be private, and it generates a VBO for the
 	 * six faces of a cube in the same fashion as datasurface.
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} src information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		// Victory! It works!
@@ -123,14 +128,14 @@ function isosurface(string, options, source) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/** Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function.
 	 *
 	 * This method can be called at any time after initialization to draw
 	 * the box to the screen.  Though, it is meant to be primarily called by
 	 * grapher.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		this.setUniforms(scr);
@@ -155,11 +160,10 @@ function isosurface(string, options, source) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* \brief Generates the shader programs necessary to render this
-	 * primitive
-	 *
-	 * Generates the shader program, and replaces the code blocks (if
-	 * necessary) to do coordinate conversions in the shader.
+	/** Generates the shader programs necessary to render this
+	 * primitive.  Generates the shader program, and replaces 
+	 * the code blocks (if necessary) to do coordinate conversions
+	 * in the shader.
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/isosurface.vert").replace("USER_FUNCTION", this.f);
