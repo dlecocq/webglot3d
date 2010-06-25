@@ -1,5 +1,6 @@
-/* \brief This class encapsulates the 2D PDE surface primitive.
+/** This class encapsulates the 2D PDE surface primitive.
  *
+ * @class
  * Test class - everything is hard-coded in the shader at this
  * point, and works with the poisson equation.  It then visual-
  * izes this result as a color-coded surface.  Currently it is
@@ -7,46 +8,60 @@
  * the solver is a Jacobi kernel, but we'll be exploring other
  * algorithms to use in its place.
  *
- * \param string WARNING not used in this version
- * \param options WARNING not used in this version
+ * @constructor
+ * @param {String} string WARNING not used in this version
+ * @param {int} options WARNING not used in this version
+ * @requires primitive
+ * @requires texture has a member instance
+ * @requires screen
  */
 function pde(string, options) {
-	
+	/** The WebGLContext we'll be using for all this */
 	this.gl   = null;
+	/** @deprecated */
 	this.f    = string;
-	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that stores coordinate information */
 	this.vertexVBO	= null;
+	/** The VBO that stores texture coordinates */
 	this.textureVBO = null;
-	this.indexVBO		= null;
-	
-	/* A more apt name might be "resolution," as count is the number
-	 * of samples along each axis (x and y) samples are taken. Being
-	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
-	 */
-	this.count			= 150;
+	/** The indices of the VBO elements to render */
+	this.indexVBO	= null;
+	/** The number of elements in indexVBO */
 	this.index_ct   = 0;
 	
+	/** @deprecated */
+	this.count		= 150;
+	
+	/** Used for swapping back and forth in ping-pong rendering */
 	this.tmp    = null;
+	/** One of the textures used in ping-pong rendering */
 	this.ping   = null;
+	/** The other texture used in ping-pong rendering */
 	this.pong   = null;
+	/** The FBO into which we render */
 	this.fbo    = null;
+	/** @deprecated */
 	this.rb     = null;
 	
+	/** The parameters that should appear in the shader */
 	this.parameters = null;
 	
+	/** The width of the grid of the PDE. This is the number of texels,
+	 * though, the simulation has four times as many cells as texels
+	 * (twice in each direction).
+	 */
 	this.width  = 0;
+	/** The height of the grid of the PDE. This is the number of texels,
+	 * though, the simulation has four times as many cells as texels
+	 * (twice in each direction).
+	 */
 	this.height = 0;
+	/** @private */
 	this.level  = 0;
-	
+	/** The shader program used for calculation */
 	this.calc_program = null;
 
-	/* \brief This function is called by the grapher class so that the 
+	/** This function is called by the grapher class so that the 
 	 * primitive has access to relevant information, but it is only 
 	 * initialized when grapher deems appropriate
 	 *
@@ -55,11 +70,11 @@ function pde(string, options) {
 	 * to run the iterative solver.  This is the size of the ping and
 	 * pong framebuffer objects.
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings that will be used as parameters to the function
+	 * @param {WebGLContext} gl is an WebGL context, provided by grapher
+	 * @param {screen} scr is a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters is an array of strings that will be used as parameters to the function
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.width  = scr.width ;
@@ -70,7 +85,7 @@ function pde(string, options) {
 		this.gen_program();
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/** Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.
 	 *
 	 * This method is meant to only be called by the grapher class.  It 
@@ -78,7 +93,7 @@ function pde(string, options) {
 	 * states in the Jacobi kernel).  Additionally, it ensures that a 
 	 * framebuff object is instantiated.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -97,7 +112,7 @@ function pde(string, options) {
 		this.fbo = this.gl.createFramebuffer();
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/** All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
@@ -111,7 +126,7 @@ function pde(string, options) {
 	 * as we are trying to visualize the result as a surface, it becomes
 	 * important to have sufficient sampling.
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		/*
@@ -212,7 +227,7 @@ function pde(string, options) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Calculate the next iteration of the Jacobi kernel
+	/** Calculate the next iteration of the Jacobi kernel
 	 *
 	 * As this primitive involves a two-pass process, the first (or in
 	 * some cases, the first few) are to calculate iterations of the Jacobi
@@ -232,7 +247,7 @@ function pde(string, options) {
 	 *
 	 * It uses ping-pong rendering to accomplish the calculations.
 	 *
-	 * \param scr is the current screen object, passed in from draw
+	 * @param {screen} scr is the current screen object, passed in from draw
 	 */
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
@@ -272,7 +287,7 @@ function pde(string, options) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/** Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function.
 	 *
 	 * This method can be called at any time after initialization to draw
@@ -283,7 +298,7 @@ function pde(string, options) {
 	 * rendering to calculate an approximation to the PDE solution.  Then it
 	 * interprets this result as a height-field surface.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.sfq();
@@ -322,7 +337,7 @@ function pde(string, options) {
 		
 	}
 	
-	/* \brief Generates the shader programs necessary to render this
+	/** Generates the shader programs necessary to render this
 	 * primitive
 	 *
 	 * This is a two-pass algorithm, and each pass requires a different
