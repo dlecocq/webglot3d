@@ -195,9 +195,7 @@ function sphere(x, y, z, radius, options, color) {
 	}
 	
 	/** Generates the shader programs necessary to render this
-	 * primitive.  Generates the shader program, and replaces 
-	 * the code blocks (if necessary) to do coordinate conversions
-	 * in the shader.
+	 * primitive.  The sphere needs only a pass-through shader
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/sphere.vert");

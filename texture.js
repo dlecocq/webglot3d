@@ -1,16 +1,25 @@
-/* http://learningwebgl.com/blog/?p=507
+/** @class
+ * A helper class to read textures and use them
+ *
+ * @constructor
+ * @param {WebGLContext} context the context we'll use to \
+ *     generate the texture
+ * @param {String} src the path of the image
  */
 function texture(context, src) {
-	
+	/** The WebGLTexture we'll generate */
 	this.texture = null;
 	this.image	 = null;
-	
-	this.gl			 = context;
-	this.src		 = src;
-	
+	/** The WebGLContext we'll use */
+	this.gl	     = context;
+	/** The path to the image file. */
+	this.src     = src;
+	/** The width of the image */
 	this.width   = 0;
+	/** The height of the image */
 	this.height  = 0;
 
+	/** The callback handler for when the data is read */
 	this.handler = function() {
 		this.gl.console.log("Loaded " + this.src);
 		this.gl.enable(this.gl.TEXTURE_2D);
@@ -25,6 +34,7 @@ function texture(context, src) {
 		this.height = this.image.height;
 	}
 
+	/** Start reading the image */
 	this.initialize = function() {
 		this.texture = this.gl.createTexture();
 		this.image = new Image();
@@ -35,6 +45,7 @@ function texture(context, src) {
 		this.image.src = this.src;
 	}
 	
+	/** Bind the texture */
 	this.bind = function() {
 		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);

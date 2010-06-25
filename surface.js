@@ -1,4 +1,5 @@
-/* \brief This class encapsulates the surface primitive.
+/** @class
+ * This class encapsulates the surface primitive.
  * 
  * It requires the OpenGL context to be passed in, though 
  * this is an incredibly ugly interface, and hopefully I 
@@ -13,36 +14,50 @@
  * Currently options is not used, but eventually it will
  * include support for what coordinate space this function
  * is defined in, and so forth.
+ *
+ * @constructor
+ * @param {String} string the function we should render
+ * @param {int} options to specify the coordinate system to use
+ * @param {String} source the path to an image to use as the texture
+ * 
+ * @requires primitive
+ * @requires screen
  */
 function surface(string, options, source) {
-	
+	/** The WebGLContext we'll be using throughout */
 	this.gl   = null;
+	/** The function we should be rendering */
 	this.f    = string;
 	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that stores the coordinate information */
 	this.vertexVBO	= null;
+	/** The VBO that stores texture coordinate information */
 	this.textureVBO = null;
+	/** The VBO that stores indices */
 	this.indexVBO	= null;
+	/** The number of elements in indexVBO */
+	this.index_ct   = 0;
 	
-	/* A more apt name might be "resolution," as count is the number
+	/** A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
 	this.count		= 250;
-	this.index_ct   = 0;
 	
+	/** The texture we should apply to the surface */
 	this.texture    = null;
-	this.source     = source || "textures/deisa.jpg";
-	//"textures/saudi-flag.gif"
-	//"textures/dan.jpg"
+	/** The path to the image we should use as texture.  Defaults to kaust's logo */
+	this.source     = source || "textures/kaust.png";
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/** This function is called by the grapher class so that the surface
+	 * has access to relevant information, but it is only initialized
+	 * when grapher deems appropriates
+	 *
+	 * @param {WebGLContext} gl a WebGL context, provided by grapher
+	 * @param {screen} scr is a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters array of strings that will be used as parameters to the function
+	 *
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		this.gl = gl;
@@ -51,20 +66,27 @@ function surface(string, options, source) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	/** Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.
+	 *
+	 * This method is meant to only be called by the grapher class. It
+	 * just makes a call to generate the vertex buffer object to draw
+	 *
+	 * @param {screen} scr required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		this.texture = new texture(this.gl, this.source);
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
+	/** All primitives are responsible for knowing how to construct
+	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
+	 *
+	 * This class generates a dense triangular mesh, and evaluates the
+	 * function at each of those points
+	 *
+	 * @param {screen} src information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -158,7 +180,7 @@ function surface(string, options, source) {
 		this.index_ct = indices.length;
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
+	/** Every primitive is also responsible for knowing how to draw itself,
 	 * and that behavior is encapsulated in this function. It should be 
 	 * completely self-contained, returning the context state to what it
 	 * was before it's called.
@@ -185,10 +207,10 @@ function surface(string, options, source) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/** Generates the shader programs necessary to render this
+	 * primitive.  Generates the shader program, and replaces 
+	 * the code blocks (if necessary) to do coordinate conversions
+	 * in the shader.
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/surface.vert").replace("USER_FUNCTION", this.f);
