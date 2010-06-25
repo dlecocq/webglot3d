@@ -1,44 +1,61 @@
-/* This class encapsulates the sphere primitive.
- *
- * It accepts x, y coordinates for its position
+/** @class
+ * This class encapsulates the sphere primitive.
  *
  * Currently options is not used, but eventually it will
  * include support for what coordinate space this function
  * is defined in, and so forth.
+ *
+ * @constructor
+ * @param {Number} x the x coordinate of the center of the sphere
+ * @param {Number} y the y coordinate of the center of the sphere
+ * @param {Number} z the z coordinate of the center of the sphere
+ * @param {Number} radius the radius of the sphere
+ * @param {int} options WARNING - currently only a placeholder
+ * @param {Array(r,g,b,a)} color the rgba components of the color
+ *
+ * @requires primitive
+ * @requires screen
  */
 function sphere(x, y, z, radius, options, color) {
-	
+	/** The WebGLContext we'll be using */
 	this.gl   = null;
-	
+	/** The x coordinate */
 	this.x    = x;
+	/** The y coordinate */
 	this.y    = y;
+	/** The z coordinate */
 	this.z    = z;
+	/** The radius, defaulted to 1 */
 	this.r    = radius || 1; 
-	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that holds coordinate information */
 	this.vertexVBO	= null;
+	/** The VBO that holds texture information */
 	this.textureVBO = null;
+	/** The VBO that holds indices of coordinates to render */
 	this.indexVBO	= null;
+	/** The number of entries in indexVBO */
+	this.index_ct   = 0;
 	
-	/* A more apt name might be "resolution," as count is the number
+	/** A more apt name might be "resolution," as count is the number
 	 * of samples along each axis (x and y) samples are taken. Being
 	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
 	 */
 	this.count		= 50;
-	this.index_ct   = 0;
 	
+	/** @deprecated The texture of to apply to the surface */
 	this.texture    = null;
+	/** The color of the sphere, defaulted to a reasonable random color */
 	this.color      = color || [Math.random() * 0.8 + 0.2, Math.random() * 0.8 + 0.2, Math.random() * 0.8 + 0.2, 1];
-	//"textures/saudi-flag.gif"
-	//"textures/dan.jpg"
 
-	/* This will likely be depricated, but it currently is hidden from
-	 * the end programmer.
+	/** This function is called by the grapher class so that the sphere
+	 * has access to relevant information, but it is only initialized
+	 * when grapher deems appropriates
+	 *
+	 * @param {WebGLContext} gl a WebGL context, provided by grapher
+	 * @param {screen} scr is a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters array of strings that will be used as parameters to the function
+	 *
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr) {
 		this.gl = gl;
@@ -46,20 +63,23 @@ function sphere(x, y, z, radius, options, color) {
 		this.gen_program();
 	}
 	
-	/* Refresh is a way for the grapher instance to notify surface of
-	 * changes to the viewing environment.  All the new information is
-	 * contained in the screen object passed in, including the minimum
-	 * and maximum x and y values for the surface. In the 3D implemen-
-	 * tation, it's not commonly-used.
+	/** Refresh is a way for the grapher instance to notify surface
+	 * of changes to the viewing environment.  This does not really
+	 * apply to this, the sphere, but it is set up this way to adhere
+	 * to the pattern of primitives that has developed.
+	 *
+	 * @param {screen} scr required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
 		this.texture = new texture(this.gl, this.source);
 	}
 
-	/* All primitives are responsible for knowing how to construct them-
-	 * selves and so this is the function that constructs the VBO for
-	 * the objects.
+	/** Construct an "ok" mesh for the sphere.  A better triangulation
+	 * is possible, but for these intents and purposes, ultimately
+	 * unnecessary.
+	 *
+	 * @param {screen} scr the current screen
 	 */
 	this.gen_vbo = function(scr) {
 		var vertices = [];
@@ -147,10 +167,10 @@ function sphere(x, y, z, radius, options, color) {
 		this.index_ct = indices.length;
 	}
 	
-	/* Every primitive is also responsible for knowing how to draw itself,
-	 * and that behavior is encapsulated in this function. It should be 
-	 * completely self-contained, returning the context state to what it
-	 * was before it's called.
+	/** Every primitive is also responsible for knowing how to draw
+	 * itself, and that behavior is encapsulated in this function.
+	 *
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		this.setUniforms(scr);
@@ -174,10 +194,10 @@ function sphere(x, y, z, radius, options, color) {
 		this.gl.disableVertexAttribArray(1);
 	}
 	
-	/* Any class who inherits from the primitive class gets free access
-	 * to shader compilation and program linking, but only must provide
-	 * the fragment and vertex shader sources.  The primitive class also
-	 * provides free access to functionality for reading files.
+	/** Generates the shader programs necessary to render this
+	 * primitive.  Generates the shader program, and replaces 
+	 * the code blocks (if necessary) to do coordinate conversions
+	 * in the shader.
 	 */
 	this.gen_program = function() {
 		var vertex_source = this.read("shaders/sphere.vert");
