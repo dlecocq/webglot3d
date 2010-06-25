@@ -1,5 +1,6 @@
-/* \brief This class encapsulates the 3D PDE primitive.
+/** This class encapsulates the 3D PDE primitive.
  *
+ * @class
  * Test class - This class approximates a 3D PDE through successive
  * Jacobi iterations.  It uses the same tilling / packing technique
  * as the datasurface class, but instead of merely interpreting the
@@ -9,51 +10,60 @@
  * isosurface, in the exact same fashion as the datasurface. At this
  * point in development, everything is hard-coded in the shader.
  *
- * \param string NOT USED in this version
- * \param options NOT USED in this version
+ * @constructor
+ * @param {String} string NOT USED in this version
+ * @param {int} options NOT USED in this version
+ * @requires primitive
+ * @requires texture
+ * @requires screen
  */
 function pde3d(string, options) {
-	
+	/** The WebGLContext we'll be using */
 	this.gl   = null;
+	/** @deprecated */
 	this.f    = string;
-	
-	/* This is one way in which the WebGL implementation of OpenGLot
-	 * differs greatly from the C++ implementatiln.  WebGL (OpenGL 
-	 * ES 2.0) does not support display lists, and instead I've moved
-	 * the implementation to use vertex-buffer objects.  These are
-	 * those.
-	 */
+	/** The VBO that holds coordinate information */
 	this.vertexVBO	   = null;
+	/** The VBO that holds texture information */
 	this.textureVBO    = null;
 	this.inttexVBO     = null;
 	this.real_coordVBO = null;
+	/** The VBO that holds the indices to render */
 	this.indexVBO	   = null;
-	
-	/* A more apt name might be "resolution," as count is the number
-	 * of samples along each axis (x and y) samples are taken. Being
-	 * set to 100 means that it will produce 2 * 100 * 100 triangles.
-	 */
-	this.count			= 15;
+	/** The number of elements in indexVBO */
 	this.index_ct   = 0;
 	
+	/** @deprecated */
+	this.count		= 15;
+	
+	/** Used for swapping ping and pong textures */
 	this.tmp    = null;
+	/** One of the textures used for ping-pong rendering */
 	this.ping   = null;
+	/** The other texture used for ping-pong rendering */
 	this.pong   = null;
+	/** The FBO into which we'll be rendering in the calculation */
 	this.fbo    = null;
+	/** @deprecated The renderbuffer */
 	this.rb     = null;
-	
+	/** The parameters that should be added to the shader source */
 	this.parameters = null;
-	
+	/** The width of the domain */
 	this.width    = 64;
+	/** The height of the domain */
 	this.height   = 64;
+	/** The number of columns to use in the tiling of the volume data */
 	this.b_width  = 8;
+	/** The number of rows to use in the tiling of the volume data */
 	this.b_height = 8;
+	/** The depth of the domain */
 	this.depth    = this.b_width * this.b_height;
+	/** @private */
 	this.level    = 0;
-	
+	/** The shader program used to perform the calculations */
 	this.calc_program = null;
 
-	/* \brief This function is called by the grapher class so that the box
+	/** This function is called by the grapher class so that the box
 	 * has access to relevant information, but it is only initialized
 	 * when grapher deems appropriates
 	 *
@@ -61,11 +71,11 @@ function pde3d(string, options) {
 	 * simply copies all the parameters passed into it as local objects,
 	 * and then generates the shader programs.
 	 *
-	 * \param gl is an WebGL context, provided by grapher
-	 * \param scr is a reference to the screen object, provided by grapher
-	 * \param parameters is an array of strings that will be used as parameters to the function
+	 * @param {WebGLContext} gl is an WebGL context, provided by grapher
+	 * @param {screen} scr is a reference to the screen object, provided by grapher
+	 * @param {Array(String)} parameters is an array of strings that will be used as parameters to the function
 	 *
-	 * \sa grapher
+	 * @see grapher
 	 */
 	this.initialize = function(gl, scr, parameters) {
 		/*
@@ -78,14 +88,14 @@ function pde3d(string, options) {
 		this.gen_program();
 	}
 	
-	/* \brief Refresh is a way for the grapher instance to notify surface
+	/** Refresh is a way for the grapher instance to notify surface
 	 * of changes to the viewing environment.
 	 *
 	 * This method is meant to only be called by the grapher class.  It 
 	 * initializes the ping-pong textures used for storing itermediate
 	 * approximations from the Jacobi kernel.
 	 *
-	 * \param scr is required for information about the viewable screen
+	 * @param {screen} scr is required for information about the viewable screen
 	 */
 	this.refresh = function(scr) {
 		this.gen_vbo(scr);
@@ -111,7 +121,7 @@ function pde3d(string, options) {
 		this.fbo = this.gl.createFramebuffer();
 	}
 
-	/* \brief All primitives are responsible for knowing how to construct
+	/** All primitives are responsible for knowing how to construct
 	 * themselves and so this is the function that constructs the VBO for
 	 * the objects.
 	 *
@@ -119,7 +129,7 @@ function pde3d(string, options) {
 	 * of a cube for the isosurface rendering.  It also uses one of the 
 	 * faces as the screen-filling quad for calculating the Jacobi iterates
 	 *
-	 * \param src is information about the viewable screen
+	 * @param {screen} src is information about the viewable screen
 	 */
 	this.gen_vbo = function(scr) {
 		// Victory! It works!
@@ -273,7 +283,7 @@ function pde3d(string, options) {
 		this.index_ct = indices.length;
 	}
 	
-	/* \brief Calculate the next iteration of the IBFV algorithm
+	/** Calculate the next iteration of the IBFV algorithm
 	 *
 	 * As this primitive involves a two-pass process, the first pass
 	 * is to advance the PDE solver.  This functionality is contained
@@ -292,13 +302,13 @@ function pde3d(string, options) {
 	 * ially enable the same order accuracy in all directions, but
 	 * this seems non-trivial upon initial inspection.
 	 *
-	 * \param scr is the current screen object, passed in from draw
+	 * @param {screen} scr is the current screen object, passed in from draw
 	 */
 	this.calculate = function(scr) {
 		this.setUniforms(scr, this.calc_program);
 		this.gl.viewport(0, 0, this.width * this.b_width, this.height * this.b_height);
 		
-    this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
+    	this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "uSampler"), 0);
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "width")   , this.width   );
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "height")  , this.height  );
 		this.gl.uniform1i(this.gl.getUniformLocation(this.calc_program, "b_width") , this.b_width );
@@ -350,7 +360,7 @@ function pde3d(string, options) {
 		*/
 	}
 	
-	/* \brief Every primitive is also responsible for knowing how to draw
+	/** Every primitive is also responsible for knowing how to draw
 	 * itself, and that behavior is encapsulated in this function.
 	 *
 	 * This method can be called at any time after initialization to draw
@@ -361,7 +371,7 @@ function pde3d(string, options) {
 	 * rendering to calculate the iterations, and then performs isosurface
 	 * rendering in exactly the same way as the datasurface.
 	 *
-	 * \param scr the current screen
+	 * @param {screen} scr the current screen
 	 */
 	this.draw = function(scr) {
 		scr.sfq();
@@ -415,7 +425,7 @@ function pde3d(string, options) {
 		
 	}
 	
-	/* \brief Generates the shader programs necessary to render this
+	/** Generates the shader programs necessary to render this
 	 * primitive
 	 *
 	 * This is a two-pass algorithm, and each pass requires a different
