@@ -465,17 +465,22 @@ function grapher() {
 		var context = this.getContext();
 	
 		var w = canvas.clientWidth;
-		var h = canvas.clientHeight
+		var h = canvas.clientHeight;
 	
 		/* If the width and height of the resized canvas are already
 		 * the stored sizes, return and do nothing.
 		 */
+		/*
 		if (w == this.scr.width && h == this.scr.height) {
 			return;
 		}
+		*/
+		
+		canvas.width = w;
+		canvas.height = h;
 		
 		this.gl.console.log("Setting viewport to be (" + w + " x " + h + ")");
-		//context.viewport(0, 0, w, h);
+		context.viewport(0, 0, w, h);
 		
 		this.scr.width = w;
 		this.scr.height = h;
