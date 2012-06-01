@@ -75,12 +75,13 @@ function grapher() {
 	 * only browser specific, but version specific as well.
 	 */
 	this.getContext = function() {
+		if (this.gl)
+			return this.gl;
+
 		/* Though the canvas name is hard-coded, it will likely be moved
 		 * to a parameter if multiple view contexts are desired.
 		 */
 		var canvas = document.getElementById("glot");
-	
-		var gl = null;
 	
 		/* These seem to the be the context names for most current imp-
 		 * lementations around now.
@@ -89,15 +90,35 @@ function grapher() {
 		
 		for (var i = 0; i < strings.length; ++i) {
 			try {
-				if (!gl) {
-					gl = canvas.getContext(strings[i]);
+				if (!this.gl) {
+					this.gl = canvas.getContext(strings[i]);
 				} else {
 					break;
 				}
 			} catch (e) { }
 		}
 	
-		return gl;
+		// The vast majority of this library uses floating-point textures, so
+		// require the availability of the OES_texture_float extension here.
+		if (!this.gl.getExtension("OES_texture_float")) {
+			this.gl = null;
+			throw "Requires the OES_texture_float extension";
+		}
+
+		/*
+		// Uncomment, and include webgl-debug.js in .html file (must copy from Khronos repository),
+		// to debug WebGL errors.
+		function throwOnGLError(err, funcName, args) {
+			var errorString = WebGLDebugUtils.glEnumToString(err) +
+				" was caused by call to " + funcName;
+			throw errorString;
+		};
+
+		if (this.gl)
+			this.gl = WebGLDebugUtils.makeDebugContext(this.gl, throwOnGLError);
+		*/
+
+		return this.gl;
 	}
 	
 	/** This returns the 3D point clicked, on a unit glass ball
@@ -339,21 +360,19 @@ function grapher() {
 
 		/* Enable some features I'd like to use.
 		 */
-		gl.enable(gl.POINT_SMOOTH);
-		gl.enable(gl.VERTEX_ARRAY);
-		gl.enable(gl.LINE_SMOOTH);
 		gl.enable(gl.DEPTH_TEST);
 		gl.enable(gl.BLEND);
 	
 		// Other smoothness and blending options
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-		gl.hint(gl.LINE_SMOOTH_HINT, gl.DONT_CARE);
 	
 		// Set the line width and point size
 		gl.lineWidth(1.5);
 		
 		this.setDomain(-2, 2, -2, 2);
 		
+		// FIXME: must set the point size using gl_PointSize in the vertex shader.
+
 		/* WebGL doesn't support this, it seems.  OpenGL ES 2.0 elliminated
 		 * it to obviate the need for dedicated hardware for this task,
 		 * which is a luxury in some sense.

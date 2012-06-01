@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+precision mediump float;
+
 uniform mat4 u_modelViewMatrix;
 
 varying vec3 direction;
@@ -74,7 +76,7 @@ void main () {
 	vec3 point;
 	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
 
-	float s   = 0.0;
+	float s   = 0.01;
 	float ds  = 0.05;
 
 	float h = 0.01;
@@ -89,7 +91,11 @@ void main () {
 	point = start + direction * s;
 	v_previous = function(point.x, point.y, point.z);
 
-	for (s = 0.01; s < 6.92; s += ds) {
+	// Number of iterations = [0.01...6.92) incrementing by ds
+
+	for (int ii = 0; ii < 138; ++ii) {
+		s = 0.01 + float(ii) * ds;
+
 		// Determine the point you're sampling, and sample it
 		point = start + direction * s;
 		value = function(point.x, point.y, point.z);

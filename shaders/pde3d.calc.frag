@@ -19,7 +19,7 @@
  * SOFTWARE.
  */
 
-#version 120
+precision mediump float;
 
 varying vec2 vTextureCoord;
 
