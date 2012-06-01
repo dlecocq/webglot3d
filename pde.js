@@ -235,15 +235,15 @@ function pde(string, options) {
 		
 		this.vertexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(vertices), this.gl.STATIC_DRAW);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
 
 		this.textureVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.textureVBO);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(texture), this.gl.STATIC_DRAW);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(texture), this.gl.STATIC_DRAW);
 		
 		this.indexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
-		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray(indices), this.gl.STATIC_DRAW);
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
 		
 		this.index_ct = indices.length;
 	}
@@ -297,7 +297,6 @@ function pde(string, options) {
 		// First, set up Framebuffer we'll render into
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.fbo);
 		this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.ping, 0);
-		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.pong);
 		this.checkFramebuffer();
 
@@ -349,7 +348,6 @@ function pde(string, options) {
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 		
 		// the recently-drawn texture
-		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.ping);
 		this.gl.drawElements(this.gl.TRIANGLE_STRIP, this.index_ct, this.gl.UNSIGNED_SHORT, 0);
 		
@@ -373,12 +371,12 @@ function pde(string, options) {
 		var frag_source   = this.read("shaders/pde.calc.frag");//.replace("USER_FUNCTION", this.f);
 		//*/
 		
-		this.calc_program = this.compile_program(vertex_source, frag_source);
+		this.calc_program = this.compile_program(vertex_source, frag_source, { "position": 0, "aTextureCoord": 1 });
 
 		var vertex_source = this.read("shaders/pde.vert");
 		var frag_source	  = this.read("shaders/pde.frag");
 		
-		this.program = this.compile_program(vertex_source, frag_source);
+		this.program = this.compile_program(vertex_source, frag_source, { "position": 0, "aTextureCoord": 1 });
 	}
 }
 

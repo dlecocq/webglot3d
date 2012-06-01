@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+precision mediump float;
+
 uniform mat4 u_modelViewMatrix;
 
 varying vec3 direction;

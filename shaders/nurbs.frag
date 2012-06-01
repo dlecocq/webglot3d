@@ -19,6 +19,8 @@
  * SOFTWARE.
  */
 
+precision mediump float;
+
 varying vec2 coord;
 varying vec3 normal;
 varying vec3 light;

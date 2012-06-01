@@ -60,8 +60,9 @@ function primitive(context) {
 	 *
 	 * @param {String} vertex_source the source of the vertex shader
 	 * @param {String} frag_source the source of the fragment shader
+         * @param {Object} [bound_attribs] optional map of names and indices of vertex attributes to bind
 	 */
-	this.compile_program = function(vertex_source, frag_source) {
+	this.compile_program = function(vertex_source, frag_source, bound_attribs) {
 		// Add user parameters
 		if (this.parameters) {
 			console.log("Adding parameters to shader source");
@@ -73,8 +74,12 @@ function primitive(context) {
 			vertex_source = vertex_source.replace("// USER_PARAMETERS", params);
 			frag_source   = frag_source.replace(  "// USER_PARAMETERS", params);
 			
-			vertex_source = vertex_source.replace(/([^\d\w\.]|^)(\d+)(?![\w\.\d])/g, "$1$2.0");
-			frag_source   = frag_source.replace(/([^\d\w\.]|^)(\d+)(?![\w\.\d])/g, "$1$2.0");
+			// These regexps are a hack to try to replace integer numerical constants
+			// with floating-point ones, presumably to fix type conversion errors. They
+			// break loop iteration so are being removed. The shaders themselves should
+			// be manually fixed.
+			// vertex_source = vertex_source.replace(/([^\d\w\.]|^)(\d+)(?![\w\.\d])/g, "$1$2.0");
+			// frag_source   = frag_source.replace(/([^\d\w\.]|^)(\d+)(?![\w\.\d])/g, "$1$2.0");
 		}
 		
 		/*
@@ -120,16 +125,12 @@ function primitive(context) {
 		this.gl.attachShader(this.program, vertex_shader);
 		this.gl.attachShader(this.program, frag_shader);
 
-		// Bind attribute locations - this could be very dangerous.
-		//*
-		this.gl.bindAttribLocation(this.program, 0, "position");
-		this.gl.bindAttribLocation(this.program, 1, "aTextureCoord");
-		//*/
-		/*
-		this.gl.bindAttribLocation(this.program, 0, "vPosition");
-		this.gl.bindAttribLocation(this.program, 1, "vTexCoord");
-		*/
-		
+                // Bind any specified vertex attribute locations
+                if (bound_attribs) {
+			for (var name in bound_attribs) {
+				this.gl.bindAttribLocation(this.program, bound_attribs[name], name);
+			}
+                }
 
 		// Link the program
 		this.gl.linkProgram(this.program);
@@ -210,9 +211,9 @@ function primitive(context) {
 			scale_location      = this.gl.getUniformLocation(program, "scale");
 			color_location      = this.gl.getUniformLocation(program, "color");
 
-			this.gl.uniformMatrix4fv(modelview_location , false, scr.modelview.getAsWebGLFloatArray());
-			this.gl.uniformMatrix4fv(projection_location, false, scr.projection.getAsWebGLFloatArray());
-			this.gl.uniformMatrix4fv(inversemv_location , false, scr.inversemv.getAsWebGLFloatArray());
+			this.gl.uniformMatrix4fv(modelview_location , false, scr.modelview.getAsFloat32Array());
+			this.gl.uniformMatrix4fv(projection_location, false, scr.projection.getAsFloat32Array());
+			this.gl.uniformMatrix4fv(inversemv_location , false, scr.inversemv.getAsFloat32Array());
 			this.gl.uniform1f(time_location, scr.wall.time());
 
 			if (this.color) {

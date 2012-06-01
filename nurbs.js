@@ -299,15 +299,15 @@ function nurbs(string, options) {
 		
 		this.vertexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexVBO);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(vertices), this.gl.STATIC_DRAW);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(vertices), this.gl.STATIC_DRAW);
 		
 		this.lVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.lVBO);
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new WebGLFloatArray(ls), this.gl.STATIC_DRAW);
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(ls), this.gl.STATIC_DRAW);
 		
 		this.indexVBO = this.gl.createBuffer();
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexVBO);
-		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray(indices), this.gl.STATIC_DRAW);
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.gl.STATIC_DRAW);
 		
 		this.index_ct = indices.length;
 	}
@@ -337,9 +337,6 @@ function nurbs(string, options) {
 		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "cpCounts"  ), this.cps.length, this.cps[0].length);
 		this.gl.uniform2f(this.gl.getUniformLocation(this.program, "n"         ), this.nu, this.nv);
 		
-		this.gl.bindAttribLocation(this.program, 0, "position");
-	    this.gl.bindAttribLocation(this.program, 1, "ls");
-		
 		this.gl.enableVertexAttribArray(0);
 		this.gl.enableVertexAttribArray(1);
 		
@@ -356,7 +353,6 @@ function nurbs(string, options) {
 		this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 		
 		// the recently-drawn texture
-		this.gl.enable(this.gl.TEXTURE_2D);
 		this.gl.activeTexture(this.gl.TEXTURE0);
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this.usTex);
 		this.gl.activeTexture(this.gl.TEXTURE1);
@@ -386,7 +382,7 @@ function nurbs(string, options) {
 		var vertex_source = this.read("shaders/nurbs.vert").replace("USER_FUNCTION", this.f);
 		var frag_source   = this.read("shaders/nurbs.frag").replace("USER_FUNCTION", this.f);
 
-		this.program      = this.compile_program(vertex_source, frag_source);
+		this.program      = this.compile_program(vertex_source, frag_source, { "position": 0, "ls": 1 });
 	}
 }
 

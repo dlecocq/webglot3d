@@ -78,8 +78,7 @@ void main() {
 
 //*
 
-// Is this necessary?
-#version 120
+precision mediump float;
 
 varying vec3 direction;
 varying vec3 vposition;
